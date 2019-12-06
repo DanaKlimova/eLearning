@@ -1,0 +1,4 @@
+__pycache__/
+*.py[cod]
+eLearningVenv/
+eLearning/db.sqlite3
