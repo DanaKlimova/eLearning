@@ -1,0 +1,42 @@
+<html>
+
+<head>
+    <title>
+    {% block title %}
+    Base
+    {% endblock %}
+    </title>
+    <!-- HEADER-->
+    {% include 'main/snippets/header.html' %}
+    <!-- END HEADER-->
+    <!-- CSS -->
+    {% block styles %}
+    {% endblock %}
+    <!-- END CSS -->
+</head>
+
+<body class="p-3 mb-2 bg-light text-dark">
+    <!-- BODY-->
+    <style type='text/css'>
+        .main{
+            min-height: 100vh;
+            height: 100%;
+        }
+    </style>
+    <div class='main'>
+        {% block content %}
+            Base
+        {% endblock %}
+    </div>
+
+    <!-- END BODY-->
+    <!-- FOOTER -->
+    {% include 'main/snippets/footer.html' %}
+    <!-- END FOOTER -->
+    <!-- JS -->
+    {% block js_scripts %}
+    {% endblock %}
+    <!-- END JS -->
+</body>
+
+</html>
