@@ -1,0 +1,42 @@
+{% extends "main/base.html" %}
+{% block title %}
+Account
+{% endblock %}
+
+{% block styles %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'accounts/css/base.css' %}"/>
+{% endblock %}
+
+{% block content %}
+<form class="form-signin" id="account_form" method="post" action="{% url 'account' %}">
+    {% csrf_token %}
+    <h1 class="h3 mb-3 font-weight-normal">Account</h1>
+
+    <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required
+        value="{{account_form.initial.email}}">
+
+    <input type="text" name="first_name" id="inputFirstName" class="form-control" placeholder="First name" required
+        autofocus value="{{account_form.initial.first_name}}">
+
+    <input type="text" name="last_name" id="inputLastName" class="form-control" placeholder="Last name" required
+        value="{{account_form.initial.last_name}}">
+
+    {% for field in account_form %}
+    <p>
+        {% for error in field.errors%}
+        <p style="color:red;">{{ error|default:"" }}</p>
+        {% endfor %}
+    </p>
+    {% endfor %}
+    {% if account_form.non_field_errors %}
+    <p style="color:red;">{{ account_form.non_field_errors|default:"" }}</p>
+    {% endif %}
+
+    {% if success_message %}
+    <p style="color: green; text-align: center;">{{success_message}}</p>
+    {% endif %}
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
+</form>
+{% endblock %}
