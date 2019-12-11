@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 
 from accounts.forms import (
     AccountAuthenticationForm,
@@ -77,3 +77,8 @@ def account_view(request):
         )
     context["account_form"] = form
     return render(request, "accounts/account.html", context=context)
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("home")
