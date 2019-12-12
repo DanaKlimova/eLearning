@@ -6,6 +6,8 @@ from accounts.models import Account
 
 
 class AccountAuthenticationForm(forms.ModelForm):
+    user = None
+
     class Meta:
         model = Account
         fields = ("email", "password")
@@ -13,12 +15,20 @@ class AccountAuthenticationForm(forms.ModelForm):
             'password': forms.PasswordInput,
         }
 
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def clean(self):
         if self.is_valid():
             email = self.cleaned_data.get("email")
             password = self.cleaned_data.get("password")
-            if not authenticate(email=email, password=password):
+            self.user = authenticate(email=email, password=password)
+            if not self.user:
                 raise forms.ValidationError("Invalid email or password")
+
+    def get_user(self):
+        if self.is_valid():
+            return self.user
 
 
 class RegistrationForm(UserCreationForm):
