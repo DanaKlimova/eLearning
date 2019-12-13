@@ -14,29 +14,29 @@ Register
     <h1 class="h3 mb-3 font-weight-normal">Register</h1>
     <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" autofocus
         required>
-    {% for error in registration_form.email.errors%}
+    {% for error in form.email.errors%}
     <p style="color:red;">{{ error|default:"" }}</p>
     {% endfor %}
     <input type="text" name="first_name" id="inputFirstName" class="form-control" placeholder="First name" required>
-    {% for error in registration_form.first_name.errors%}
+    {% for error in form.first_name.errors%}
     <p style="color:red;">{{ error|default:"" }}</p>
     {% endfor %}
     <input type="text" name="last_name" id="inputLastName" class="form-control" placeholder="Last name" required>
-    {% for error in registration_form.last_name.errors%}
+    {% for error in form.last_name.errors%}
     <p style="color:red;">{{ error|default:"" }}</p>
     {% endfor %}
     <input type="password" name="password1" id="inputPassword1" class="form-control" placeholder="Password" required>
     <input type="password" name="password2" id="inputPassword2" class="form-control" placeholder="Confirm password"
         required>
-    {% for error in registration_form.password1.errors%}
+    {% for error in form.password1.errors%}
     <p style="color:red;">{{ error|default:"" }}</p>
     {% endfor %}
-    {% for error in registration_form.password2.errors%}
+    {% for error in form.password2.errors%}
     <p style="color:red;">{{ error|default:"" }}</p>
     {% endfor %}
 
-    {% if registration_form.non_field_errors %}
-    <p style="color:red;">{{ registration_form.non_field_errors|default:"" }}</p>
+    {% if form.non_field_errors %}
+    <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
     {% endif %}
 
     <button class="btn btn-lg btn-primary btn-block" type="submit">Registration</button>
