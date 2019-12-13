@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.views import LoginView
-from django.views.generic.edit import FormView, UpdateView
+from django.contrib.auth.views import LoginView, LogoutView
+from django.views.generic.edit import FormView
 from django.http import HttpResponse
 
 from accounts.forms import (
@@ -40,12 +40,12 @@ class AccountView(FormView):
 
     def form_valid(self, form):
         form.initial = {
-                "email": self.request.POST.get("email"),
-                "first_name": self.request.POST.get("first_name"),
-                "last_name": self.request.POST.get("last_name"),
-            }
+            "email": self.request.POST.get("email"),
+            "first_name": self.request.POST.get("first_name"),
+            "last_name": self.request.POST.get("last_name"),
+        }
         form.save()
-        return render(self.request, self.template_name, self.get_context_data()) 
+        return render(self.request, self.template_name, self.get_context_data())
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -73,6 +73,5 @@ class AccountView(FormView):
         return self.render_to_response(self.get_context_data())
 
 
-def logout_view(request):
-    logout(request)
-    return redirect("home")
+class LogoutUser(LogoutView):
+    template_name = 'accounts/logout.html'
