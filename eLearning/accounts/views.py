@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.views import LoginView
-from django.views.generic.edit import FormView
-from django.http import HttpResponseRedirect
+from django.views.generic.edit import FormView, UpdateView
+from django.http import HttpResponse
 
 from accounts.forms import (
     AccountAuthenticationForm,
@@ -31,32 +31,46 @@ class RegistrationView(FormView):
         return HttpResponseRedirect(reverse(self.get_success_url()))
 
 
-def account_view(request):
-    if not request.user.is_authenticated:
-        return redirect("login")
+class AccountView(FormView):
+    template_name = "accounts/account.html"
+    form_class = AccountUpdateForm
+    model = Account
+    success_url = 'account'
+    extra_context = {"success_message": ""}
 
-    context = {}
+    def form_valid(self, form):
+        form.initial = {
+                "email": self.request.POST.get("email"),
+                "first_name": self.request.POST.get("first_name"),
+                "last_name": self.request.POST.get("last_name"),
+            }
+        form.save()
+        return render(self.request, self.template_name, self.get_context_data()) 
 
-    if request.method == "POST":
-        form = AccountUpdateForm(request.POST, instance=request.user)
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'instance': self.request.user})
+        return kwargs
+
+    def get_initial(self):
+        self.initial = {
+            "email": self.request.user.email,
+            "first_name": self.request.user.first_name,
+            "last_name": self.request.user.last_name,
+        }
+        return self.initial.copy()
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
         if form.is_valid():
-            form.initial = {
-                "email": request.POST.get("email"),
-                "first_name": request.POST.get("first_name"),
-                "last_name": request.POST.get("last_name"),
-            }
-            form.save()
-            context["success_message"] = "Account updated"
-    else:
-        form = AccountUpdateForm(
-            initial={
-                "email": request.user.email,
-                "first_name": request.user.first_name,
-                "last_name": request.user.last_name,
-            }
-        )
-    context["account_form"] = form
-    return render(request, "accounts/account.html", context=context)
+            self.extra_context["success_message"] = "Account updated"
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get(self, request, *args, **kwargs):
+        self.extra_context["success_message"] = ""
+        return self.render_to_response(self.get_context_data())
 
 
 def logout_view(request):
