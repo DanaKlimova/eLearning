@@ -1,16 +1,24 @@
+import logging
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+
+
+logger = logging.getLogger('eLearning')
 
 
 def _is_valid_credentials(func):
         def wrapper(self, email, first_name, last_name, password):
             if not email:
+                logger.warning("Attempt to create a user without email.")
                 raise ValueError("User must have an email address.")
             if not first_name:
+                logger.warning("Attempt to create a user without first name.")
                 raise ValueError("User must have a fisrt name.")
             if not last_name:
+                logger.warning("Attempt to create a user without last name.")
                 raise ValueError("User must have a last name.")
             if not password:
+                logger.warning("Attempt to create a user without password.")
                 raise ValueError("User must have a password.")
             func(email, first_name, last_name, password)
         return wrapper

@@ -128,3 +128,42 @@ AUTH_USER_MODEL = 'accounts.Account'
 
 # OVERRIDE DEFAULT LOGIN REDIRECT URL
 LOGIN_REDIRECT_URL = 'home'
+
+
+# LOGGING DICTCONFIG
+LOGGING_CONFIG = 'logging.config.dictConfig'
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'formatters' : {
+        'simple': {
+            'format': '{levelname} - {asctime} - {module} - {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': os.getenv("DJANGO_LOG_LEVEL"),
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'debug.log'),
+            'formatter': 'simple',
+        },
+        'console': {
+            'level': os.getenv("DJANGO_LOG_LEVEL"),
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    },
+    'loggers': {
+        'eLearning': {
+            'handlers': ['file', 'console'],
+            'level': os.getenv("DJANGO_LOG_LEVEL"),
+        },
+    },
+}

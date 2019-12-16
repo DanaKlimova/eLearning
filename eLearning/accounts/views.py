@@ -1,8 +1,11 @@
+import logging
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth import login, authenticate, logout
+from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic.edit import FormView
 from django.http import HttpResponse, HttpResponseRedirect
+
 
 from accounts.forms import (
     AccountAuthenticationForm,
@@ -12,9 +15,22 @@ from accounts.forms import (
 from accounts.models import Account
 
 
+logger = logging.getLogger('eLearning')
+
+
 class LoginUser(LoginView):
     template_name = 'accounts/login.html'
     authentication_form = AccountAuthenticationForm
+
+    def form_valid(self, form):
+        user = form.get_user()
+        login(self.request, user)
+        logger.info(f'Security check complete. Loged {user} in.')
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        logger.info("User entered invalid credentions. User didn't log in.")
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 class RegistrationView(FormView):
@@ -28,7 +44,12 @@ class RegistrationView(FormView):
         password = form.cleaned_data.get("password1")
         account = authenticate(email=email, password=password)
         login(self.request, account)
+        logger.info(f'{email} registered. Loged {email} in.')
         return HttpResponseRedirect(reverse(self.get_success_url()))
+
+    def form_invalid(self, form):
+        logger.info("User entered invalid credentions. User didn't register.")
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 class AccountView(FormView):
@@ -64,8 +85,10 @@ class AccountView(FormView):
         form = self.get_form()
         if form.is_valid():
             self.extra_context["success_message"] = "Account updated"
+            logger.info(f'{request.user} updated account data.')
             return self.form_valid(form)
         else:
+            logger.info(f"{request.user} didn't update account data.")
             return self.form_invalid(form)
 
     def get(self, request, *args, **kwargs):
@@ -75,3 +98,12 @@ class AccountView(FormView):
 
 class LogoutUser(LogoutView):
     template_name = 'accounts/logout.html'
+
+    @never_cache
+    def dispatch(self, request, *args, **kwargs):
+        logger.info(f'Loged {request.user} out.')
+        logout(request)
+        next_page = self.get_next_page()
+        if next_page:
+            return HttpResponseRedirect(next_page)
+        return super().dispatch(request, *args, **kwargs)
