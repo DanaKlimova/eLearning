@@ -13,17 +13,18 @@ def _is_valid_credentials(func):
                 raise ValueError("User must have an email address.")
             if not first_name:
                 logger.warning("Attempt to create a user without first name.")
-                raise ValueError("User must have a fisrt name.")
+                raise ValueError("User must have a first name.")
             if not last_name:
                 logger.warning("Attempt to create a user without last name.")
                 raise ValueError("User must have a last name.")
             if not password:
                 logger.warning("Attempt to create a user without password.")
                 raise ValueError("User must have a password.")
-            func(email, first_name, last_name, password)
+            func(self, email, first_name, last_name, password)
         return wrapper
 
 
+# TODO: fix transfering user from create user to create_superuser
 class AccountManager(BaseUserManager):
     @_is_valid_credentials
     def create_user(self, email, first_name, last_name, password):
@@ -35,15 +36,18 @@ class AccountManager(BaseUserManager):
 
         user.set_password(password)
         user.save(using=self._db)
+        # print(f'create user: {user}')
         return user
 
-    def create_superuser(self, email, first_name, last_name, password=None):
+    def create_superuser(self, email, first_name, last_name, password):
         user = self.create_user(
             email=self.normalize_email(email),
             first_name=first_name,
             last_name=last_name,
             password=password,
         )
+        user = Account.objects.get(email=email)
+        # print(f'create superuser: {user}')
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
