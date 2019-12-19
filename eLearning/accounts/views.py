@@ -5,6 +5,8 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic.edit import FormView
 from django.http import HttpResponse, HttpResponseRedirect
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 
 
 from accounts.forms import (
@@ -51,7 +53,7 @@ class RegistrationView(FormView):
         logger.info("User entered invalid credentions. User didn't register.")
         return self.render_to_response(self.get_context_data(form=form))
 
-
+@method_decorator(login_required, name='dispatch')
 class AccountView(FormView):
     template_name = "accounts/account.html"
     form_class = AccountUpdateForm
