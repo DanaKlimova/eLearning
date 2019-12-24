@@ -23,7 +23,7 @@ class Course(models.Model):
 
     owner_type = models.CharField(max_length=3, choices=COURSE_OWNER_TYPE_CHOICES,)
     owner_user = models.ForeignKey(
-        Account, null=True, on_delete=models.CASCADE, related_name='owner_user'
+        Account, null=True, on_delete=models.CASCADE, related_name='managed_courses'
     )
     min_pass_grade = models.FloatField(verbose_name='minimum pass grade')
     status = models.CharField(
@@ -33,7 +33,7 @@ class Course(models.Model):
     content = models.TextField()
     name = models.CharField(max_length=255)
     rating = models.FloatField()
-    students = models.ManyToManyField(Account, related_name='students')
+    students = models.ManyToManyField(Account, related_name='individual_courses')
 
 
 class CertificateTemplate(models.Model):
@@ -72,14 +72,14 @@ class Certificate(models.Model):
 class CourseEnrollment(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    certificate = models.ForeignKey(Certificate, on_delete=models.CASCADE)
-    current_page = models.ForeignKey(Page, on_delete=models.CASCADE)
+    certificate = models.ForeignKey(Certificate, on_delete=models.CASCADE, null=True)
+    current_page = models.ForeignKey(Page, on_delete=models.CASCADE, null=True)
     started_at = models.DateField()
-    finished_at = models.DateField()
-    grade = models.FloatField()
-    progress = models.FloatField()
-    rate = models.FloatField()
-    is_active = models.BooleanField()
+    finished_at = models.DateField(null=True)
+    grade = models.FloatField(null=True)
+    progress = models.FloatField(null=True)
+    rate = models.FloatField(null=True)
+    is_active = models.BooleanField(default=True)
 
 
 class Results(models.Model):
