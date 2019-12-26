@@ -8,10 +8,13 @@ Course list
 {% endblock %}
 
 {% block content %}
+<a href="#">
+    <button class="float-right btn btn-lg btn-primary" type="submit">Add</button>
+</a>
 <table class="table">
   <thead>
     <tr>
-    `<th scope="col">#</th>
+      <th scope="col">#</th>
       <th scope="col">Course</th>
       <th scope="col">Rating</th>
       <th scope="col">Edit</th>
@@ -23,7 +26,7 @@ Course list
         <th scope="row">{{forloop.counter}}</th>
         <td>{{course.name}}</td>
         <td>{{course.rating}}</td>
-        <td><a href="{% url 'course_detail' course.pk %}">edit</a></td>
+        <td><a href="{% url 'course_edit' course.pk %}">edit</a></td>
     </tr>
     {% endfor %}
   </tbody>

@@ -1,0 +1,67 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Course detail
+{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+<form class="form-course" id="course_form" method="post" action="{% url 'course_edit' pk %}">
+    {% csrf_token %}
+    <h1 class="h3 mb-3 font-weight-normal">Course</h1>
+
+    <p><input type="text" name="name" id="inputName" class="form-control" placeholder="Course name" required
+        value="{{form.initial.name}}" autofocus></p>
+    {% for error in form.name.errors%}
+    <p style="color:red;">{{ error|default:"" }}</p>
+    {% endfor %}
+
+    <p><input type="text" name="min_pass_grade" id="inputMinPassGrade" class="form-control" placeholder="Minimum pass grade" required
+        value="{{form.initial.min_pass_grade}}"></p>
+    {% for error in form.min_pass_grade.errors%}
+    <p style="color:red;">{{ error|default:"" }}</p>
+    {% endfor %}
+    
+    <p>
+    <label> Choose type:</label>
+        <select name="type" required>
+            {% for type, type_name in course_type %}
+            <option value="{{type}}">{{type_name}}</option>
+            {% endfor %}
+        </select>
+    </p>
+    {% for error in form.type.errors%}
+    <p style="color:red;">{{ error|default:"" }}</p>
+    {% endfor %}
+
+    <p>
+        <label> Choose status:</label>
+        <select name="status" required>
+            {% for status, status_name in course_status %}
+            <option value="{{status}}">{{status_name}}</option>
+            {% endfor %}
+        </select>
+    </p>
+    {% for error in form.status.errors%}
+    <p style="color:red;">{{ error|default:"" }}</p>
+    {% endfor %}
+
+    <p><input type="text" name="content" id="inputContent" class="form-control" placeholder="Description" required
+        autofocus value="{{form.initial.content}}"></p>
+    {% for error in form.content.errors%}
+    <p style="color:red;">{{ error|default:"" }}</p>
+    {% endfor %}
+
+    {% if form.non_field_errors %}
+    <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
+    {% endif %}
+
+    {% if success_message %}
+    <p style="color: green; text-align: center;">{{success_message}}</p>
+    {% endif %}
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
+</form>
+{% endblock %}
