@@ -8,7 +8,11 @@ Course detail
 {% endblock %}
 
 {% block content %}
+{% if 'edit' in view %}
 <form class="form-course" id="course_form" method="post" action="{% url 'course_edit' pk %}">
+{% else %}
+<form class="form-course" id="course_form" method="post" action="{% url 'course_create' %}">
+{% endif %}
     {% csrf_token %}
     <h1 class="h3 mb-3 font-weight-normal">Course</h1>
 

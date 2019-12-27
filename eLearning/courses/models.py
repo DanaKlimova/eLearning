@@ -32,7 +32,7 @@ class Course(models.Model):
     type = models.CharField(max_length=3, choices=COURSE_TYPE_CHOICES, default='pbl')
     content = models.TextField()
     name = models.CharField(max_length=255)
-    rating = models.FloatField()
+    rating = models.FloatField(null=True)
     students = models.ManyToManyField(Account, related_name='individual_courses')
 
 
