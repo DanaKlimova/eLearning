@@ -32,7 +32,7 @@ class CourseListView(ListView):
         return queryset
 
 
-# TODO: add js to focus on correct option on select field
+# TODO: transfer js code in static file
 @method_decorator(login_required, name='dispatch')
 class EditCourseView(FormView):
     template_name = "courses/course_edit.html"
@@ -83,12 +83,13 @@ class EditCourseView(FormView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs['pk'] = self.pk
-        kwargs['course_type'] = self.model.COURSE_TYPE_CHOICES
-        kwargs['course_status'] = self.model.COURSE_STATUS_CHOICES
+        kwargs['course_types'] = self.model.COURSE_TYPE_CHOICES
+        kwargs['course_statuses'] = self.model.COURSE_STATUS_CHOICES
+        kwargs['type'] = self.course_instance.type
+        kwargs['status'] = self.course_instance.status
         return kwargs
 
     def form_valid(self, form):
-        print(self.request.POST.get("type"))
         form.initial = {
             "name": self.request.POST.get("name"),
             "min_pass_grade": self.request.POST.get("min_pass_grade"),

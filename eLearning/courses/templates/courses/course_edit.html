@@ -26,8 +26,8 @@ Course detail
     
     <p>
     <label> Choose type:</label>
-        <select name="type" required>
-            {% for type, type_name in course_type %}
+        <select id="typeId" name="type" required>
+            {% for type, type_name in course_types %}
             <option value="{{type}}">{{type_name}}</option>
             {% endfor %}
         </select>
@@ -38,8 +38,8 @@ Course detail
 
     <p>
         <label> Choose status:</label>
-        <select name="status" required>
-            {% for status, status_name in course_status %}
+        <select id="statusId" name="status" required>
+            {% for status, status_name in course_statuses %}
             <option value="{{status}}">{{status_name}}</option>
             {% endfor %}
         </select>
@@ -64,4 +64,18 @@ Course detail
 
     <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
 </form>
+{% endblock %}
+
+{% block js_scripts %}
+<script>
+$(document).ready(function() {
+    selectElement('typeId', '{{ type }}')
+    selectElement('statusId', '{{ status }}')
+
+    function selectElement(id, valueToSelect) {
+        let element = document.getElementById(id);
+        element.value = valueToSelect;
+    }
+});
+</script>
 {% endblock %}
