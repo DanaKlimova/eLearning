@@ -1,6 +1,9 @@
 from django import forms
 
-from courses.models import Course
+from courses.models import (
+    Course,
+    Page,
+)
 
 
 class CourseForm(forms.ModelForm):
@@ -13,4 +16,13 @@ class CourseForm(forms.ModelForm):
             'content',
             'name',
             # 'students',
+        )
+
+
+class PageForm(forms.ModelForm):
+    class Meta:
+        model = Page
+        fields = (
+            'number',
+            'content',
         )

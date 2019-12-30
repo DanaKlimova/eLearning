@@ -8,66 +8,95 @@ Course detail
 {% endblock %}
 
 {% block content %}
-{% if 'edit' in view %}
-<form class="form-course" id="course_form" method="post" action="{% url 'course_edit' pk %}">
-{% else %}
-<form class="form-course" id="course_form" method="post" action="{% url 'course_create' %}">
-{% endif %}
-    {% csrf_token %}
-    <h1 class="h3 mb-3 font-weight-normal">Course</h1>
+<div class="row">
+    <div class="col">
+        {% if 'edit' in view %}
+        <form class="form-course" id="course_form" method="post" action="{% url 'course_edit' course_pk=course_pk %}">
+        {% else %}
+        <form class="form-course" id="course_form" method="post" action="{% url 'course_create' %}">
+        {% endif %}
+            {% csrf_token %}
+            <h1 class="h3 mb-3 font-weight-normal">Course</h1>
 
-    <p><input type="text" name="name" id="inputName" class="form-control" placeholder="Course name" required
-        value="{{form.initial.name}}" autofocus></p>
-    {% for error in form.name.errors%}
-    <p style="color:red;">{{ error|default:"" }}</p>
-    {% endfor %}
-
-    <p><input type="text" name="min_pass_grade" id="inputMinPassGrade" class="form-control" placeholder="Minimum pass grade" required
-        value="{{form.initial.min_pass_grade}}"></p>
-    {% for error in form.min_pass_grade.errors%}
-    <p style="color:red;">{{ error|default:"" }}</p>
-    {% endfor %}
-    
-    <p>
-    <label> Choose type:</label>
-        <select id="typeId" name="type" required>
-            {% for type, type_name in course_types %}
-            <option value="{{type}}">{{type_name}}</option>
+            <p><input type="text" name="name" id="inputName" class="form-control" placeholder="Course name" required
+                value="{{form.initial.name}}" autofocus></p>
+            {% for error in form.name.errors%}
+            <p style="color:red;">{{ error|default:"" }}</p>
             {% endfor %}
-        </select>
-    </p>
-    {% for error in form.type.errors%}
-    <p style="color:red;">{{ error|default:"" }}</p>
-    {% endfor %}
 
-    <p>
-        <label> Choose status:</label>
-        <select id="statusId" name="status" required>
-            {% for status, status_name in course_statuses %}
-            <option value="{{status}}">{{status_name}}</option>
+            <p><input type="text" name="min_pass_grade" id="inputMinPassGrade" class="form-control" placeholder="Minimum pass grade" required
+                value="{{form.initial.min_pass_grade}}"></p>
+            {% for error in form.min_pass_grade.errors%}
+            <p style="color:red;">{{ error|default:"" }}</p>
             {% endfor %}
-        </select>
-    </p>
-    {% for error in form.status.errors%}
-    <p style="color:red;">{{ error|default:"" }}</p>
-    {% endfor %}
+            
+            <p>
+            <label> Choose type:</label>
+                <select id="typeId" name="type" required>
+                    {% for type, type_name in course_types %}
+                    <option value="{{type}}">{{type_name}}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            {% for error in form.type.errors%}
+            <p style="color:red;">{{ error|default:"" }}</p>
+            {% endfor %}
 
-    <p><input type="text" name="content" id="inputContent" class="form-control" placeholder="Description" required
-        autofocus value="{{form.initial.content}}"></p>
-    {% for error in form.content.errors%}
-    <p style="color:red;">{{ error|default:"" }}</p>
-    {% endfor %}
+            <p>
+                <label> Choose status:</label>
+                <select id="statusId" name="status" required>
+                    {% for status, status_name in course_statuses %}
+                    <option value="{{status}}">{{status_name}}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            {% for error in form.status.errors%}
+            <p style="color:red;">{{ error|default:"" }}</p>
+            {% endfor %}
 
-    {% if form.non_field_errors %}
-    <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
+            <p><input type="text" name="content" id="inputContent" class="form-control" placeholder="Description" required
+                autofocus value="{{form.initial.content}}"></p>
+            {% for error in form.content.errors%}
+            <p style="color:red;">{{ error|default:"" }}</p>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+            <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
+            {% endif %}
+
+            {% if success_message %}
+            <p style="color: green; text-align: center;">{{success_message}}</p>
+            {% endif %}
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
+        </form>
+    </div>
+    {% if 'edit' in view %}
+    <div class="col">
+        <a href="{% url 'page_create' course_pk=course_pk %}">
+            <button class="float-right btn btn-lg btn-primary" type="submit">Add</button>
+        </a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Number</th>
+                    <th scope="col">Page</th>
+                    <th scope="col">Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for page in page_list %}
+                <tr>
+                    <th scope="row">{{page.number}}</th>
+                    <td>{{page.content}}</td>
+                    <td><a href="{% url 'page_edit' course_pk=course_pk page_pk=page.pk %}">edit</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% endif %}
-
-    {% if success_message %}
-    <p style="color: green; text-align: center;">{{success_message}}</p>
-    {% endif %}
-
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
-</form>
+</div>
 {% endblock %}
 
 {% block js_scripts %}
