@@ -26,7 +26,7 @@ class CourseListView(ListView):
     context_object_name = 'course_list'
 
     def dispatch(self, request, *args, **kwargs):
-        logger.info(f'{self.request.user} viewed course list.')
+        logger.info(f'{request.user} viewed course list.')
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
@@ -184,12 +184,12 @@ class  CreatePageView(FormView):
         form.instance.course = self.course_instance
         page = form.save()
         self.page_pk = page.pk
-        logger.info(f'{request.user} created page - {self.page_pk}.')
+        logger.info(f'{self.request.user} created page - {self.page_pk}.')
         success_url = reverse('page_edit', kwargs={'course_pk': self.course_pk, 'page_pk': self.page_pk})
         return HttpResponseRedirect(success_url)
 
     def form_invalid(self, form):
-        logger.info(f"{request.user} didn't created page.")
+        logger.info(f"{self.request.user} didn't created page.")
         form.initial = {
             "content": self.request.POST.get("content"),
         }
