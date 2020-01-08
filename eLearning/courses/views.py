@@ -1,5 +1,5 @@
 import logging
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, resolve
 from django.views.generic import ListView, DetailView, FormView
 from django.utils.decorators import method_decorator
@@ -502,3 +502,28 @@ class EditVariantView(FormView):
         }
         form.save()
         return render(self.request, self.template_name, self.get_context_data())
+
+
+@method_decorator(login_required, name='dispatch')
+class CourseDetailView(DetailView):
+    model = Course
+    context_object_name = 'course'
+    course_pk = None
+
+    def get_object(self):
+        self.course_pk = self.kwargs.get('course_pk')
+        return get_object_or_404(Course, id=self.course_pk)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        try:
+            CourseEnrollment.objects.get(user=request.user, course=self.object)
+        except CourseEnrollment.DoesNotExist:
+            return self.render_to_response(context)
+        else:
+            # redirect_url = reverse('course_welcom', kwargs={
+            # 'course_pk': self.course_pk,
+            # })
+            # return HttpResponseRedirect(redirect_url)
+            raise Exception("Redirect url does not exist.")

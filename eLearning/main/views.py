@@ -44,7 +44,7 @@ def home(request):
 
         recomended_courses = NamedCourses(
             'Recomended',
-            Course.objects.order_by('-rating')[:5]
+            Course.objects.filter(type='pbl').order_by('-rating')[:5]
         )
 
         context['courses_set'] = [

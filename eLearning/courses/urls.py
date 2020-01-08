@@ -28,4 +28,7 @@ urlpatterns = [
         views.CreateVariantView.as_view(),
         name="variant_create"
     ),
+    path('learn/<int:course_pk>/', views.CourseDetailView.as_view(), name="course_detail"),
+    # path('learn/<int:course_pk>/home/welcome/', views.CourseWelcomView.as_view(), name="course_welcom"),
+    # path('learn/<int:course_pk>/home/page/<int:page_pk>/', views.),
 ]
