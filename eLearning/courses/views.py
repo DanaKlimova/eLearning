@@ -9,11 +9,15 @@ from django.http import HttpResponseRedirect
 from courses.models import (
     Course,
     Page,
+    Question,
+    Variant,
 )
 
 from courses.forms import (
     CourseForm,
-    PageForm
+    PageForm,
+    QuestionForm,
+    VariantForm,
 )
 
 
@@ -191,6 +195,7 @@ class  CreatePageView(FormView):
     def form_invalid(self, form):
         logger.info(f"{self.request.user} didn't created page.")
         form.initial = {
+            "number": self.request.POST.get("number"),
             "content": self.request.POST.get("content"),
         }
         return self.render_to_response(self.get_context_data(form=form))
@@ -223,6 +228,7 @@ class EditPageView(FormView):
 
     def get_initial(self):
         self.initial = {
+            "number": self.page_instance.number,
             "content": self.page_instance.content,
         }
         return self.initial.copy()
@@ -234,7 +240,7 @@ class EditPageView(FormView):
             logger.info(f'{request.user} updated page - {self.page_pk}.')
             return self.form_valid(form)
         else:
-            logger.info(f"{request.user} didn't update course - {self.page_pk}.")
+            logger.info(f"{request.user} didn't update page - {self.page_pk}.")
             return self.form_invalid(form)
 
     def get(self, request, *args, **kwargs):
@@ -246,10 +252,252 @@ class EditPageView(FormView):
         kwargs['page_pk'] = self.page_pk
         kwargs['course_pk'] = self.course_pk
         kwargs['view'] = 'edit'
+        kwargs['question_list'] = self.page_instance.question_set.all()
+        kwargs['question_types'] = dict(Question.QUESTION_TYPE_CHOICES)
         return kwargs
 
     def form_valid(self, form):
         form.initial = {
+            "content": self.request.POST.get("content"),
+        }
+        form.save()
+        return render(self.request, self.template_name, self.get_context_data())
+
+
+@method_decorator(login_required, name='dispatch')
+class  CreateQuestionView(FormView):
+    template_name = "courses/question_edit.html"
+    form_class = QuestionForm
+    model = Question
+    course_pk = None
+    page_pk = None
+    question_pk = None
+    page_instance = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.course_pk = kwargs['course_pk']
+        self.page_pk = kwargs['page_pk']
+        self.page_instance = Page.objects.get(pk=self.page_pk)
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs['view'] = 'create'
+        kwargs['course_pk'] = self.course_pk
+        kwargs['page_pk'] = self.page_pk
+        kwargs['question_types'] = self.model.QUESTION_TYPE_CHOICES
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.page = self.page_instance
+        question = form.save()
+        self.question_pk = question.pk
+        logger.info(f'{self.request.user} created question - {self.question_pk}.')
+        success_url = reverse('question_edit', kwargs={
+            'course_pk': self.course_pk,
+            'page_pk': self.page_pk,
+            'question_pk': self.question_pk
+            })
+        return HttpResponseRedirect(success_url)
+
+    def form_invalid(self, form):
+        logger.info(f"{self.request.user} didn't create question.")
+        form.initial = {
+            "type": self.request.POST.get("type"),
+            "content": self.request.POST.get("content"),
+        }
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+# TODO: transfer js code in static file
+@method_decorator(login_required, name='dispatch')
+class EditQuestionView(FormView):
+    template_name = "courses/question_edit.html"
+    form_class = QuestionForm
+    model = Question
+    extra_context = {"success_message": ""}
+    course_pk = None
+    page_pk = None
+    question_pk = None
+    question_instance = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.course_pk = kwargs['course_pk']
+        self.page_pk = kwargs['page_pk']
+        self.question_pk = kwargs['question_pk']
+        self.question_instance = Question.objects.get(pk=self.question_pk)
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'instance': self.question_instance})
+        return kwargs
+
+    def get_initial(self):
+        self.initial = {
+            "type": self.question_instance.type,
+            "content": self.question_instance.content,
+        }
+        return self.initial.copy()
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            self.extra_context["success_message"] = "Question updated"
+            logger.info(f'{request.user} updated question - {self.question_pk}.')
+            return self.form_valid(form)
+        else:
+            logger.info(f"{request.user} didn't update question - {self.question_pk}.")
+            return self.form_invalid(form)
+
+    def get(self, request, *args, **kwargs):
+        self.extra_context["success_message"] = ""
+        return self.render_to_response(self.get_context_data())
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs['course_pk'] = self.course_pk
+        kwargs['page_pk'] = self.page_pk
+        kwargs['question_pk'] = self.question_pk
+        kwargs['question_types'] = self.model.QUESTION_TYPE_CHOICES
+        kwargs['type'] = self.question_instance.type
+        kwargs['view'] = 'edit'
+        kwargs['variant_list'] = self.question_instance.variant_set.all()
+        return kwargs
+
+    def form_valid(self, form):
+        form.initial = {
+            "type": self.request.POST.get("type"),
+            "content": self.request.POST.get("content"),
+        }
+        form.save()
+        return render(self.request, self.template_name, self.get_context_data())
+
+@method_decorator(login_required, name='dispatch')
+class  CreateVariantView(FormView):
+    template_name = "courses/variant_edit.html"
+    form_class = VariantForm
+    model = Variant
+    course_pk = None
+    page_pk = None
+    question_pk = None
+    variant_pk = None
+    question_instance = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.course_pk = kwargs['course_pk']
+        self.page_pk = kwargs['page_pk']
+        self.question_pk = kwargs['question_pk']
+        self.question_instance = Question.objects.get(pk=self.question_pk)
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs['view'] = 'create'
+        kwargs['course_pk'] = self.course_pk
+        kwargs['page_pk'] = self.page_pk
+        kwargs['question_pk'] = self.question_pk
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.question = self.question_instance
+        variant = form.save()
+        self.variant_pk = variant.pk
+        logger.info(f'{self.request.user} created variant - {self.variant_pk}.')
+        success_url = reverse('variant_edit', kwargs={
+            'course_pk': self.course_pk,
+            'page_pk': self.page_pk,
+            'question_pk': self.question_pk,
+            'variant_pk': self.variant_pk,
+            })
+        return HttpResponseRedirect(success_url)
+
+    def form_invalid(self, form):
+        logger.info(f"{self.request.user} didn't create variant.")
+        form.initial = {
+            "is_correct": self.request.POST.get("is_correct"),
+            "content": self.request.POST.get("content"),
+        }
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+# TODO: transfer js code in static file
+# TODO: add question type check
+@method_decorator(login_required, name='dispatch')
+class EditVariantView(FormView):
+    template_name = "courses/variant_edit.html"
+    form_class = VariantForm
+    model = Variant
+    extra_context = {"success_message": ""}
+    course_pk = None
+    page_pk = None
+    question_pk = None
+    variant_pk = None
+    variant_instance = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.course_pk = kwargs['course_pk']
+        self.page_pk = kwargs['page_pk']
+        self.question_pk = kwargs['question_pk']
+        self.variant_pk = kwargs['variant_pk']
+        self.variant_instance = Variant.objects.get(pk=self.variant_pk)
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'instance': self.variant_instance})
+        return kwargs
+
+    def get_initial(self):
+        self.initial = {
+            "is_correct": self.variant_instance.is_correct,
+            "content": self.variant_instance.content,
+        }
+        return self.initial.copy()
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            self.extra_context["success_message"] = "Variant updated"
+            logger.info(f'{request.user} updated variant - {self.variant_pk}.')
+            return self.form_valid(form)
+        else:
+            logger.info(f"{request.user} didn't update variant - {self.variant_pk}.")
+            return self.form_invalid(form)
+
+    def get(self, request, *args, **kwargs):
+        self.extra_context["success_message"] = ""
+        return self.render_to_response(self.get_context_data())
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs['course_pk'] = self.course_pk
+        kwargs['page_pk'] = self.page_pk
+        kwargs['question_pk'] = self.question_pk
+        kwargs['variant_pk'] = self.variant_pk
+        kwargs['is_correct'] = self.variant_instance.is_correct
+        kwargs['view'] = 'edit'
+        return kwargs
+
+    def form_valid(self, form):
+        form.initial = {
+            "is_correct": self.request.POST.get("is_correct"),
             "content": self.request.POST.get("content"),
         }
         form.save()

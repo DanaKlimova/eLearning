@@ -3,6 +3,8 @@ from django import forms
 from courses.models import (
     Course,
     Page,
+    Question,
+    Variant,
 )
 
 
@@ -24,5 +26,23 @@ class PageForm(forms.ModelForm):
         model = Page
         fields = (
             'number',
+            'content',
+        )
+
+
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = (
+            'type',
+            'content',
+        )
+
+
+class VariantForm(forms.ModelForm):
+    class Meta:
+        model = Variant
+        fields = (
+            'is_correct',
             'content',
         )

@@ -8,4 +8,24 @@ urlpatterns = [
     path('create/', views.CreateCourseView.as_view(), name="course_create"),
     path('<int:course_pk>/page/<int:page_pk>/', views.EditPageView.as_view(), name="page_edit"),
     path('<int:course_pk>/page/create/', views.CreatePageView.as_view(), name="page_create"),
+    path(
+        '<int:course_pk>/page/<int:page_pk>/question/<int:question_pk>',
+        views.EditQuestionView.as_view(),
+        name="question_edit"
+    ),
+    path(
+        '<int:course_pk>/page/<int:page_pk>/question/create/',
+        views.CreateQuestionView.as_view(),
+        name="question_create"
+    ),
+    path(
+        '<int:course_pk>/page/<int:page_pk>/question/<int:question_pk>/variant/<int:variant_pk>/',
+        views.EditVariantView.as_view(),
+        name="variant_edit"
+    ),
+    path(
+        '<int:course_pk>/page/<int:page_pk>/question/<int:question_pk>/variant/create/',
+        views.CreateVariantView.as_view(),
+        name="variant_create"
+    ),
 ]

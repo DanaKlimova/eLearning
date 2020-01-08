@@ -46,8 +46,31 @@ Page detail
             <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
         </form>
     </div>
+    {% if 'edit' in view %}
     <div class="col">
-        
+        <a href="{% url 'question_create' course_pk=course_pk page_pk=page_pk %}">
+            <button class="float-right btn btn-lg btn-primary" type="submit">Add</button>
+        </a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col">Question</th>
+                    <th scope="col">Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for question in question_list %}
+                {% load course_extras %}
+                <tr>
+                    <th scope="row">{{ question_types|get_item:question.type }}</th>
+                    <td>{{question.content}}</td>
+                    <td><a href="{% url 'question_edit' course_pk=course_pk page_pk=page_pk question_pk=question.pk %}">edit</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
