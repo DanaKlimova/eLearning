@@ -8,9 +8,11 @@ Course detail
 {% endblock %}
 
 {% block content %}
-<a href="#">
+<form id="follow_form" method="post" action="{% url 'course_welcom' course_pk=course_pk%}">
+    {% csrf_token %}
     <button class="float-right btn btn-lg btn-primary" type="submit">Follow</button>
-</a>
+</form>
+
 <div class="row">
     <div class="col">
     <p>

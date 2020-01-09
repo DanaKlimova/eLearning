@@ -74,7 +74,7 @@ class CourseEnrollment(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     certificate = models.ForeignKey(Certificate, on_delete=models.CASCADE, null=True)
     current_page = models.ForeignKey(Page, on_delete=models.CASCADE, null=True)
-    started_at = models.DateField()
+    started_at = models.DateField(auto_now_add=True)
     finished_at = models.DateField(null=True)
     grade = models.FloatField(null=True)
     progress = models.FloatField(null=True)

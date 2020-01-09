@@ -1,0 +1,68 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Course enrollment detail
+{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+<a href="#">
+    <button class="float-right btn btn-lg btn-primary" type="submit">Continue</button>
+</a>
+<div class="row">
+    <div class="col">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Page number</th>
+                    <th scope="col">Done</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for page in page_list %}
+                <tr>
+                    <th scope="row">{{page.number}}</th>
+                    {% if course_enrollment.current_page.number <= page.number %}
+                    <td>yes</td>
+                    {% else %}
+                    <td>no</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col">
+    <p>
+        <label>Course name:</label>
+        {{ course_enrollment.course.name }}
+    </p>
+    <p>
+        <label>Course author:</label>
+        {{ course_enrollment.course.owner_user.first_name}}
+        {{ course_enrollment.course.owner_user.last_name}}
+    </p>
+    <p>
+        <label>Course rating:</label>
+        {{ course_enrollment.course.rating }}
+    </p>
+    <p>
+        <label>Course content:</label>
+        {{ course_enrollment.course.content }}
+    </p>
+    <p>
+        <label>Started at:</label>
+        {{ course_enrollment.started_at }}
+    </p>
+    <p>
+        <label>Current page:</label>
+        {{ course_enrollment.current_page.number|default:"you haven't started to study" }}
+    </p>
+
+    </div>
+</div>
+
+{% endblock %}
+

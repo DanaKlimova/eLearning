@@ -1,7 +1,7 @@
 import logging
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, resolve
-from django.views.generic import ListView, DetailView, FormView
+from django.views.generic import ListView, DetailView, FormView, View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -11,6 +11,7 @@ from courses.models import (
     Page,
     Question,
     Variant,
+    CourseEnrollment,
 )
 
 from courses.forms import (
@@ -522,8 +523,66 @@ class CourseDetailView(DetailView):
         except CourseEnrollment.DoesNotExist:
             return self.render_to_response(context)
         else:
-            # redirect_url = reverse('course_welcom', kwargs={
-            # 'course_pk': self.course_pk,
-            # })
-            # return HttpResponseRedirect(redirect_url)
-            raise Exception("Redirect url does not exist.")
+            redirect_url = reverse('course_welcom', kwargs={
+            'course_pk': self.course_pk,
+            })
+            return HttpResponseRedirect(redirect_url)
+    
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs['course_pk'] = self.course_pk
+        return kwargs
+
+
+@method_decorator(login_required, name='dispatch')
+class CourseWelcomView(View):
+    model = CourseEnrollment
+    context_object_name = 'course_enrollment'
+    template = 'courses/course_welcom.html'
+    course_enrollment_instance = None
+    course_pk = None
+
+    def get(self, request, *args, **kwargs):
+        self.course_pk = self.kwargs.get('course_pk')
+        user = self.request.user
+        course = Course.objects.get(pk=self.course_pk)
+        try:
+            course_enrollment = CourseEnrollment.objects.get(user=request.user, course=course)
+        except CourseEnrollment.DoesNotExist:
+            redirect_url = reverse('course_detail', kwargs={
+            'course_pk': self.course_pk,
+            })
+            return HttpResponseRedirect(redirect_url)
+        else:
+            self.course_enrollment_instance = course_enrollment
+            context = self.get_context_data(self.course_enrollment_instance)
+            return render(request, self.template, context)
+
+    def post(self, request, *args, **kwargs):
+        self.course_pk = self.kwargs.get('course_pk')
+        user = self.request.user
+        course = Course.objects.get(pk=self.course_pk)
+        try:
+            course_enrollment = CourseEnrollment.objects.get(user=request.user, course=course)
+        except CourseEnrollment.DoesNotExist:
+            course_enrollment = CourseEnrollment.objects.create(
+                user=user,
+                course=course,
+            )
+        redirect_url = reverse('course_welcom', kwargs={
+        'course_pk': self.course_pk,
+        })
+        return HttpResponseRedirect(redirect_url)
+    
+    def get_context_data(self, object_):
+        current_page = self.course_enrollment_instance.current_page
+        if not current_page:
+            # TODO: is it magic number? Should I create constant for first page?
+            current_page = self.course_enrollment_instance.course.page_set.get(number=1)
+        context = {
+            self.context_object_name: object_,
+            'page_list': self.course_enrollment_instance.course.page_set.all(),
+            'current_page': current_page
+        }
+        return context
+    
