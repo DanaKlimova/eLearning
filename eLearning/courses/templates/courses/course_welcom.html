@@ -8,7 +8,7 @@ Course enrollment detail
 {% endblock %}
 
 {% block content %}
-<a href="#">
+<a href="{% url 'course_page' course_pk=course_enrollment.course.pk page_pk=current_page.pk%}">
     <button class="float-right btn btn-lg btn-primary" type="submit">Continue</button>
 </a>
 <div class="row">

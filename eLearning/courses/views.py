@@ -19,6 +19,8 @@ from courses.forms import (
     PageForm,
     QuestionForm,
     VariantForm,
+    CheckboxQuestionForm,
+    RadioQuestionForm,
 )
 
 
@@ -585,4 +587,85 @@ class CourseWelcomView(View):
             'current_page': current_page
         }
         return context
+
+
+@method_decorator(login_required, name='dispatch')
+class CoursePageView(View):
+    model = Page
+    context_object_name = 'current_page'
+    template = 'courses/course_page.html'
+    course_pk = None
+    page_pk = None
+    page_instance = None
+
+    def get(self, request, *args, **kwargs):
+        self.course_pk = self.kwargs.get('course_pk')
+        self.page_pk = self.kwargs.get('page_pk')
+        user = self.request.user
+        course = Course.objects.get(pk=self.course_pk)
+        try:
+            course_enrollment = CourseEnrollment.objects.get(user=request.user, course=course)
+        except CourseEnrollment.DoesNotExist:
+            # TODO: create decorator for course enrollment existing?
+            redirect_url = reverse('course_detail', kwargs={
+            'course_pk': self.course_pk,
+            })
+            return HttpResponseRedirect(redirect_url)
+        else:
+            self.page_instance = Page.objects.get(pk=self.page_pk)
+            questions = self.page_instance.question_set.all()
+            question_forms = []
+            for question in questions:
+                question_forms.append(CoursePageView.dispatch_question(question))
+            context = self.get_context_data(self.page_instance, question_forms)
+            return render(request, self.template, context)
+
+    # TODO: think about duplicated question types
+    @staticmethod
+    def dispatch_question(question):
+        return {
+            'chb': CoursePageView.create_checkbox_question_form,
+            'rad': CoursePageView.create_radio_question_form,
+        }.get(question.type, lambda x: None)(question)
+
+    @staticmethod
+    def create_checkbox_question_form(question):
+        choices = []
+        for variant in question.variant_set.all():
+            choices.append((variant.content, variant.content))
+        form = CheckboxQuestionForm(initial={
+            'question_pk': question.pk,
+            'content': question.content,
+        })
+        form.fields['choices'].choices = choices
+        return form
+
+    @staticmethod
+    def create_radio_question_form(question):
+        choices = []
+        for variant in question.variant_set.all():
+            choices.append((variant.content, variant.content))
+        form = RadioQuestionForm(initial={
+            'question_pk': question.pk,
+            'content': question.content,
+        })
+        form.fields['choices'].choices = choices
+        return form
+
+    def post(self, request, *args, **kwargs):
+        print(request.POST)
+        self.course_pk = self.kwargs.get('course_pk')
+        self.page_pk = self.kwargs.get('page_pk')
+        user = self.request.user
+        course = Course.objects.get(pk=self.course_pk)
+        course_enrollment = CourseEnrollment.objects.get(user=request.user, course=course)
+        return render(request, self.template, context) 
     
+    def get_context_data(self, object_=None, question_forms=None):
+        context = {
+            'course_pk': self.course_pk,
+            'page_pk': self.page_pk,
+            self.context_object_name: object_,
+            'question_forms': question_forms,
+        }
+        return context

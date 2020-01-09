@@ -1,0 +1,48 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Course page
+{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+<p>
+    <label>Page number:</label>
+    {{ current_page.number }}
+</p>
+<p>
+    <label>Page content:</label>
+    {{ current_page.content }}
+</p>
+
+{% for form in question_forms %}
+<form>
+<p>
+    <label>{{ form.content.label }}:</label>
+    {{ form.content }}
+</p>
+<p>
+    <label>{{ form.choices.label }}:</label>
+    {{ form.choices }}
+</p>
+</form>
+{% endfor %}
+<button id="buttonId" class="float-left btn btn-lg btn-primary" type="submit">Submit</button>
+{% endblock %}
+
+{% block js_scripts %}
+<script>
+$(document).ready(function() {
+    document.getElementById("buttonId").onclick = function() {submitForms()};
+
+    function submitForms(){
+        for (let i = 0; i = document.forms.length; i++) {
+            document.forms[i].submit();
+        }
+    }
+});
+</script>
+{% endblock %}
+

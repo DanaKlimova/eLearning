@@ -49,7 +49,6 @@ class Page(models.Model):
 
 class Question(models.Model):
     QUESTION_TYPE_CHOICES = [
-        ('slc', 'select'),
         ('chb', 'checkbox'),
         ('rad', 'radio'),
     ]
