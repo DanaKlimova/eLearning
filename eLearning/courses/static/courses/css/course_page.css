@@ -1,3 +1,7 @@
 .correct {
-    background-color: green; 
+    background-color: green;
+}
+
+.user-answer {
+    font-weight: bold;
 }

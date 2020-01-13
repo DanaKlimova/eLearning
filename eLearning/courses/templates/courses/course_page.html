@@ -35,23 +35,30 @@ Course page
     <label>Variants:</label>
     {% for variant_pk, variant in task.variants %}
     <p>
-        <label>
-            <input type="{{ task.question_types|get_item:task.question.type }}" value="{{ variant }}" 
+        <div class="" id="q_{{ task.question.pk}}_v_{{ variant_pk }}">
+            <input
+                {% if task_type %}
+                type="{{ task_type }}"
+                hidden
+                {% else %}
+                type="{{ task.question_types|get_item:task.question.type }}"
+                value="{{ variant }}" 
+                {% endif %}
                 name="{{task.question.pk}}"
-                id="q_{{ task.question.pk}}_v_{{ variant_pk }}"
+                id="q_{{ task.question.pk}}_v_{{ variant_pk }}_"
                 {% if forloop.first and task.question_types|get_item:task.question.type == 'radio' %}
                 required
                 checked
                 {% endif %}>
             {{ variant }}
-        </label> 
+        </div>
     </p>  
     {% endfor %}
 </p>
 {% endfor %}
 {% if 'Next' in button_type %}
 <a href="{% url 'course_page' course_pk=course_pk page_pk=next_page_pk %}">
-{% elif 'Finish' in button_type %}
+{% elif 'Finish' in button_type or 'To course enrollment detail' in button_type %}
 <a href="{% url 'course_welcom' course_pk=course_pk %}">
 {% endif %}
 <button id="buttonId" class="float-left btn btn-lg btn-primary" type="submit">{{button_type}}</button>
@@ -65,14 +72,16 @@ Course page
 {% block js_scripts %}
 <script>
 $(document).ready(function() {
-    setCorrectQuestions('{{ correct_questions }}');
+    addClassById("{{ correct_questions }}", "correct");
+    addClassById("{{ users_answers }}", "user-answer");
 
-    function setCorrectQuestions(correct_questions) {
-        if (correct_questions != 'None') {
-            correct_questions_ = correct_questions.split(' ');
-            correct_questions_.forEach(function (item, index) {
-            correct_question = document.getElementById(item);
-            correct_question.className += "correct";
+    function addClassById(element_ids, class_) {
+        console.log(element_ids)
+        if (element_ids != "None" && element_ids) {
+            element_ids_ = element_ids.split(' ');
+            element_ids_.forEach(function (item, index) {
+            element_id = document.getElementById(item);
+            element_id.className += class_;
         });
         }
     }

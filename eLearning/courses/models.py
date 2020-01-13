@@ -82,7 +82,9 @@ class CourseEnrollment(models.Model):
 
 
 class Result(models.Model):
+    RESULTS_SEPARATOR = ' '
     results = models.CharField(max_length=255)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     is_correct = models.BooleanField(default=False)
+    page = models.ForeignKey(Page, on_delete=models.CASCADE)

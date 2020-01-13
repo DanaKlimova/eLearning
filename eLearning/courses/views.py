@@ -1,4 +1,6 @@
 import logging
+from datetime import date
+
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, resolve
 from django.views.generic import ListView, DetailView, FormView, View
@@ -545,36 +547,38 @@ class CourseWelcomView(View):
     template = 'courses/course_welcom.html'
     course_enrollment_instance = None
     course_pk = None
+    course_instance = None
+    user = None
 
     def get(self, request, *args, **kwargs):
         self.course_pk = self.kwargs.get('course_pk')
-        user = self.request.user
-        course = Course.objects.get(pk=self.course_pk)
+        self.user = request.user
+        self.course_instance = Course.objects.get(pk=self.course_pk)
         try:
-            course_enrollment = CourseEnrollment.objects.get(user=request.user, course=course)
+            self.course_enrollment_instance = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
         except CourseEnrollment.DoesNotExist:
             redirect_url = reverse('course_detail', kwargs={
             'course_pk': self.course_pk,
             })
             return HttpResponseRedirect(redirect_url)
         else:
-            self.course_enrollment_instance = course_enrollment
             context = self.get_context_data(self.course_enrollment_instance)
             return render(request, self.template, context)
 
     def post(self, request, *args, **kwargs):
         self.course_pk = self.kwargs.get('course_pk')
-        user = self.request.user
-        course = Course.objects.get(pk=self.course_pk)
+        self.user = request.user
+        self.course_instance = Course.objects.get(pk=self.course_pk)
         # TODO: if there are no pages in course?
-        page = Page.objects.filter(course=course).get(number=1)
+        page = Page.objects.filter(course=self.course_instance).get(number=1)
         try:
-            CourseEnrollment.objects.get(user=request.user, course=course)
+            CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
         except CourseEnrollment.DoesNotExist:
             CourseEnrollment.objects.create(
-                user=user,
-                course=course,
+                user=self.user,
+                course=self.course_instance,
                 current_page=page,
+                grade=None,
             )
         redirect_url = reverse('course_welcom', kwargs={
         'course_pk': self.course_pk,
@@ -585,11 +589,18 @@ class CourseWelcomView(View):
         current_page = self.course_enrollment_instance.current_page
         if not current_page:
             # TODO: is it magic number? Should I create constant for first page?
+            # Constraint on page count of ready courses?
             current_page = self.course_enrollment_instance.course.page_set.get(number=1)
+        
+        course_pages = self.course_enrollment_instance.course.page_set.all()
+        total_grade = 0.0
+        for page in course_pages:
+            total_grade += Question.objects.filter(page=page).count()
         context = {
             self.context_object_name: object_,
-            'page_list': self.course_enrollment_instance.course.page_set.all(),
-            'current_page': current_page
+            'page_list': course_pages,
+            'current_page': current_page,
+            'total_grade': total_grade,
         }
         return context
 
@@ -600,16 +611,19 @@ class CoursePageView(View):
     context_object_name = 'current_page'
     template = 'courses/course_page.html'
     course_pk = None
+    course_instance = None
     page_pk = None
     page_instance = None
+    user = None
 
     def get(self, request, *args, **kwargs):
         self.course_pk = self.kwargs.get('course_pk')
         self.page_pk = self.kwargs.get('page_pk')
-        user = self.request.user
-        course = Course.objects.get(pk=self.course_pk)
+        self.page_instance = Page.objects.get(pk=self.page_pk)
+        self.user = self.request.user
+        self.course_instance = Course.objects.get(pk=self.course_pk)
         try:
-            course_enrollment = CourseEnrollment.objects.get(user=request.user, course=course)
+            course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
         except CourseEnrollment.DoesNotExist:
             # TODO: create decorator for course enrollment existing?
             redirect_url = reverse('course_detail', kwargs={
@@ -617,9 +631,59 @@ class CoursePageView(View):
             })
             return HttpResponseRedirect(redirect_url)
         else:
-            tasks = self.get_tasks()
-            context = self.get_context_data(object_=self.page_instance, tasks=tasks, button_type='Submit')
+            results = Result.objects.filter(page=self.page_instance)
+            if results:
+                current_page_number = course_enrollment.current_page.number
+                next_page_number = current_page_number + 1
+                try:
+                    next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
+                # last page
+                except Page.DoesNotExist:
+                    button_type='Finish'
+                    if course_enrollment.finished_at:
+                        button_type='To course enrollment detail'
+                    next_page_pk = None
+                # next page
+                else:
+                    button_type = 'Next'
+                    next_page_pk = next_page.pk
+
+                tasks = self.get_tasks()
+
+                users_answers = self.get_users_answers(results)
+                correct_questions = self.get_correct_questions(results)
+
+                context = self.get_context_data(
+                    object_=self.page_instance,
+                    tasks=tasks,
+                    button_type=button_type,
+                    users_answers=users_answers,
+                    correct_questions=correct_questions,
+                    task_type='text',
+                )
+            else:
+                tasks = self.get_tasks()
+                context = self.get_context_data(
+                    object_=self.page_instance,
+                    tasks=tasks,
+                    button_type='Submit'
+                )
             return render(request, self.template, context)
+
+    def get_users_answers(self, results):
+        users_answers = []
+        for result in results:
+            variants = result.results.split(Result.RESULTS_SEPARATOR)
+            for variant in variants:
+                users_answers.append(f'q_{result.question.pk}_v_{variant}')
+        return Result.RESULTS_SEPARATOR.join(users_answers)
+
+    def get_correct_questions(self, results):
+        correct_questions = []
+        for result in results:
+            if result.is_correct:
+                correct_questions.append(f'q_{result.question.pk}')
+        return Result.RESULTS_SEPARATOR.join(correct_questions)
 
     @staticmethod
     def create_task(question):
@@ -633,7 +697,6 @@ class CoursePageView(View):
         return task
 
     def get_tasks(self):
-        self.page_instance = Page.objects.get(pk=self.page_pk)
         questions = self.page_instance.question_set.all()
         tasks = []
         for question in questions:
@@ -641,13 +704,14 @@ class CoursePageView(View):
         return tasks
 
     def post(self, request, *args, **kwargs):
-        print(request.POST)
         self.course_pk = self.kwargs.get('course_pk')
         self.page_pk = self.kwargs.get('page_pk')
-        user = self.request.user
-        course = Course.objects.get(pk=self.course_pk)
+        self.page_instance = Page.objects.get(pk=self.page_pk)
+        self.user = self.request.user
+        self.course_instance = Course.objects.get(pk=self.course_pk)
+        
         try:
-            course_enrollment = CourseEnrollment.objects.get(user=user, course=course)
+            course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
         except CourseEnrollment.DoesNotExist:
             redirect_url = reverse('course_detail', kwargs={
             'course_pk': self.course_pk,
@@ -657,62 +721,72 @@ class CoursePageView(View):
             current_page_number = course_enrollment.current_page.number
             next_page_number = current_page_number + 1
             try:
-                next_page = Page.objects.get(course=course, number=next_page_number)
+                next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
+            # last page
             except Page.DoesNotExist:
+                course_enrollment.finished_at = date.today()
+                course_enrollment.is_active = False
+                course_enrollment.progress = 100
+                course_enrollment.save()
                 button_type='Finish'
                 next_page_pk = None
+            # next page
             else:
                 course_enrollment.current_page = next_page
+                total_page_count = Page.objects.filter(course=self.course_instance).count()
+                course_enrollment.progress = current_page_number / total_page_count * 100
                 course_enrollment.save()
                 button_type = 'Next'
                 next_page_pk = next_page.pk
 
-            results_ = dict(request.POST)
-            del results_['csrfmiddlewaretoken']
-            print(results_)
+            user_input = dict(request.POST)
+            del user_input['csrfmiddlewaretoken']
 
             correct_questions = []
-
-            for question_pk, variants_content in results_.items():
+            for question_pk, variants_content in user_input.items():
                 question = Question.objects.get(pk=question_pk)
                 # users variants
-                variants = {}
+                users_variants = {}
                 for variant_content in variants_content:
                     variant = Variant.objects.get(question=question, content=variant_content)
-                    variants[variant.pk] = variant
-
-                print('Variants: ', variants)
-                
+                    users_variants[variant.pk] = variant
                 # correct variants
                 correct_variants = {}
                 for correct_variant in question.variant_set.all():
                     if correct_variant.is_correct:
                         correct_variants[correct_variant.pk] = correct_variant
                 
-                print('correct_variants: ', correct_variants)
-                results = []
-                for _, variant in variants.items():
-                    results.append(variant.pk)
+                users_variant_pks = []
+                for _, variant in users_variants.items():
+                    users_variant_pks.append(str(variant.pk))
 
-                is_correct = True if variants == correct_variants else False
+                is_correct = True if users_variants == correct_variants else False
 
                 if is_correct:
                     correct_questions.append(f'q_{question.pk}')
                 
-                # Result.objects.create(
-                #     user=user,
-                #     question=question,
-                #     results=results,
-                #     is_correct=is_correct,
-                # )
-
-                print("Question ", question)
-                print("Results ", results)
-                print("Is correct ", is_correct)
-                print("correct_questions ", correct_questions)
+                separator = Result.RESULTS_SEPARATOR
+                users_variant_pks = separator.join(users_variant_pks)
+                Result.objects.create(
+                    user=self.user,
+                    question=question,
+                    results=users_variant_pks,
+                    is_correct=is_correct,
+                    page=self.page_instance,
+                )
 
             tasks = self.get_tasks()
+            grade = course_enrollment.grade
+            if grade:
+                course_enrollment.grade += len(correct_questions)
+            else:
+                course_enrollment.grade = len(correct_questions)
+            course_enrollment.save()
+
             correct_questions = ' '.join(correct_questions)
+
+            results = Result.objects.filter(page=self.page_instance)
+            users_answers = self.get_users_answers(results)
 
             context = self.get_context_data(
                 object_=self.page_instance,
@@ -720,21 +794,15 @@ class CoursePageView(View):
                 button_type=button_type,
                 next_page_pk=next_page_pk,
                 correct_questions=correct_questions,
+                task_type='text',
+                users_answers=users_answers,
             )
             return render(request, self.template, context) 
 
-
-    
     # TODO: change method with *kwargs?
-    def get_context_data(self, object_=None, tasks=None, button_type=None, next_page_pk=None, 
-                        correct_questions=None):
-        context = {
-            'course_pk': self.course_pk,
-            'page_pk': self.page_pk,
-            self.context_object_name: object_,
-            'tasks': tasks,
-            'button_type': button_type,
-            'next_page_pk': next_page_pk,
-            'correct_questions': correct_questions,
-        }
+    def get_context_data(self, object_=None, **kwargs):
+        context = kwargs
+        context[self.context_object_name] = object_
+        context['course_pk'] = self.course_pk
+        context['page_pk'] = self.page_pk
         return context

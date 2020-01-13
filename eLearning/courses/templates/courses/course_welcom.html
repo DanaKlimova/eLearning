@@ -8,9 +8,11 @@ Course enrollment detail
 {% endblock %}
 
 {% block content %}
+{% if not course_enrollment.finished_at %}
 <a href="{% url 'course_page' course_pk=course_enrollment.course.pk page_pk=current_page.pk%}">
     <button class="float-right btn btn-lg btn-primary" type="submit">Continue</button>
 </a>
+{% endif %}
 <div class="row">
     <div class="col">
         <table class="table">
@@ -23,10 +25,15 @@ Course enrollment detail
             <tbody>
                 {% for page in page_list %}
                 <tr>
-                    <th scope="row">{{page.number}}</th>
-                    {% if course_enrollment.current_page.number > page.number or course_enrollment.course.finished_at %}
+                    {% if course_enrollment.current_page.number > page.number or course_enrollment.finished_at %}
+                    <th scope="row">
+                        <a href="{% url 'course_page' course_pk=course_enrollment.course.pk page_pk=page.pk %}">
+                        {{page.number}}
+                        </a>
+                    </th>
                     <td>yes</td>
                     {% else %}
+                    <th scope="row">{{page.number}}</th>
                     <td>no</td>
                     {% endif %}
                 </tr>
@@ -57,8 +64,21 @@ Course enrollment detail
         {{ course_enrollment.started_at }}
     </p>
     <p>
+        <label>Finished at:</label>
+        {{ course_enrollment.finished_at|default:"you haven't finished" }}
+    </p>
+    <p>
         <label>Current page:</label>
         {{ course_enrollment.current_page.number|default:"you haven't started to study" }}
+    </p>
+    <p>
+        <label>Progress:</label>
+        {{ course_enrollment.progress|default:"you haven't started to study" }}
+    </p>
+    <p>
+        <label>Grade:</label>
+        {{ course_enrollment.grade|default:"you haven't started to study" }}
+        of {{ total_grade }}
     </p>
 
     </div>
