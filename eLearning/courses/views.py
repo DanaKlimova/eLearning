@@ -12,6 +12,7 @@ from courses.models import (
     Question,
     Variant,
     CourseEnrollment,
+    Result,
 )
 
 from courses.forms import (
@@ -19,8 +20,6 @@ from courses.forms import (
     PageForm,
     QuestionForm,
     VariantForm,
-    CheckboxQuestionForm,
-    RadioQuestionForm,
 )
 
 
@@ -171,10 +170,12 @@ class  CreatePageView(FormView):
     course_instance = None
     course_pk = None
     page_pk = None
+    page_number = None
 
     def dispatch(self, request, *args, **kwargs):
         self.course_pk = kwargs['course_pk']
         self.course_instance = Course.objects.get(pk=self.course_pk)
+        self.page_number = Page.objects.filter(course=self.course_instance).count() + 1
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
@@ -185,6 +186,7 @@ class  CreatePageView(FormView):
         kwargs = super().get_context_data(**kwargs)
         kwargs['view'] = 'create'
         kwargs['course_pk'] = self.course_pk
+        kwargs['page_number'] = self.page_number
         return kwargs
 
     def form_valid(self, form):
@@ -564,12 +566,15 @@ class CourseWelcomView(View):
         self.course_pk = self.kwargs.get('course_pk')
         user = self.request.user
         course = Course.objects.get(pk=self.course_pk)
+        # TODO: if there are no pages in course?
+        page = Page.objects.filter(course=course).get(number=1)
         try:
-            course_enrollment = CourseEnrollment.objects.get(user=request.user, course=course)
+            CourseEnrollment.objects.get(user=request.user, course=course)
         except CourseEnrollment.DoesNotExist:
-            course_enrollment = CourseEnrollment.objects.create(
+            CourseEnrollment.objects.create(
                 user=user,
                 course=course,
+                current_page=page,
             )
         redirect_url = reverse('course_welcom', kwargs={
         'course_pk': self.course_pk,
@@ -612,45 +617,28 @@ class CoursePageView(View):
             })
             return HttpResponseRedirect(redirect_url)
         else:
-            self.page_instance = Page.objects.get(pk=self.page_pk)
-            questions = self.page_instance.question_set.all()
-            question_forms = []
-            for question in questions:
-                question_forms.append(CoursePageView.dispatch_question(question))
-            context = self.get_context_data(self.page_instance, question_forms)
+            tasks = self.get_tasks()
+            context = self.get_context_data(object_=self.page_instance, tasks=tasks, button_type='Submit')
             return render(request, self.template, context)
 
-    # TODO: think about duplicated question types
     @staticmethod
-    def dispatch_question(question):
-        return {
-            'chb': CoursePageView.create_checkbox_question_form,
-            'rad': CoursePageView.create_radio_question_form,
-        }.get(question.type, lambda x: None)(question)
+    def create_task(question):
+        variants = [(variant.pk, variant.content) for variant in question.variant_set.all()]
+        question_types = dict(Question.QUESTION_TYPE_CHOICES)
+        task = {
+            'question': question,
+            'question_types': question_types,
+            'variants': variants,
+        }
+        return task
 
-    @staticmethod
-    def create_checkbox_question_form(question):
-        choices = []
-        for variant in question.variant_set.all():
-            choices.append((variant.content, variant.content))
-        form = CheckboxQuestionForm(initial={
-            'question_pk': question.pk,
-            'content': question.content,
-        })
-        form.fields['choices'].choices = choices
-        return form
-
-    @staticmethod
-    def create_radio_question_form(question):
-        choices = []
-        for variant in question.variant_set.all():
-            choices.append((variant.content, variant.content))
-        form = RadioQuestionForm(initial={
-            'question_pk': question.pk,
-            'content': question.content,
-        })
-        form.fields['choices'].choices = choices
-        return form
+    def get_tasks(self):
+        self.page_instance = Page.objects.get(pk=self.page_pk)
+        questions = self.page_instance.question_set.all()
+        tasks = []
+        for question in questions:
+            tasks.append(CoursePageView.create_task(question))
+        return tasks
 
     def post(self, request, *args, **kwargs):
         print(request.POST)
@@ -658,14 +646,95 @@ class CoursePageView(View):
         self.page_pk = self.kwargs.get('page_pk')
         user = self.request.user
         course = Course.objects.get(pk=self.course_pk)
-        course_enrollment = CourseEnrollment.objects.get(user=request.user, course=course)
-        return render(request, self.template, context) 
+        try:
+            course_enrollment = CourseEnrollment.objects.get(user=user, course=course)
+        except CourseEnrollment.DoesNotExist:
+            redirect_url = reverse('course_detail', kwargs={
+            'course_pk': self.course_pk,
+            })
+            return HttpResponseRedirect(redirect_url)
+        else:
+            current_page_number = course_enrollment.current_page.number
+            next_page_number = current_page_number + 1
+            try:
+                next_page = Page.objects.get(course=course, number=next_page_number)
+            except Page.DoesNotExist:
+                button_type='Finish'
+                next_page_pk = None
+            else:
+                course_enrollment.current_page = next_page
+                course_enrollment.save()
+                button_type = 'Next'
+                next_page_pk = next_page.pk
+
+            results_ = dict(request.POST)
+            del results_['csrfmiddlewaretoken']
+            print(results_)
+
+            correct_questions = []
+
+            for question_pk, variants_content in results_.items():
+                question = Question.objects.get(pk=question_pk)
+                # users variants
+                variants = {}
+                for variant_content in variants_content:
+                    variant = Variant.objects.get(question=question, content=variant_content)
+                    variants[variant.pk] = variant
+
+                print('Variants: ', variants)
+                
+                # correct variants
+                correct_variants = {}
+                for correct_variant in question.variant_set.all():
+                    if correct_variant.is_correct:
+                        correct_variants[correct_variant.pk] = correct_variant
+                
+                print('correct_variants: ', correct_variants)
+                results = []
+                for _, variant in variants.items():
+                    results.append(variant.pk)
+
+                is_correct = True if variants == correct_variants else False
+
+                if is_correct:
+                    correct_questions.append(f'q_{question.pk}')
+                
+                # Result.objects.create(
+                #     user=user,
+                #     question=question,
+                #     results=results,
+                #     is_correct=is_correct,
+                # )
+
+                print("Question ", question)
+                print("Results ", results)
+                print("Is correct ", is_correct)
+                print("correct_questions ", correct_questions)
+
+            tasks = self.get_tasks()
+            correct_questions = ' '.join(correct_questions)
+
+            context = self.get_context_data(
+                object_=self.page_instance,
+                tasks=tasks,
+                button_type=button_type,
+                next_page_pk=next_page_pk,
+                correct_questions=correct_questions,
+            )
+            return render(request, self.template, context) 
+
+
     
-    def get_context_data(self, object_=None, question_forms=None):
+    # TODO: change method with *kwargs?
+    def get_context_data(self, object_=None, tasks=None, button_type=None, next_page_pk=None, 
+                        correct_questions=None):
         context = {
             'course_pk': self.course_pk,
             'page_pk': self.page_pk,
             self.context_object_name: object_,
-            'question_forms': question_forms,
+            'tasks': tasks,
+            'button_type': button_type,
+            'next_page_pk': next_page_pk,
+            'correct_questions': correct_questions,
         }
         return context

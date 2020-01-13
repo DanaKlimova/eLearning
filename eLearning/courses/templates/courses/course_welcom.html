@@ -24,7 +24,7 @@ Course enrollment detail
                 {% for page in page_list %}
                 <tr>
                     <th scope="row">{{page.number}}</th>
-                    {% if course_enrollment.current_page.number <= page.number %}
+                    {% if course_enrollment.current_page.number > page.number or course_enrollment.course.finished_at %}
                     <td>yes</td>
                     {% else %}
                     <td>no</td>

@@ -81,8 +81,8 @@ class CourseEnrollment(models.Model):
     is_active = models.BooleanField(default=True)
 
 
-class Results(models.Model):
+class Result(models.Model):
     results = models.CharField(max_length=255)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    page = models.ForeignKey(Page, on_delete=models.CASCADE)
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    is_correct = models.BooleanField(default=False)

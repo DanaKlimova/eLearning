@@ -1,10 +1,13 @@
 {% extends 'main/base.html' %}
+{% load course_extras %}
 
 {% block title %}
 Course page
 {% endblock %}
 
 {% block styles %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'courses/css/course_page.css' %}" />
 {% endblock %}
 
 {% block content %}
@@ -17,32 +20,62 @@ Course page
     {{ current_page.content }}
 </p>
 
-{% for form in question_forms %}
-<form>
+{% if 'Submit' in button_type %}
+<form method="post" action="{% url 'course_page' course_pk=course_pk page_pk=page_pk %}">
+{% endif %}
+{% csrf_token %}
+{% for task in tasks %}
 <p>
-    <label>{{ form.content.label }}:</label>
-    {{ form.content }}
+    <label id="q_{{ task.question.pk }}">
+        Question:
+    </label>
+    {{ task.question.content }}
 </p>
 <p>
-    <label>{{ form.choices.label }}:</label>
-    {{ form.choices }}
+    <label>Variants:</label>
+    {% for variant_pk, variant in task.variants %}
+    <p>
+        <label>
+            <input type="{{ task.question_types|get_item:task.question.type }}" value="{{ variant }}" 
+                name="{{task.question.pk}}"
+                id="q_{{ task.question.pk}}_v_{{ variant_pk }}"
+                {% if forloop.first and task.question_types|get_item:task.question.type == 'radio' %}
+                required
+                checked
+                {% endif %}>
+            {{ variant }}
+        </label> 
+    </p>  
+    {% endfor %}
 </p>
-</form>
 {% endfor %}
-<button id="buttonId" class="float-left btn btn-lg btn-primary" type="submit">Submit</button>
+{% if 'Next' in button_type %}
+<a href="{% url 'course_page' course_pk=course_pk page_pk=next_page_pk %}">
+{% elif 'Finish' in button_type %}
+<a href="{% url 'course_welcom' course_pk=course_pk %}">
+{% endif %}
+<button id="buttonId" class="float-left btn btn-lg btn-primary" type="submit">{{button_type}}</button>
+{% if 'Submit' in button_type %}
+</form>
+{% else %}
+</a>
+{% endif %}
 {% endblock %}
 
 {% block js_scripts %}
 <script>
 $(document).ready(function() {
-    document.getElementById("buttonId").onclick = function() {submitForms()};
+    setCorrectQuestions('{{ correct_questions }}');
 
-    function submitForms(){
-        for (let i = 0; i = document.forms.length; i++) {
-            document.forms[i].submit();
+    function setCorrectQuestions(correct_questions) {
+        if (correct_questions != 'None') {
+            correct_questions_ = correct_questions.split(' ');
+            correct_questions_.forEach(function (item, index) {
+            correct_question = document.getElementById(item);
+            correct_question.className += "correct";
+        });
         }
     }
 });
 </script>
 {% endblock %}
-
