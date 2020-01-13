@@ -24,9 +24,9 @@ def home(request):
         )
 
         users_courses = NamedCourses('Users courses', (
-            Course.objects.filter(type='pbl', owner_type='usr').order_by('-rating')[:5]
+            Course.objects.filter(type='pbl', owner_type='usr', status='rdy').order_by('-rating')[:5]
         ).union(
-            user.individual_courses.filter(owner_type='usr').order_by('-rating')[:5]
+            user.individual_courses.filter(owner_type='usr', status='rdy').order_by('-rating')[:5]
         ))
 
         starred_courses = NamedCourses(
@@ -44,7 +44,7 @@ def home(request):
 
         recomended_courses = NamedCourses(
             'Recomended',
-            Course.objects.filter(type='pbl').order_by('-rating')[:5]
+            Course.objects.filter(type='pbl', status='rdy').order_by('-rating')[:5]
         )
 
         context['courses_set'] = [
