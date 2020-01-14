@@ -25,6 +25,7 @@ from courses.forms import (
 )
 
 
+START_PAGE_NUMBER = 1
 logger = logging.getLogger('eLearning')
 
 
@@ -117,7 +118,6 @@ class EditCourseView(FormView):
             "status": self.request.POST.get("status"),
             "content": self.request.POST.get("content"),
         }
-        form.save()
         return render(self.request, self.template_name, self.get_context_data())
 
 
@@ -149,6 +149,11 @@ class  CreateCourseView(FormView):
         form.instance.owner_type = 'usr'
         form.instance.owner_user = self.request.user
         course = form.save()
+        Page.objects.create(
+            course=course,
+            content="",
+            number=START_PAGE_NUMBER,
+        )
         self.course_pk = course.pk
         success_url = reverse('course_edit', kwargs={'course_pk': self.course_pk})
         return HttpResponseRedirect(success_url)
@@ -302,6 +307,11 @@ class  CreateQuestionView(FormView):
     def form_valid(self, form):
         form.instance.page = self.page_instance
         question = form.save()
+        Variant.objects.create(
+            question=question,
+            content="",
+            is_correct=False,
+        )
         self.question_pk = question.pk
         logger.info(f'{self.request.user} created question - {self.question_pk}.')
         success_url = reverse('question_edit', kwargs={
@@ -569,8 +579,7 @@ class CourseWelcomView(View):
         self.course_pk = self.kwargs.get('course_pk')
         self.user = request.user
         self.course_instance = Course.objects.get(pk=self.course_pk)
-        # TODO: if there are no pages in course?
-        page = Page.objects.filter(course=self.course_instance).get(number=1)
+        page = Page.objects.filter(course=self.course_instance).get(number=START_PAGE_NUMBER)
         try:
             CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
         except CourseEnrollment.DoesNotExist:
@@ -590,7 +599,7 @@ class CourseWelcomView(View):
         if not current_page:
             # TODO: is it magic number? Should I create constant for first page?
             # Constraint on page count of ready courses?
-            current_page = self.course_enrollment_instance.course.page_set.get(number=1)
+            current_page = self.course_enrollment_instance.course.page_set.get(number=START_PAGE_NUMBER)
         
         course_pages = self.course_enrollment_instance.course.page_set.all()
         total_grade = 0.0
