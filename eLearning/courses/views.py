@@ -631,7 +631,7 @@ class CoursePageView(View):
             })
             return HttpResponseRedirect(redirect_url)
         else:
-            results = Result.objects.filter(page=self.page_instance)
+            results = Result.objects.filter(page=self.page_instance, user=self.user)
             if results:
                 current_page_number = course_enrollment.current_page.number
                 next_page_number = current_page_number + 1
@@ -785,7 +785,7 @@ class CoursePageView(View):
 
             correct_questions = ' '.join(correct_questions)
 
-            results = Result.objects.filter(page=self.page_instance)
+            results = Result.objects.filter(page=self.page_instance, user=self.user)
             users_answers = self.get_users_answers(results)
 
             context = self.get_context_data(
@@ -799,7 +799,6 @@ class CoursePageView(View):
             )
             return render(request, self.template, context) 
 
-    # TODO: change method with *kwargs?
     def get_context_data(self, object_=None, **kwargs):
         context = kwargs
         context[self.context_object_name] = object_

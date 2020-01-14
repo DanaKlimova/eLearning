@@ -78,7 +78,9 @@ Course enrollment detail
     <p>
         <label>Grade:</label>
         {{ course_enrollment.grade|default:"you haven't started to study" }}
+        {% if course_enrollment.grade %}
         of {{ total_grade }}
+        {% endif %}
     </p>
 
     </div>
