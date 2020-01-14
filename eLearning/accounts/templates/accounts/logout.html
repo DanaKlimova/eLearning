@@ -1,0 +1,18 @@
+{% extends "main/base.html" %}
+{% block title %}
+Logout
+{% endblock %}
+
+{% block styles %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'accounts/css/base.css' %}"/>
+{% endblock %}
+
+{% block content %}
+<div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h2 class="display-4">You have been logged out.</h2>
+    <small class="text-muted">
+        <a class="lead" href="{% url 'login' %}">Log In Again</a>
+    </small>
+</div>
+{% endblock %}
