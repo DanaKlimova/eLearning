@@ -783,11 +783,13 @@ class CoursePageView(View):
 
             tasks = self.get_tasks()
             grade = course_enrollment.grade
+            earned_points = len(correct_questions)
             if grade:
-                course_enrollment.grade += len(correct_questions)
+                course_enrollment.grade += earned_points
             else:
-                course_enrollment.grade = len(correct_questions)
-            course_enrollment.save()
+                course_enrollment.grade = earned_points
+            if earned_points != 0:
+                course_enrollment.save()
 
             correct_questions = ' '.join(correct_questions)
 
