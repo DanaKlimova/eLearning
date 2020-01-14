@@ -12,7 +12,17 @@ class Course(models.Model):
         ('drf', 'draft'),
         ('rdy', 'ready'),
     ]
+    # all choices
     COURSE_TYPE_CHOICES = [
+        ('pbl', 'public'),
+        ('prv', 'private'),
+        ('ind', 'individual'),
+    ]
+    COURSE_USER_TYPE_CHOICES = [
+        ('pbl', 'public'),
+        ('ind', 'individual'),
+    ]
+    COURSE_ORG_TYPE_CHOICES = [
         ('pbl', 'public'),
         ('prv', 'private'),
         ('ind', 'individual'),

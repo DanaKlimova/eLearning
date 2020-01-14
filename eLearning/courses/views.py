@@ -98,7 +98,7 @@ class EditCourseView(FormView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs['course_pk'] = self.course_pk
-        kwargs['course_types'] = self.model.COURSE_TYPE_CHOICES
+        kwargs['course_types'] = self.model.COURSE_USER_TYPE_CHOICES
         kwargs['course_statuses'] = self.model.COURSE_STATUS_CHOICES
         kwargs['type'] = self.course_instance.type
         kwargs['status'] = self.course_instance.status
@@ -139,7 +139,7 @@ class  CreateCourseView(FormView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs['course_types'] = self.model.COURSE_TYPE_CHOICES
+        kwargs['course_types'] = self.model.COURSE_USER_TYPE_CHOICES
         kwargs['course_statuses'] = self.model.COURSE_STATUS_CHOICES
         # kwargs['action_url'] = 'course_create'
         kwargs['view'] = 'create'
