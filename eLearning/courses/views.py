@@ -597,8 +597,6 @@ class CourseWelcomView(View):
     def get_context_data(self, object_):
         current_page = self.course_enrollment_instance.current_page
         if not current_page:
-            # TODO: is it magic number? Should I create constant for first page?
-            # Constraint on page count of ready courses?
             current_page = self.course_enrollment_instance.course.page_set.get(number=START_PAGE_NUMBER)
         
         course_pages = self.course_enrollment_instance.course.page_set.all()
@@ -634,7 +632,6 @@ class CoursePageView(View):
         try:
             course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
         except CourseEnrollment.DoesNotExist:
-            # TODO: create decorator for course enrollment existing?
             redirect_url = reverse('course_detail', kwargs={
             'course_pk': self.course_pk,
             })
