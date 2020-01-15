@@ -53,7 +53,7 @@ Course enrollment detail
     </p>
     <p>
         <label>Course rating:</label>
-        {{ course_enrollment.course.rating }}
+        {{ total_rate|default:"course wasn't rated" }}
     </p>
     <p>
         <label>Course content:</label>

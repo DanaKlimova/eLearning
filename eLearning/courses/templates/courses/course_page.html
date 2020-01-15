@@ -16,37 +16,27 @@ Course page
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Please, rate app</h4>
+        <h4 class="modal-title">Please, rate course</h4>
       </div>
       <div class="modal-body">
-        {% comment %} <div>
-            <h4 class="modal-title">Please, rate app</h4>
-        </div> {% endcomment %}
-        <div class="rating">
-            <input type="radio" name="star" id="star1Id" value="1"><label for "star1Id">
-            </label>
-            {% comment %} <input type="radio" name="star" id="star1Id" value="1"><i class="fa fa-star-o"></i> {% endcomment %}
-            
-            <input type="radio" name="star" id="star2Id" value="2"><label for "star2Id">
-            </label>
-            <input type="radio" name="star" id="star3Id" value="3"><label for "star3Id">
-            </label>
-            <input type="radio" name="star" id="star4Id" value="4"><label for "star4Id">
-            </label>
-            <input type="radio" name="star" id="star5Id" value="5"><label for "star5Id">
-            </label>
-        </div>
-        {% comment %} <div>
-            <a href="{% url 'course_welcom' course_pk=course_pk %}">
-                <button id="closeButtonId" type="button" class="btn btn-default" >Close</button>
-            </a>
-            <button id="rateButtonId" type="button" class="btn btn-primary">Rate</button>
-        </div> {% endcomment %}
+        <form>
+            {% csrf_token %}
+            <div class="rate">
+                <input type="radio" id="star5" name="rate" value="5" />
+                <label for="star5" title="5">5 stars</label>
+                <input type="radio" id="star4" name="rate" value="4" />
+                <label for="star4" title="4">4 stars</label>
+                <input type="radio" id="star3" name="rate" value="3" />
+                <label for="star3" title="3">3 stars</label>
+                <input type="radio" id="star2" name="rate" value="2" />
+                <label for="star2" title="2">2 stars</label>
+                <input type="radio" id="star1" name="rate" value="1" />
+                <label for="star1" title="1">1 star</label>
+            </div>
+        </form>
       </div>
        <div class="modal-footer">
-        <a href="{% url 'course_welcom' course_pk=course_pk %}">
-            <button id="closeButtonId" type="button" class="btn btn-default" >Close</button>
-        </a>
+        <button id="closeButtonId" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button id="rateButtonId" type="button" class="btn btn-primary">Rate</button>
       </div> 
     </div>
@@ -100,7 +90,7 @@ Course page
 
 {% if 'Next' in button_type %}
 <a href="{% url 'course_page' course_pk=course_pk page_pk=next_page_pk %}">
-{% elif 'To course enrollment detail' in button_type %}
+{% elif 'Finish' in button_type or 'To course enrollment detail' in button_type %}
 <a href="{% url 'course_welcom' course_pk=course_pk %}">
 {% endif %}
 
@@ -109,7 +99,7 @@ Course page
 
 {% if 'Submit' in button_type %}
 </form>
-{% elif 'To course enrollment detail' in button_type or 'Next' in button_type %}
+{% else %}
 </a>
 {% endif %}
 
@@ -122,24 +112,27 @@ $(document).ready(function() {
     addClassById("{{ users_answers }}", "user-answer");
 
     if ("{{ button_type }}" === "Finish") {
-        $("#buttonId").click(function() {
         $("#modalId").modal('show');
-        });
     }
+        
+    $("#rateButtonId").click(async function() {
+        let rate = $("input[name='rate']:checked").val();
+        let post_data = {
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+            user: "{{ user }}",
+            course_pk: "{{ course_pk }}",
+            rate: rate
+        };
+        console.log(post_data);
 
-    $("#rateButtonId").click(function() {
-        let rate = $("input[name='star']:checked").val();
-        // send data
-        $.post("{% url 'course_rate' course_pk=course_pk %}",
-            {
-                dataType: "json",
-                user: "{{ user }}",
-                course_pk: "{{ course_pk }}",
-                rate: rate
-            }
-        );
-        let url = "{% url 'course_welcom' course_pk=course_pk %}";
-        $(location).attr('href', url);
+        let response = await fetch("{% url 'course_rate' course_pk=course_pk %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(post_data)
+        });
+        $("#modalId").modal('toggle');
     });
 
     function addClassById(element_ids, class_) {

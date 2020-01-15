@@ -1,5 +1,6 @@
 import logging
 from datetime import date
+import json
 
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, resolve
@@ -7,6 +8,8 @@ from django.views.generic import ListView, DetailView, FormView, View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
 
 from courses.models import (
     Course,
@@ -23,6 +26,8 @@ from courses.forms import (
     QuestionForm,
     VariantForm,
 )
+
+from accounts.models import Account
 
 
 START_PAGE_NUMBER = 1
@@ -636,6 +641,14 @@ class CourseWelcomView(View):
             grade = self.course_enrollment_instance.points * TOTAL_GRADE / total_points
         else:
             grade = None
+
+        total_rate = 0.0
+        course_enrollments = CourseEnrollment.objects.filter(course=self.course_instance).all()
+        for course_enrollment in course_enrollments:
+            rate = course_enrollment.rate
+            if rate:
+                total_rate += rate
+
         context = {
             self.context_object_name: object_,
             'page_list': course_pages,
@@ -643,6 +656,7 @@ class CourseWelcomView(View):
             'total_points': total_points,
             'grade': grade,
             'total_grade': TOTAL_GRADE,
+            'total_rate': total_rate,
         }
         return context
 
@@ -850,22 +864,25 @@ class CoursePageView(View):
         return context
 
 
+@csrf_exempt
 def course_rate(request, course_pk):
     if request.method == 'POST':
-        print(request.POST)
-        print(request.user)
-        user = request.user
+        body = json.loads(request.body)
+        course_pk = body['course_pk']
         course = Course.objects.get(pk=course_pk)
-        course_enrollment = CourseEnrollment.objects.get(
-            course=course,
-            user=user,
-        )
+        user_email = body['user']
+        user = Account.objects.get(email=user_email)
+        rate = body['rate']
         try:
-            rate = int(request.POST['rate'])
-        except ValueError:
-            logger.info(f'{user} sent error rate.')
-            return HttpResponse("Invalid rate!")
+            course_enrollment = CourseEnrollment.objects.get(
+                course=course,
+                user=user,
+            )
+        except CourseEnrollment.DoesNotExist:
+            logger.info("Rate ajax wasn't success.")
+            return HttpResponse("Invalid request.")
         else:
+            logger.info("Rate ajax was success.")
             course_enrollment.rate = rate
             course_enrollment.save()
             return HttpResponse("Success!")
