@@ -119,6 +119,7 @@ class EditCourseView(FormView):
             "status": self.request.POST.get("status"),
             "content": self.request.POST.get("content"),
         }
+        form.save()
         return render(self.request, self.template_name, self.get_context_data())
 
 
