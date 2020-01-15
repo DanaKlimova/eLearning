@@ -6,7 +6,7 @@ from django.urls import reverse, resolve
 from django.views.generic import ListView, DetailView, FormView, View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 
 from courses.models import (
     Course,
@@ -615,7 +615,7 @@ class CourseWelcomView(View):
                 user=self.user,
                 course=self.course_instance,
                 current_page=page,
-                grade=None,
+                points=None,
             )
         redirect_url = reverse('course_welcom', kwargs={
         'course_pk': self.course_pk,
@@ -631,7 +631,10 @@ class CourseWelcomView(View):
         total_points = 0.0
         for page in course_pages:
             total_points += Question.objects.filter(page=page).count()
-        grade = self.course_enrollment_instance.points * TOTAL_GRADE / total_points
+        if self.course_enrollment_instance.points:
+            grade = self.course_enrollment_instance.points * TOTAL_GRADE / total_points
+        else:
+            grade = None
         context = {
             self.context_object_name: object_,
             'page_list': course_pages,
@@ -813,12 +816,12 @@ class CoursePageView(View):
                 )
 
             tasks = self.get_tasks()
-            grade = course_enrollment.grade
+            points = course_enrollment.points
             earned_points = len(correct_questions)
-            if grade:
-                course_enrollment.grade += earned_points
+            if points:
+                course_enrollment.points += earned_points
             else:
-                course_enrollment.grade = earned_points
+                course_enrollment.points = earned_points
             if earned_points != 0:
                 course_enrollment.save()
 
@@ -844,3 +847,24 @@ class CoursePageView(View):
         context['course_pk'] = self.course_pk
         context['page_pk'] = self.page_pk
         return context
+
+
+def course_rate(request, course_pk):
+    if request.method == 'POST':
+        print(request.POST)
+        print(request.user)
+        user = request.user
+        course = Course.objects.get(pk=course_pk)
+        course_enrollment = CourseEnrollment.objects.get(
+            course=course,
+            user=user,
+        )
+        try:
+            rate = int(request.POST['rate'])
+        except ValueError:
+            logger.info(f'{user} sent error rate.')
+            return HttpResponse("Invalid rate!")
+        else:
+            course_enrollment.rate = rate
+            course_enrollment.save()
+            return HttpResponse("Success!")

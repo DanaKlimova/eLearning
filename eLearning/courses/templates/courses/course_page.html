@@ -8,9 +8,50 @@ Course page
 {% block styles %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'courses/css/course_page.css' %}" />
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
+<div id="modalId" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Please, rate app</h4>
+      </div>
+      <div class="modal-body">
+        {% comment %} <div>
+            <h4 class="modal-title">Please, rate app</h4>
+        </div> {% endcomment %}
+        <div class="rating">
+            <input type="radio" name="star" id="star1Id" value="1"><label for "star1Id">
+            </label>
+            {% comment %} <input type="radio" name="star" id="star1Id" value="1"><i class="fa fa-star-o"></i> {% endcomment %}
+            
+            <input type="radio" name="star" id="star2Id" value="2"><label for "star2Id">
+            </label>
+            <input type="radio" name="star" id="star3Id" value="3"><label for "star3Id">
+            </label>
+            <input type="radio" name="star" id="star4Id" value="4"><label for "star4Id">
+            </label>
+            <input type="radio" name="star" id="star5Id" value="5"><label for "star5Id">
+            </label>
+        </div>
+        {% comment %} <div>
+            <a href="{% url 'course_welcom' course_pk=course_pk %}">
+                <button id="closeButtonId" type="button" class="btn btn-default" >Close</button>
+            </a>
+            <button id="rateButtonId" type="button" class="btn btn-primary">Rate</button>
+        </div> {% endcomment %}
+      </div>
+       <div class="modal-footer">
+        <a href="{% url 'course_welcom' course_pk=course_pk %}">
+            <button id="closeButtonId" type="button" class="btn btn-default" >Close</button>
+        </a>
+        <button id="rateButtonId" type="button" class="btn btn-primary">Rate</button>
+      </div> 
+    </div>
+  </div>
+</div>
 <p>
     <label>Page number:</label>
     {{ current_page.number }}
@@ -56,17 +97,22 @@ Course page
     {% endfor %}
 </p>
 {% endfor %}
+
 {% if 'Next' in button_type %}
 <a href="{% url 'course_page' course_pk=course_pk page_pk=next_page_pk %}">
-{% elif 'Finish' in button_type or 'To course enrollment detail' in button_type %}
+{% elif 'To course enrollment detail' in button_type %}
 <a href="{% url 'course_welcom' course_pk=course_pk %}">
 {% endif %}
-<button id="buttonId" class="float-left btn btn-lg btn-primary" type="submit">{{button_type}}</button>
+
+<button id="buttonId" class="float-left btn btn-lg btn-primary"
+        type="submit">{{button_type}}</button>
+
 {% if 'Submit' in button_type %}
 </form>
-{% else %}
+{% elif 'To course enrollment detail' in button_type or 'Next' in button_type %}
 </a>
 {% endif %}
+
 {% endblock %}
 
 {% block js_scripts %}
@@ -74,6 +120,27 @@ Course page
 $(document).ready(function() {
     addClassById("{{ correct_questions }}", "correct");
     addClassById("{{ users_answers }}", "user-answer");
+
+    if ("{{ button_type }}" === "Finish") {
+        $("#buttonId").click(function() {
+        $("#modalId").modal('show');
+        });
+    }
+
+    $("#rateButtonId").click(function() {
+        let rate = $("input[name='star']:checked").val();
+        // send data
+        $.post("{% url 'course_rate' course_pk=course_pk %}",
+            {
+                dataType: "json",
+                user: "{{ user }}",
+                course_pk: "{{ course_pk }}",
+                rate: rate
+            }
+        );
+        let url = "{% url 'course_welcom' course_pk=course_pk %}";
+        $(location).attr('href', url);
+    });
 
     function addClassById(element_ids, class_) {
         console.log(element_ids)
