@@ -449,6 +449,22 @@ class  CreateVariantView(FormView):
         }
         return self.render_to_response(self.get_context_data(form=form))
 
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        content = form['content'].value()
+        try:
+            Variant.objects.get(
+                question=self.question_instance,
+                content=content,
+            )
+        except Variant.DoesNotExist:
+            if form.is_valid():
+                return self.form_valid(form)
+            else:
+                return self.form_invalid(form)
+        else:
+            form.add_error(None, f'A variant with "{content}" content already exists.')
+            return self.form_invalid(form)
 
 # TODO: transfer js code in static file
 # TODO: add question type check
@@ -490,12 +506,23 @@ class EditVariantView(FormView):
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
-        if form.is_valid():
-            self.extra_context["success_message"] = "Variant updated"
-            logger.info(f'{request.user} updated variant - {self.variant_pk}.')
-            return self.form_valid(form)
+        question_instance = Question.objects.get(pk=self.question_pk)
+        content = form['content'].value()
+        try:
+            Variant.objects.get(
+                question=question_instance,
+                content=content,
+            )
+        except Variant.DoesNotExist:
+            if form.is_valid():
+                self.extra_context["success_message"] = "Variant updated"
+                logger.info(f'{request.user} updated variant - {self.variant_pk}.')
+                return self.form_valid(form)
+            else:
+                logger.info(f"{request.user} didn't update variant - {self.variant_pk}.")
+                return self.form_invalid(form)
         else:
-            logger.info(f"{request.user} didn't update variant - {self.variant_pk}.")
+            form.add_error(None, f'A variant with "{content}" content already exists.')
             return self.form_invalid(form)
 
     def get(self, request, *args, **kwargs):
