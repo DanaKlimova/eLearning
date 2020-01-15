@@ -76,9 +76,16 @@ Course enrollment detail
         {{ course_enrollment.progress|default:"you haven't started to study" }}
     </p>
     <p>
+        <label>Points:</label>
+        {{ course_enrollment.points|default:"you haven't started to study" }}
+        {% if course_enrollment.points %}
+        of {{ total_points }}
+        {% endif %}
+    </p>
+    <p>
         <label>Grade:</label>
-        {{ course_enrollment.grade|default:"you haven't started to study" }}
-        {% if course_enrollment.grade %}
+        {{ grade|default:"you haven't started to study" }}
+        {% if grade %}
         of {{ total_grade }}
         {% endif %}
     </p>

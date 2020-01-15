@@ -26,6 +26,7 @@ from courses.forms import (
 
 
 START_PAGE_NUMBER = 1
+TOTAL_GRADE = 10
 logger = logging.getLogger('eLearning')
 
 
@@ -627,14 +628,17 @@ class CourseWelcomView(View):
             current_page = self.course_enrollment_instance.course.page_set.get(number=START_PAGE_NUMBER)
         
         course_pages = self.course_enrollment_instance.course.page_set.all()
-        total_grade = 0.0
+        total_points = 0.0
         for page in course_pages:
-            total_grade += Question.objects.filter(page=page).count()
+            total_points += Question.objects.filter(page=page).count()
+        grade = self.course_enrollment_instance.points * TOTAL_GRADE / total_points
         context = {
             self.context_object_name: object_,
             'page_list': course_pages,
             'current_page': current_page,
-            'total_grade': total_grade,
+            'total_points': total_points,
+            'grade': grade,
+            'total_grade': TOTAL_GRADE,
         }
         return context
 
