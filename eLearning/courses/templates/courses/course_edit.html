@@ -11,9 +11,11 @@ Course detail
 <div class="row">
     <div class="col">
         {% if 'edit' in view %}
-        <form class="form-course" id="course_form" method="post" action="{% url 'course_edit' course_pk=course_pk %}">
+        <form class="form-course" id="course_form" method="post" enctype="multipart/form-data"
+            action="{% url 'course_edit' course_pk=course_pk %}">
         {% else %}
-        <form class="form-course" id="course_form" method="post" action="{% url 'course_create' %}">
+        <form class="form-course" id="course_form" method="post" enctype="multipart/form-data"
+            action="{% url 'course_create' %}">
         {% endif %}
             {% csrf_token %}
             <h1 class="h3 mb-3 font-weight-normal">Course</h1>
@@ -55,10 +57,26 @@ Course detail
             {% endfor %}
 
             <p><input type="text" name="content" id="inputContent" class="form-control" placeholder="Description" required
-                autofocus value="{{form.initial.content}}"></p>
+                value="{{form.initial.content}}"></p>
             {% for error in form.content.errors%}
             <p style="color:red;">{{ error|default:"" }}</p>
             {% endfor %}
+
+
+            <p>
+                <label> Current image:</label>
+                <p>
+                    <img src="{{ cover_url }}" alt="{{ form.initial.name }}">
+                </p>
+                <p>
+                    <input type="file" name="cover" id="inputCover" placeholder="Course cover">
+                </p>
+            </p>
+            {% comment %} 
+            # TODO: Always displays error "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+            {% for error in form.cover.errors%}
+            <p style="color:red;">{{ error|default:"" }}</p>
+            {% endfor %} {% endcomment %}
 
             {% if form.non_field_errors %}
             <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>

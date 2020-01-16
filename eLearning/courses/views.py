@@ -1,6 +1,7 @@
 import logging
 from datetime import date
 import json
+import os
 
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, resolve
@@ -9,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 
 from courses.models import (
@@ -18,6 +20,7 @@ from courses.models import (
     Variant,
     CourseEnrollment,
     Result,
+    course_cover_path,
 )
 
 from courses.forms import (
@@ -114,17 +117,28 @@ class EditCourseView(FormView):
         # print(kwargs['action_url'])
         kwargs['page_list'] = self.course_instance.page_set.all()
         kwargs['view'] = 'edit'
+        kwargs['cover_url'] = self.course_instance.cover.url
         return kwargs
 
     def form_valid(self, form):
+        filename = str(self.course_instance.cover)
+        full_cover = course_cover_path(self.course_instance, filename)
+        print('filename ', filename)
+        print('full_cover ', full_cover)
+        print('path ', os.path.join(settings.MEDIA_ROOT, full_cover))
+        if self.course_instance.cover != Course.DEFAULT_COURSE_COVER:
+            os.remove(os.path.join(settings.MEDIA_ROOT, full_cover))
         form.initial = {
             "name": self.request.POST.get("name"),
             "min_pass_grade": self.request.POST.get("min_pass_grade"),
             "type": self.request.POST.get("type"),
             "status": self.request.POST.get("status"),
             "content": self.request.POST.get("content"),
+            "cover": self.request.FILES.get("cover"),
         }
-        form.save()
+        # print("FILES ", form.files)
+        course = form.save()
+        # print("FORM data ", form.errors)
         return render(self.request, self.template_name, self.get_context_data())
 
 

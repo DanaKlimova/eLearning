@@ -43,6 +43,9 @@ Course enrollment detail
     </div>
     <div class="col">
     <p>
+        <img src="{{ course_enrollment.course.cover.url }}" alt="{{ course.name }}">
+    </p>
+    <p>
         <label>Course name:</label>
         {{ course_enrollment.course.name }}
     </p>

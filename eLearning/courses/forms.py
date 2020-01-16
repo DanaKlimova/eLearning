@@ -18,6 +18,7 @@ class CourseForm(forms.ModelForm):
             'content',
             'name',
             # 'students',
+            'cover',
         )
 
 

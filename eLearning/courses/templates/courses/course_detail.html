@@ -15,6 +15,9 @@ Course detail
 
 <div class="row">
     <div class="col">
+    <img src="{{ course.cover.url }}" alt="{{ course.name }}">
+    </div>
+    <div class="col">
     <p>
         <label>Course name:</label>
         {{ course.name }}
@@ -24,8 +27,6 @@ Course detail
         {{ course.owner_user.first_name}}
         {{ course.owner_user.last_name}}
     </p>
-    </div>
-    <div class="col">
     <p>
         <label>Course rating:</label>
         {{ course.rating }}

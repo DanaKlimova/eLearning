@@ -1,10 +1,36 @@
 import logging
+import os
 
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
 
 from accounts.models import Account
 
 logger = logging.getLogger('eLearning')
+
+
+def validate_image_size(img):
+        img_size = img.file.size
+        print(img_size)
+        if img_size > Course.MAX_IMAGE_SIZE:
+            raise ValidationError(f"Max image size is {Course.MB} MB.")
+
+
+def course_cover_path(course, filename):
+    return f'courses/{course.pk}_{filename}'
+
+
+class OverwriteStorage(FileSystemStorage):
+    '''
+    Muda o comportamento padrão do Django e o faz sobrescrever arquivos de
+    mesmo nome que foram carregados pelo usuário ao invés de renomeá-los.
+    '''
+    def get_available_name(self, name, max_length):
+        if self.exists(name):
+            os.remove(os.path.join(settings.MEDIA_ROOT, name))
+        return name
 
 
 class Course(models.Model):
@@ -30,6 +56,9 @@ class Course(models.Model):
     COURSE_OWNER_TYPE_CHOICES = [
         ('usr', 'user'),
     ]
+    MB = 2 ** 20
+    MAX_IMAGE_SIZE = 5 * MB
+    DEFAULT_COURSE_COVER = 'courses/default.png'
 
     owner_type = models.CharField(max_length=3, choices=COURSE_OWNER_TYPE_CHOICES,)
     owner_user = models.ForeignKey(
@@ -44,6 +73,8 @@ class Course(models.Model):
     name = models.CharField(max_length=255)
     rating = models.FloatField(null=True)
     students = models.ManyToManyField(Account, related_name='individual_courses')
+    cover = models.ImageField(upload_to=course_cover_path, default=DEFAULT_COURSE_COVER,
+                              validators=[validate_image_size], storage=OverwriteStorage())
 
 
 class CertificateTemplate(models.Model):
