@@ -1,12 +1,8 @@
-<style type="text/css">
-    .footer {
-        min-height: 100px;
-    }
-</style>
+{% load static %}
+<link rel="stylesheet" href="{% static 'main/css/footer.css' %}" />
 
-<hr>
-<div class="d-flex flex-row align-items-center footer ">
-    <p class="m-auto">eLearning | 2019</p>
+<div class="footer-text">
+    eLearning | {% now "Y" %}
 </div>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"

@@ -1,29 +1,30 @@
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
+.header-grid {
+    display: grid;
+    grid-template-areas: "user-name" "nav";
+    grid-template-rows: 1fr 1fr;
+    background-color: #ffffff;
+    border-radius: 1em;
+    padding: 10px;
+    box-shadow: 0 0 1em rgba(0, 0, 0, .05);
 }
 
-.container {
-    max-width: 960px;
+.user-name {
+    justify-self: start;
+    align-self: center;
+    text-align: center;
+    padding: 8px;
+    border: 1px;
+    font-size: 1.7vw;
+    color: #343a40;
 }
 
-.pricing-header {
-    max-width: 700px;
+.nav {
+    justify-self: end;
+    align-self: center;
+    border: 1px;
+    font-size: 1.5vw;
 }
 
-.card-deck .card {
-    min-width: 220px;
-}
-
-.border-top {
-    border-top: 1px solid #e5e5e5;
-}
-
-.border-bottom {
-    border-bottom: 1px solid #e5e5e5;
-}
-
-.box-shadow {
-    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+.nav>a {
+    color: #343a40;
 }

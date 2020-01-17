@@ -1,0 +1,29 @@
+body {
+    padding: 4px;
+    margin: 4px;
+    background-color: rgb(215, 209, 216);
+}
+
+.main-grid {
+    display: grid;
+    grid-template-areas: "header" "main" "footer";
+    /* NOT WORKING grid-gap: 1 em; */
+}
+
+.header {
+    grid-area: header;
+    margin: 10px;
+}
+
+.main {
+    grid-area: main;
+    margin: 10px;
+}
+
+.footer {
+    grid-area: footer;
+    margin: 10px;
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+}
