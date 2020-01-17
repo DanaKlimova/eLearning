@@ -64,16 +64,22 @@ Course detail
 
 
             <p>
-                <label> Current image:</label>
+                {% if 'edit' in view %}
+                <label> Current cover:</label>
                 <p>
                     <img src="{{ cover_url }}" alt="{{ form.initial.name }}">
                 </p>
+                <label> Change cover:</label>
+                {% else %}
+                <label> Upload cover:</label>
+                {% endif %}
                 <p>
                     <input type="file" name="cover" id="inputCover" placeholder="Course cover">
                 </p>
             </p>
             {% comment %} 
             # TODO: Always displays error "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+            # Is it because of bound form?
             {% for error in form.cover.errors%}
             <p style="color:red;">{{ error|default:"" }}</p>
             {% endfor %} {% endcomment %}

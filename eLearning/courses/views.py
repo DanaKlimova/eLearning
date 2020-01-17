@@ -1,7 +1,6 @@
 import logging
 from datetime import date
 import json
-import os
 
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, resolve
@@ -10,7 +9,6 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 
 
 from courses.models import (
@@ -121,13 +119,9 @@ class EditCourseView(FormView):
         return kwargs
 
     def form_valid(self, form):
-        filename = str(self.course_instance.cover)
-        full_cover = course_cover_path(self.course_instance, filename)
-        print('filename ', filename)
-        print('full_cover ', full_cover)
-        print('path ', os.path.join(settings.MEDIA_ROOT, full_cover))
-        if self.course_instance.cover != Course.DEFAULT_COURSE_COVER:
-            os.remove(os.path.join(settings.MEDIA_ROOT, full_cover))
+        # TODO: remove old cover
+        # TODO: revise bound and unboubd forms
+        # TODO: save thumbnail
         form.initial = {
             "name": self.request.POST.get("name"),
             "min_pass_grade": self.request.POST.get("min_pass_grade"),
@@ -136,9 +130,7 @@ class EditCourseView(FormView):
             "content": self.request.POST.get("content"),
             "cover": self.request.FILES.get("cover"),
         }
-        # print("FILES ", form.files)
         course = form.save()
-        # print("FORM data ", form.errors)
         return render(self.request, self.template_name, self.get_context_data())
 
 

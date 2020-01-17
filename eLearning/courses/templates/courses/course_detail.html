@@ -29,7 +29,7 @@ Course detail
     </p>
     <p>
         <label>Course rating:</label>
-        {{ course.rating }}
+        {{ course.rating|default:"course wasn't rated" }}
     </p>
     <p>
         <label>Course content:</label>

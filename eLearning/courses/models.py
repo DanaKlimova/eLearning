@@ -19,18 +19,7 @@ def validate_image_size(img):
 
 
 def course_cover_path(course, filename):
-    return f'courses/{course.pk}_{filename}'
-
-
-class OverwriteStorage(FileSystemStorage):
-    '''
-    Muda o comportamento padrão do Django e o faz sobrescrever arquivos de
-    mesmo nome que foram carregados pelo usuário ao invés de renomeá-los.
-    '''
-    def get_available_name(self, name, max_length):
-        if self.exists(name):
-            os.remove(os.path.join(settings.MEDIA_ROOT, name))
-        return name
+    return f'courses/{filename}'
 
 
 class Course(models.Model):
@@ -74,7 +63,7 @@ class Course(models.Model):
     rating = models.FloatField(null=True)
     students = models.ManyToManyField(Account, related_name='individual_courses')
     cover = models.ImageField(upload_to=course_cover_path, default=DEFAULT_COURSE_COVER,
-                              validators=[validate_image_size], storage=OverwriteStorage())
+                              validators=[validate_image_size])
 
 
 class CertificateTemplate(models.Model):
