@@ -25,28 +25,23 @@ Home
     </div>
 </div>
 {% else %}
-<div class="container">
+<div class="home-grid">
     {% for courses in courses_set%}
-    {% if forloop.first %}
-    <div class="row">
-    {% endif %}
-    {% if forloop.counter|divisibleby:4 %}
-    </div>
-    <div class="row">
-    {% endif %}
-        <div class="col">
-            <h6 class="text-muted">{{ courses.name }}</h6>
-            <ul class="list-group">
-                {% for course in courses.courses %}
-                <li class="text-dark list-group-item d-flex justify-content-between align-items-center">
-                    <a href="{% url 'course_detail' course_pk=course.pk %}">{{ course.name }}</a>
-                </li>
-                {% endfor %}
-            </ul>
+    <div class="courses-block">
+        <div class="course-name">
+            {{ courses.name }}
         </div>
-    {% if forloop.last %}
+        <div class="course-block">
+        {% for course in courses.courses %}
+            <div class="course-item">
+                <img src="{{ course.cover.url }}">
+                <a href="{% url 'course_detail' course_pk=course.pk %}">
+                    {{ course.name }}
+                </a>
+            </div>
+        {% endfor %}
+        </div>
     </div>
-    {% endif %}
     {% endfor %}
 </div>
 {% endif %}

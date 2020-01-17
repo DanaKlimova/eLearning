@@ -1,12 +1,12 @@
 body {
-    padding: 4px;
-    margin: 4px;
-    background-color: rgb(215, 209, 216);
+    background-color: #f8f9fa;
 }
 
 .main-grid {
     display: grid;
     grid-template-areas: "header" "main" "footer";
+    position: relative;
+    min-height: 99vh;
     /* NOT WORKING grid-gap: 1 em; */
 }
 
@@ -18,12 +18,13 @@ body {
 .main {
     grid-area: main;
     margin: 10px;
+    padding-bottom: 2.5rem;
 }
 
 .footer {
     grid-area: footer;
-    margin: 10px;
+    position: absolute;
     bottom: 0;
-    position: fixed;
+    height: 2.5rem;
     width: 100%;
 }
