@@ -34,10 +34,26 @@ Home
         <div class="course-block">
         {% for course in courses.courses %}
             <div class="course-item">
-                <img src="{{ course.cover.url }}">
+                <a href="{% url 'course_detail' course_pk=course.pk %}">
+                    <img src="{{ course.cover.url }}">
+                </a>
                 <a href="{% url 'course_detail' course_pk=course.pk %}">
                     {{ course.name }}
                 </a>
+            </div>
+        {% empty %}
+            <div class="no-courses">
+                {% if "current" in courses.name|lower %}
+                You haven't started learning.
+                {% elif "users" in courses.name|lower %}
+                There are no courses created by users.
+                {% elif "starred" in courses.name|lower %}
+                You haven't starred any course.
+                {% elif "completed" in courses.name|lower %}
+                You haven't completed any course.
+                {% elif "recommended" in courses.name|lower %}
+                There are no reated courses.
+                {% endif %}
             </div>
         {% endfor %}
         </div>
@@ -45,4 +61,18 @@ Home
     {% endfor %}
 </div>
 {% endif %}
+{% endblock %}
+
+{% block js_scripts %}
+<script>
+$(document).ready(function() {
+    document.querySelectorAll("div.course-block").forEach(function(parent) {
+        parent.childNodes.forEach(function(child) {
+            if (child.className === "no-courses") {
+                parent.classList.remove("course-block");
+            }
+        })
+    })
+});
+</script>
 {% endblock %}

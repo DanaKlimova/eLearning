@@ -5,20 +5,16 @@
 }
 
 .courses-block {
-    /* margin: 10px; */
+    margin: 10px;
+    background-color: #ffffff;
+    border-radius: 1em;
     padding: 4px;
-}
-
-.courses-block>h6 {
-    display: grid;
 }
 
 .course-block {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
-    background-color: #ffffff;
-    border-radius: 1em;
     padding: 5px;
 }
 
@@ -37,8 +33,12 @@
     padding-bottom: 5px;
 }
 
-.course-item>img {
+div img {
     max-height: 128;
     max-width: 128;
     display: block;
+}
+
+.no-courses {
+    text-align: center;
 }
