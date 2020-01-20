@@ -7,7 +7,7 @@ body {
     grid-template-rows: auto 1fr auto;
     grid-template-areas: "header" "main" "footer";
     position: relative;
-    min-height: 99vh;
+    min-height: 100vh;
     /* NOT WORKING grid-gap: 1 em; */
 }
 
@@ -19,13 +19,13 @@ body {
 .main {
     grid-area: main;
     margin: 10px;
-    padding-bottom: 2.5rem;
+    /* padding-bottom: 2.5rem; */
 }
 
 .footer {
     grid-area: footer;
-    position: absolute;
+    /* position: absolute;
     bottom: 0;
     height: 2.5rem;
-    width: 100%;
+    width: 100%; */
 }
