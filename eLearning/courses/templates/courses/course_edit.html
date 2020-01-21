@@ -6,6 +6,8 @@ Course detail
 
 {% block styles %}
 {% load static %}
+<link rel="stylesheet" type="text/css"
+    href="https://cdn.datatables.net/v/dt/dt-1.10.20/r-2.2.3/sc-2.0.1/datatables.min.css"/>
 <link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
 <link rel="stylesheet" href="{% static 'courses/css/course_edit.css' %}" />
 {% endblock %}
@@ -21,95 +23,122 @@ Course detail
             action="{% url 'course_create' %}">
         {% endif %}
             {% csrf_token %}
-            <div class="course-form-grid">
+            
+            {% if 'edit' not in view %}
+            <div class="container">
+            {% endif %}
+                <div class="course-form-grid">
 
-                <div class="form-input-item">
-                    <label>Course name</label>
-                    <input type="text" name="name" id="inputName" class="glowing-border text-input" required
-                        value="{{form.initial.name}}">
-                    <label class="error-label">
-                    {% for error in form.name.errors%}
-                    {{ error|default:"" }}
-                    {% endfor %}
-                    </label>
-                </div>
+                    <div class="form-input-item">
+                        <label>Course name</label>
+                        <input type="text" name="name" id="inputName" class="glowing-border text-input" required
+                            value="{{form.initial.name}}">
+                    </div>
 
-                <div class="form-input-item">
-                <label>Minimum pass grade</label>
-                <input type="text" name="min_pass_grade" id="inputMinPassGrade" class="glowing-border text-input" required
-                    value="{{form.initial.min_pass_grade}}">
-                <label class="error-label">
-                {% for error in form.min_pass_grade.errors%}
-                {{ error|default:"" }}
-                {% endfor %}
-                </label>
-                </div>
-
-
-                <div class="form-input-item">
-                <label>Choose type</label>
-                {% comment %} Дергается чего-то {% endcomment %}
-                <select id="typeId" class="select" name="type" required>
-                    {% for type, type_name in course_types %}
-                    <option value="{{type}}">{{type_name}}</option>
-                    {% endfor %}
-                </select>
-                <label class="error-label">
-                {% for error in form.type.errors%}
-                {{ error|default:"" }}
-                {% endfor %}
-                </label>
-                </div>
-
-                <div class="form-input-item">
-                <label>Choose status</label>
-                {% comment %} Дергается чего-то {% endcomment %}
-                <select id="statusId" class="select" name="status" required>
-                    {% for status, status_name in course_statuses %}
-                    <option value="{{status}}">{{status_name}}</option>
-                    {% endfor %}
-                </select>
-                <label class="error-label">
-                {% for error in form.status.errors%}
-                {{ error|default:"" }}
-                {% endfor %}
-                </label>
-                </div>
-
-                <div class="form-input-item">
-                <label>Description</label>
-                <input type="text" name="content" id="inputContent" class="glowing-border text-input" required
-                    value="{{form.initial.content}}">
-                <label class="error-label">
-                {% for error in form.content.errors%}
-                {{ error|default:"" }}
-                {% endfor %}
-                </label>
-                </div>
-
-                <div class="form-input-item">
-                    {% comment %} {% if 'edit' in view %}
-                    <img src="{{ cover_url }}" alt="{{ form.initial.name }}">
+                    {% if form.name.errors %}
+                    <div class="form-input-item">
+                        <label class="error-label">
+                            {% for error in form.name.errors%}
+                            {{ error|default:"" }}
+                            {% endfor %}
+                        </label>
+                    </div>
                     {% endif %}
-                    <label>
+
+                    <div class="form-input-item">
+                        <label>Minimum pass grade</label>
+                        <input type="text" name="min_pass_grade" id="inputMinPassGrade" class="glowing-border text-input" required
+                            value="{{form.initial.min_pass_grade}}">
+                    </div>
+
+                    {% if form.min_pass_grade.errors %}
+                    <div class="form-input-item">
+                        <label class="error-label">
+                            {% for error in form.min_pass_grade.errors%}
+                            {{ error|default:"" }}
+                            {% endfor %}
+                        </label>
+                    </div>
+                    {% endif %}
+
+
+                    <div class="form-input-item">
+                        <label>Choose type</label>
+                        {% comment %} Дергается чего-то {% endcomment %}
+                        <select id="typeId" class="select" name="type" required>
+                            {% for type, type_name in course_types %}
+                            <option value="{{type}}">{{type_name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    {% if form.type.errors %}
+                    <div class="form-input-item">
+                        <label class="error-label">
+                            {% for error in form.type.errors%}
+                            {{ error|default:"" }}
+                            {% endfor %}
+                        </label>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-input-item">
+                        <label>Choose status</label>
+                        {% comment %} Дергается чего-то {% endcomment %}
+                        <select id="statusId" class="select" name="status" required>
+                            {% for status, status_name in course_statuses %}
+                            <option value="{{status}}">{{status_name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    {% if form.status.errors %}
+                    <div class="form-input-item">
+                        <label class="error-label">
+                            {% for error in form.status.errors%}
+                            {{ error|default:"" }}
+                            {% endfor %}
+                        </label>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-input-item">
+                        <label>Description</label>
+                        <input type="text" name="content" id="inputContent" class="glowing-border text-input" required
+                            value="{{form.initial.content}}">
+                    </div>
+
+                    {% if form.content.errors %}
+                    <div class="form-input-item">
+                        <label class="error-label">
+                            {% for error in form.content.errors %}
+                            {{ error|default:"" }}
+                            {% endfor %}
+                        </label>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-input-item">
                         {% if 'edit' in view %}
-                        Change cover
+                            <label> Current cover:</label>
+                            <p>
+                                <img class="course-cover" src="{{ cover_url }}" alt="{{ form.initial.name }}">
+                            </p>
+                            <label> Change cover:</label>
                         {% else %}
-                        Upload cover
+                            <label> Upload cover:</label>
                         {% endif %}
-                    </label> {% endcomment %}
-                    <input type="file" name="cover" id="inputCover" placeholder="course cover"/>
+                        <input class="upload-file" type="file" name="cover" id="inputCover" placeholder="Course cover">
+                    </div>
                 </div>
-            </div>
 
-            {% comment %} 
-            # TODO: Always displays error "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
-            # Is it because of bound form?
-            {% for error in form.cover.errors%}
-            <p style="color:red;">{{ error|default:"" }}</p>
-            {% endfor %} {% endcomment %}
+                {% comment %} 
+                # TODO: Always displays error "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+                # Is it because of bound form?
+                {% for error in form.cover.errors%}
+                <p style="color:red;">{{ error|default:"" }}</p>
+                {% endfor %} {% endcomment %}
 
-            <div class="form-input-item">
                 {% if form.non_field_errors %}
                 <label class="error-label">{{ form.non_field_errors|default:"" }}</label>
                 {% endif %}
@@ -117,20 +146,19 @@ Course detail
                 {% if success_message %}
                 <label class="success-label">{{success_message}}</label>
                 {% endif %}
-                <div>
-            </div>
 
-            <button class="submit-button" type="submit">Save changes</button>
-
+                <button class="submit-button" type="submit">Save changes</button>
+            {% if 'edit' not in view %}
             </div>
+            {% endif %}
         </form>
     </div>
     {% if 'edit' in view %}
     <div class="col">
         <a href="{% url 'page_create' course_pk=course_pk %}">
-            <button class="float-right btn btn-lg btn-primary" type="submit">Add</button>
+            <button class="add-page-button" type="submit">Add page</button>
         </a>
-        <table class="table">
+        <table id="pageTableId" class="cell-border stripe hover">
             <thead>
                 <tr>
                     <th scope="col">Number</th>
@@ -141,9 +169,9 @@ Course detail
             <tbody>
                 {% for page in page_list %}
                 <tr>
-                    <th scope="row">{{page.number}}</th>
-                    <td>{{page.content}}</td>
-                    <td><a href="{% url 'page_edit' course_pk=course_pk page_pk=page.pk %}">edit</a></td>
+                    <td>{{ page.number }}</td>
+                    <td>{{ page.content }}</td>
+                    <td><a href="{% url 'page_edit' course_pk=course_pk page_pk=page.pk %}"><i class="far fa-edit"></i></a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -154,10 +182,19 @@ Course detail
 {% endblock %}
 
 {% block js_scripts %}
+<script src="https://kit.fontawesome.com/e278b3cacc.js" crossorigin="anonymous"></script>
+<script type="text/javascript"
+    src="https://cdn.datatables.net/v/dt/dt-1.10.20/r-2.2.3/sc-2.0.1/datatables.min.js">
+</script>
+
 <script>
 $(document).ready(function() {
-    selectElement('typeId', '{{ type }}')
-    selectElement('statusId', '{{ status }}')
+    $("#pageTableId").DataTable( {
+        searching: false,
+        ordering: false
+    });
+    selectElement('typeId', '{{ type }}');
+    selectElement('statusId', '{{ status }}');
 
     function selectElement(id, valueToSelect) {
         let element = document.getElementById(id);
