@@ -1,0 +1,11 @@
+.glowing-border {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem .5rem;
+}
+
+.glowing-border:focus,
+.glowing-border:hover {
+    outline: none;
+    border-color: #4f9cee;
+    box-shadow: 0 0 10px #4f9cee;
+}

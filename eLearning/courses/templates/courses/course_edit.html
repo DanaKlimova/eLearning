@@ -5,78 +5,103 @@ Course detail
 {% endblock %}
 
 {% block styles %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/course_edit.css' %}" />
 {% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col">
         {% if 'edit' in view %}
-        <form class="form-course" id="course_form" method="post" enctype="multipart/form-data"
+        <form id="course_form" method="post" enctype="multipart/form-data"
             action="{% url 'course_edit' course_pk=course_pk %}">
         {% else %}
-        <form class="form-course" id="course_form" method="post" enctype="multipart/form-data"
+        <form id="course_form" method="post" enctype="multipart/form-data"
             action="{% url 'course_create' %}">
         {% endif %}
             {% csrf_token %}
-            <h1 class="h3 mb-3 font-weight-normal">Course</h1>
+            <div class="course-form-grid">
 
-            <p><input type="text" name="name" id="inputName" class="form-control" placeholder="Course name" required
-                value="{{form.initial.name}}" autofocus></p>
-            {% for error in form.name.errors%}
-            <p style="color:red;">{{ error|default:"" }}</p>
-            {% endfor %}
+                <div class="form-input-item">
+                    <label>Course name</label>
+                    <input type="text" name="name" id="inputName" class="glowing-border text-input" required
+                        value="{{form.initial.name}}">
+                    <label class="error-label">
+                    {% for error in form.name.errors%}
+                    {{ error|default:"" }}
+                    {% endfor %}
+                    </label>
+                </div>
 
-            <p><input type="text" name="min_pass_grade" id="inputMinPassGrade" class="form-control" placeholder="Minimum pass grade" required
-                value="{{form.initial.min_pass_grade}}"></p>
-            {% for error in form.min_pass_grade.errors%}
-            <p style="color:red;">{{ error|default:"" }}</p>
-            {% endfor %}
-            
-            <p>
-            <label> Choose type:</label>
-                <select id="typeId" name="type" required>
+                <div class="form-input-item">
+                <label>Minimum pass grade</label>
+                <input type="text" name="min_pass_grade" id="inputMinPassGrade" class="glowing-border text-input" required
+                    value="{{form.initial.min_pass_grade}}">
+                <label class="error-label">
+                {% for error in form.min_pass_grade.errors%}
+                {{ error|default:"" }}
+                {% endfor %}
+                </label>
+                </div>
+
+
+                <div class="form-input-item">
+                <label>Choose type</label>
+                {% comment %} Дергается чего-то {% endcomment %}
+                <select id="typeId" class="select" name="type" required>
                     {% for type, type_name in course_types %}
                     <option value="{{type}}">{{type_name}}</option>
                     {% endfor %}
                 </select>
-            </p>
-            {% for error in form.type.errors%}
-            <p style="color:red;">{{ error|default:"" }}</p>
-            {% endfor %}
+                <label class="error-label">
+                {% for error in form.type.errors%}
+                {{ error|default:"" }}
+                {% endfor %}
+                </label>
+                </div>
 
-            <p>
-                <label> Choose status:</label>
-                <select id="statusId" name="status" required>
+                <div class="form-input-item">
+                <label>Choose status</label>
+                {% comment %} Дергается чего-то {% endcomment %}
+                <select id="statusId" class="select" name="status" required>
                     {% for status, status_name in course_statuses %}
                     <option value="{{status}}">{{status_name}}</option>
                     {% endfor %}
                 </select>
-            </p>
-            {% for error in form.status.errors%}
-            <p style="color:red;">{{ error|default:"" }}</p>
-            {% endfor %}
+                <label class="error-label">
+                {% for error in form.status.errors%}
+                {{ error|default:"" }}
+                {% endfor %}
+                </label>
+                </div>
 
-            <p><input type="text" name="content" id="inputContent" class="form-control" placeholder="Description" required
-                value="{{form.initial.content}}"></p>
-            {% for error in form.content.errors%}
-            <p style="color:red;">{{ error|default:"" }}</p>
-            {% endfor %}
+                <div class="form-input-item">
+                <label>Description</label>
+                <input type="text" name="content" id="inputContent" class="glowing-border text-input" required
+                    value="{{form.initial.content}}">
+                <label class="error-label">
+                {% for error in form.content.errors%}
+                {{ error|default:"" }}
+                {% endfor %}
+                </label>
+                </div>
 
-
-            <p>
-                {% if 'edit' in view %}
-                <label> Current cover:</label>
-                <p>
+                <div class="form-input-item">
+                    {% comment %} {% if 'edit' in view %}
                     <img src="{{ cover_url }}" alt="{{ form.initial.name }}">
-                </p>
-                <label> Change cover:</label>
-                {% else %}
-                <label> Upload cover:</label>
-                {% endif %}
-                <p>
-                    <input type="file" name="cover" id="inputCover" placeholder="Course cover">
-                </p>
-            </p>
+                    {% endif %}
+                    <label>
+                        {% if 'edit' in view %}
+                        Change cover
+                        {% else %}
+                        Upload cover
+                        {% endif %}
+                    </label> {% endcomment %}
+                    <input type="file" name="cover" id="inputCover" placeholder="course cover"/>
+                </div>
+            </div>
+
             {% comment %} 
             # TODO: Always displays error "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
             # Is it because of bound form?
@@ -84,15 +109,20 @@ Course detail
             <p style="color:red;">{{ error|default:"" }}</p>
             {% endfor %} {% endcomment %}
 
-            {% if form.non_field_errors %}
-            <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
-            {% endif %}
+            <div class="form-input-item">
+                {% if form.non_field_errors %}
+                <label class="error-label">{{ form.non_field_errors|default:"" }}</label>
+                {% endif %}
 
-            {% if success_message %}
-            <p style="color: green; text-align: center;">{{success_message}}</p>
-            {% endif %}
+                {% if success_message %}
+                <label class="success-label">{{success_message}}</label>
+                {% endif %}
+                <div>
+            </div>
 
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
+            <button class="submit-button" type="submit">Save changes</button>
+
+            </div>
         </form>
     </div>
     {% if 'edit' in view %}
