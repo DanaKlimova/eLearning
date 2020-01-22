@@ -2,6 +2,7 @@ table {
     background-color: white;
     color: #343a40;
     margin: 10px;
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
 }
 
 .table {
@@ -26,19 +27,6 @@ label {
     box-shadow: 0 0 10px #4f9cee;
 }
 
-.add-course-button {
-    background-color: #dddddd;
-    color: #343a40;
-    border-radius: 5% / 50%;
-    top: 2px;
-    bottom: 2px;
-    right: -2px;
-    left: -2px;
-    float: right;
-    font-size: 1.3vw;
-}
-
-.add-course-button:hover,
 span a:hover {
     outline: none;
     border-color: #b8bdc2;

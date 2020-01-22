@@ -79,3 +79,8 @@ table {
     border-color: #b8bdc2;
     box-shadow: 0 0 10px #b8bdc2;
 }
+
+.add-button {
+    float: right;
+    margin-bottom: 20px;
+}
