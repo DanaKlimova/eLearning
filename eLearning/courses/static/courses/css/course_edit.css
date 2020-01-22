@@ -1,3 +1,15 @@
+.course-grid {
+    display: grid;
+}
+
+.form-col {
+    grid-column: 1/2;
+}
+
+.page-col {
+    grid-column: 2/3;
+}
+
 .container {
     margin: 0 auto;
     width: 60%;
@@ -19,23 +31,7 @@
     align-self: center;
 }
 
-.add-page-button {
-    background-color: #ffffff;
-    border-radius: 15px;
-    border: 1px solid #dcdcdc;
-    padding: 10px;
-    color: #666666;
-    font-size: 1.5vw;
-    font-weight: bold;
-    text-decoration: none;
-    float: right;
-    width: 20%;
-    text-align: center;
+.submit-button {
+    display: block;
+    margin: 10px auto;
 }
-
-.add-page-button:hover {
-    outline: none;
-    border-color: #b8bdc2;
-    box-shadow: 0 0 10px #b8bdc2;
-}
-

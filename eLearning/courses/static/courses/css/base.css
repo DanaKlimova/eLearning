@@ -25,7 +25,6 @@ table {
     margin: 4px;
 }
 
-
 .select {
     border: 1px solid #ced4da;
     border-radius: 0.25rem .5rem;
@@ -48,7 +47,6 @@ table {
     box-shadow: 0 0 10px #4f9cee;
 }
 
-
 .error-label {
     color: red;
     grid-column: 2/3;
@@ -61,26 +59,7 @@ table {
     display: block;
 }
 
-.submit-button {
-    background: #ffffff;
-    background-color: #ffffff;
-    border-radius: 15px;
-    border: 1px solid #dcdcdc;
-    display: block;
-    padding: 14px 69px;
-    color: #666666;
-    font-size: 1.5vw;
-    font-weight: bold;
-    margin: 10px auto;
-}
-
-.submit-button:hover {
-    outline: none;
-    border-color: #b8bdc2;
-    box-shadow: 0 0 10px #b8bdc2;
-}
-
 .add-button {
     float: right;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
