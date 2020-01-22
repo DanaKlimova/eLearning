@@ -197,10 +197,18 @@ $(document).ready(function() {
     });
     selectElement('typeId', '{{ type }}');
     selectElement('statusId', '{{ status }}');
+    addClassByName('pageTableId_length', 'table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect');
 
     function selectElement(id, valueToSelect) {
         let element = document.getElementById(id);
         element.value = valueToSelect;
+    }
+
+    function addClassByName(name, class_) {
+        var elements = document.getElementsByName(name);
+        elements.forEach(function (item, index) {
+            item.className += class_;
+        });
     }
 });
 </script>
