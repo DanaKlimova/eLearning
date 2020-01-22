@@ -26,7 +26,7 @@ table {
 .form-input-item {
     display: grid;
     grid-template-columns: 50% 50%;
-    margin: 4px;
+    margin: 10px;
 }
 
 .select {
