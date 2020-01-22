@@ -1,3 +1,39 @@
+.page-grid {
+    display: grid;
+    grid-template-columns: 40% 60%;
+}
+
+.form-col {
+    grid-row: 2/3;
+    grid-column: 1/2;
+    margin: 0 10px;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 1em;
+    box-shadow: 0 0 1em rgba(0, 0, 0, .05);
+}
+
+.page-col {
+    grid-row: 2/3;
+    grid-column: 2/3;
+    margin: 0 10px;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 1em;
+    box-shadow: 0 0 1em rgba(0, 0, 0, .05);
+}
+
+.add-button-position {
+    grid-row: 1/2;
+    grid-column: 2/3;
+}
+
+.back-button-position {
+    grid-row: 1/2;
+    grid-column: 1/2;
+    float: left;
+}
+
 .container {
     margin: 0 auto;
     width: 60%;
@@ -7,28 +43,13 @@
     display: grid;
 }
 
-.add-question-button {
-    background-color: #ffffff;
-    border-radius: 15px;
-    border: 1px solid #dcdcdc;
-    padding: 10px;
-    color: #666666;
-    font-size: 1.5vw;
-    font-weight: bold;
-    text-decoration: none;
-    float: right;
-    width: 20%;
-    text-align: center;
-}
-
-.add-question-button:hover {
-    outline: none;
-    border-color: #b8bdc2;
-    box-shadow: 0 0 10px #b8bdc2;
-}
-
 .readonly-input {
-    background-color: #f8f9fa;
+    background-color: rgba(158,158,158,.2);;
     border: 1px solid #ced4da;
     border-radius: 0.25rem .5rem;
+}
+
+.submit-button {
+    display: block;
+    margin: 10px auto;
 }

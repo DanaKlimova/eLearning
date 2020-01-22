@@ -12,6 +12,7 @@ table {
 }
 
 .table {
+    margin: 10px;
     font-size: 1.3vw;
 }
 
@@ -37,6 +38,7 @@ table {
 
 .text-input {
     padding: 5px;
+    font-size: 1.3vw;
 }
 
 .glowing-border {
