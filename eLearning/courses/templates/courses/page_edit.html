@@ -5,6 +5,11 @@ Page detail
 {% endblock %}
 
 {% block styles %}
+{% load static %}
+<link rel="stylesheet" type="text/css"
+    href="https://cdn.datatables.net/v/dt/dt-1.10.20/r-2.2.3/sc-2.0.1/datatables.min.css"/>
+<link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/page_edit.css' %}" />
 {% endblock %}
 
 {% block content %}
@@ -21,38 +26,66 @@ Page detail
         <form class="form-page" id="page_form" method="post" action="{% url 'page_create' course_pk=course_pk%}">
         {% endif %}
             {% csrf_token %}
-            <h1 class="h3 mb-3 font-weight-normal">Page</h1>
 
-            <p><input type="text" name="number" id="inputNumber" class="form-control" placeholder="Page number" required
-                value="{% firstof page_number form.initial.number %}"
-                readonly></p>
-            {% for error in form.number.errors%}
-            <p style="color:red;">{{ error|default:"" }}</p>
-            {% endfor %}
-
-            <p><input type="text" name="content" id="inputContent" class="form-control" placeholder="Description" required
-                autofocus value="{{form.initial.content}}"></p>
-            {% for error in form.content.errors%}
-            <p style="color:red;">{{ error|default:"" }}</p>
-            {% endfor %}
-
-            {% if form.non_field_errors %}
-            <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
+            {% if 'edit' not in view %}
+            <div class="container">
             {% endif %}
+                <div class="page-form-grid">
 
-            {% if success_message %}
-            <p style="color: green; text-align: center;">{{success_message}}</p>
+                    <div class="form-input-item">
+                        <label>Page number</label>
+                        <input type="text" name="number" id="inputNumber" class="text-input readonly-input" required
+                                value="{% firstof page_number form.initial.number %}"
+                                readonly>
+                    </div>
+
+                    {% if form.name.errors %}
+                    <div class="form-input-item">
+                        <label class="error-label">
+                            {% for error in form.number.errors %}
+                            {{ error|default:"" }}
+                            {% endfor %}
+                        </label>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-input-item">
+                        <label>Description</label>
+                        <input type="text" name="content" id="inputContent" class="glowing-border text-input" required
+                                value="{{form.initial.content}}">
+                    </div>
+
+                    {% if form.name.errors %}
+                    <div class="form-input-item">
+                        <label class="error-label">
+                            {% for error in form.content.errors %}
+                            {{ error|default:"" }}
+                            {% endfor %}
+                        </label>
+                    </div>
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                    <lanel class="error-label">{{ form.non_field_errors|default:"" }}</label>
+                    {% endif %}
+
+                    {% if success_message %}
+                    <label class="success-label">{{success_message}}</label>
+                    {% endif %}
+
+                    <button class="submit-button" type="submit">Save changes</button>
+                </div>
+            {% if 'edit' not in view %}
+            </div>
             {% endif %}
-
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
         </form>
     </div>
     {% if 'edit' in view %}
     <div class="col">
         <a href="{% url 'question_create' course_pk=course_pk page_pk=page_pk %}">
-            <button class="float-right btn btn-lg btn-primary" type="submit">Add</button>
+            <button class="add-page-button" type="submit">Add question</button>
         </a>
-        <table class="table">
+        <table id="questionTableId" class="cell-border stripe hover">
             <thead>
                 <tr>
                     <th scope="col">Type</th>
@@ -74,4 +107,20 @@ Page detail
     </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block js_scripts %}
+<script src="https://kit.fontawesome.com/e278b3cacc.js" crossorigin="anonymous"></script>
+<script type="text/javascript"
+    src="https://cdn.datatables.net/v/dt/dt-1.10.20/r-2.2.3/sc-2.0.1/datatables.min.js">
+</script>
+
+<script>
+$(document).ready(function() {
+    $("#questionTableId").DataTable( {
+        searching: false,
+        ordering: false
+    });
+});
+</script>
 {% endblock %}

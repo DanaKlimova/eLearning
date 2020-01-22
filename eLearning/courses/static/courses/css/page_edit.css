@@ -3,23 +3,11 @@
     width: 60%;
 }
 
-.course-form-grid {
+.page-form-grid {
     display: grid;
 }
 
-.upload-file {
-    padding: 10px 0;
-    color: #343a40;
-}
-
-.course-cover {
-    max-height: 256;
-    max-width: 256;
-    justify-self: center;
-    align-self: center;
-}
-
-.add-page-button {
+.add-question-button {
     background-color: #ffffff;
     border-radius: 15px;
     border: 1px solid #dcdcdc;
@@ -33,9 +21,14 @@
     text-align: center;
 }
 
-.add-page-button:hover {
+.add-question-button:hover {
     outline: none;
     border-color: #b8bdc2;
     box-shadow: 0 0 10px #b8bdc2;
 }
 
+.readonly-input {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem .5rem;
+}
