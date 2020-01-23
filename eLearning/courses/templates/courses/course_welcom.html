@@ -102,9 +102,13 @@ Course enrollment detail
                     <div class="bold">
                         Grade:
                     </div>
-                    {{ grade|default:"you haven't started to study" }}
-                    {% if grade %}
-                    of {{ total_grade }}
+                    {% if course_enrollment.finished_at %}
+                        {{ grade|default:"0" }} of {{ total_grade }}
+                    {% else %}
+                        {{ grade|default:"you haven't started to study" }}
+                        {% if grade %}
+                        of {{ total_grade }}
+                        {% endif %}
                     {% endif %}
                 </label>
                 {% endif %}
