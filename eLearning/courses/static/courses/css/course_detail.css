@@ -1,0 +1,38 @@
+.follow-button {
+    float: right;
+    margin: 10px;
+    color: #343a40;
+}
+
+.container-grid {
+    display: grid;
+    width: 75%;
+    margin: 0 auto;
+}
+
+.course-grid {
+    display: grid;
+    width: 70%;
+    margin: 10px;
+    padding: 10px;
+}
+
+.image-position {
+    grid-column: 1/2;
+}
+
+.course-data-position {
+    grid-column: 2/3;
+}
+
+.course-cover {
+    display: block;
+    margin: 0 auto;
+    max-height: 512;
+    max-width: 512;
+}
+
+.text-data {
+    display: block;
+    margin: 10px 0;
+}
