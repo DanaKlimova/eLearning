@@ -25,6 +25,7 @@ th {
     width: auto;
     margin: 5px;
     padding: 2px;
+    color: #343a40;
 }
 
 .form-input-item {
@@ -37,6 +38,7 @@ th {
     border: 1px solid #ced4da;
     border-radius: 0.25rem .5rem;
     padding: 5px;
+    font-size: 1.3vw;
 }
 
 .text-input {
@@ -71,8 +73,22 @@ th {
 .add-button {
     float: right;
     margin-bottom: 10px;
+    color: #343a40;
+}
+
+.submit-button {
+    display: block;
+    margin: 10px auto;
+    color: #343a40;
 }
 
 .arrow-left {
     color: rgb(255, 64, 129);
+}
+
+.background {
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 1em;
+    box-shadow: 0 0 1em rgba(0, 0, 0, .05);
 }

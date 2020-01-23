@@ -7,20 +7,12 @@
     grid-row: 2/3;
     grid-column: 1/2;
     margin: 0 10px;
-    padding: 10px;
-    background-color: #ffffff;
-    border-radius: 1em;
-    box-shadow: 0 0 1em rgba(0, 0, 0, .05);
 }
 
 .page-col {
     grid-row: 2/3;
     grid-column: 2/3;
     margin: 0 10px;
-    padding: 10px;
-    background-color: #ffffff;
-    border-radius: 1em;
-    box-shadow: 0 0 1em rgba(0, 0, 0, .05);
 }
 
 .add-button-position {
@@ -49,9 +41,4 @@
     background-color: rgba(158, 158, 158, .2);
     border: 1px solid #ced4da;
     border-radius: 0.25rem .5rem;
-}
-
-.submit-button {
-    display: block;
-    margin: 10px auto;
 }

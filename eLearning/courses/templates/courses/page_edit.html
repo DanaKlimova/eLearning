@@ -18,10 +18,10 @@ Page detail
     <div class="back-button-position">
         <a href="{% url 'course_edit' course_pk=course_pk %}">
             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
-                    type="submit"><i class="fas fa-arrow-left arrow-left"></i></button>
+                    type="button"><i class="fas fa-arrow-left arrow-left"></i></button>
         </a>
     </div>
-    <div class="form-col">
+    <div class="form-col background">
 {% endif %}
         {% if 'edit' in view %}
         <form class="form-page" id="page_form" method="post" action="{% url 'page_edit' course_pk=course_pk page_pk=page_pk %}">
@@ -31,7 +31,13 @@ Page detail
             {% csrf_token %}
 
             {% if 'edit' not in view %}
-            <div class="container">
+            <div class="back-button-position">
+                <a href="{% url 'course_edit' course_pk=course_pk %}">
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
+                    type="button"><i class="fas fa-arrow-left arrow-left"></i></button>
+                 </a>
+            </div>
+            <div class="container background">
             {% endif %}
                 <div class="page-form-grid">
 
@@ -90,7 +96,7 @@ Page detail
                         type="submit">Add question</button>
             </a>
         </div>
-        <div class="page-col">
+        <div class="page-col background">
             <div class="table-wrapper">
                 <table id="questionTableId" class="cell-border stripe hover table">
                     <thead>
