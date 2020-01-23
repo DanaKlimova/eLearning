@@ -1,6 +1,5 @@
 label {
-    margin: 10px;
-    font-size: 1.5vw;
+    font-size: 1vw;
     color: #343a40;
 }
 
@@ -11,16 +10,16 @@ th {
 .table {
     background-color: white;
     color: #343a40;
-    font-size: 1.5vw;
+    font-size: 1vw;
 }
 
 .table-wrapper {
     margin: 10px;
-    font-size: 1.3vw;
+    font-size: 0.8vw;
 }
 
 .table-select {
-    font-size: 1.5vw;
+    font-size: 1vw;
     height: auto;
     width: auto;
     margin: 5px;
@@ -38,12 +37,21 @@ th {
     border: 1px solid #ced4da;
     border-radius: 0.25rem .5rem;
     padding: 5px;
-    font-size: 1.3vw;
+    font-size: 1vw;
 }
 
 .text-input {
     padding: 5px;
-    font-size: 1.3vw;
+    font-size: 1vw;
+}
+
+.bold {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.inline {
+    display: inline;
 }
 
 .glowing-border {
