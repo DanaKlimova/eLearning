@@ -91,3 +91,8 @@
     color: red;
     border: 0.5rem solid red;
 }
+
+.continue-button {
+    margin: 10px;
+    color: #343a40;
+}

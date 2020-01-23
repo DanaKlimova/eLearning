@@ -13,13 +13,16 @@ Course enrollment detail
 {% endblock %}
 
 {% block content %}
-{% if not course_enrollment.finished_at %}
-<a href="{% url 'course_page' course_pk=course_enrollment.course.pk page_pk=current_page.pk%}">
-    <button class="float-right btn btn-lg btn-primary" type="submit">Continue</button>
-</a>
-{% endif %}
 <div class="container-grid">
     <div class="table-col background">
+
+        {% if not course_enrollment.finished_at %}
+        <a href="{% url 'course_page' course_pk=course_enrollment.course.pk page_pk=current_page.pk%}">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect continue-button"
+                type="button">Continue</button>
+        </a>
+        {% endif %}
+
         <div class="table-wrapper">
 
             {% if course_enrollment.finished_at %}
