@@ -5,90 +5,148 @@ Question detail
 {% endblock %}
 
 {% block styles %}
+{% load static %}
+<link rel="stylesheet" type="text/css"
+    href="https://cdn.datatables.net/v/dt/dt-1.10.20/r-2.2.3/sc-2.0.1/datatables.min.css"/>
+<link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/question_edit.css' %}" />
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <a href="{% url 'page_edit' course_pk=course_pk page_pk=page_pk%}">
-        <button class="float-left btn btn-lg btn-primary" type="submit">Back to page edit</button>
-    </a>
-</div>
-<div class="row">
-    <div class="col">
+{% if 'edit' in view %}
+<div class="question-grid">
+    <div class="back-button-position">
+        <a href="{% url 'page_edit' course_pk=course_pk page_pk=page_pk %}">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
+                    type="submit"><i class="fas fa-arrow-left arrow-left"></i></button>
+        </a>
+    </div>
+    <div class="form-col">
+{% endif %}
         {% if 'edit' in view %}
         <form class="form-question" id="question_form" method="post" action="{% url 'question_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">
         {% else %}
         <form class="form-question" id="question_form" method="post" action="{% url 'question_create' course_pk=course_pk page_pk=page_pk %}">
         {% endif %}
             {% csrf_token %}
-            <h1 class="h3 mb-3 font-weight-normal">Question</h1>
 
-            <p>
-                <label> Choose type:</label>
-                <select id="typeId" name="type" required>
-                    {% for type, type_name in question_types %}
-                    <option value="{{type}}">{{type_name}}</option>
-                    {% endfor %}
-                </select>
-            </p>
-            {% for error in form.type.errors%}
-            <p style="color:red;">{{ error|default:"" }}</p>
-            {% endfor %}
-
-            <p><input type="text" name="content" id="inputContent" class="form-control" placeholder="Description" required
-                autofocus value="{{form.initial.content}}"></p>
-            {% for error in form.content.errors%}
-            <p style="color:red;">{{ error|default:"" }}</p>
-            {% endfor %}
-
-            {% if form.non_field_errors %}
-            <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
+            {% if 'edit' not in view %}
+            <div class="container">
             {% endif %}
+            <div class="question-form-grid">
 
-            {% if success_message %}
-            <p style="color: green; text-align: center;">{{success_message}}</p>
+                <div class="form-input-item">
+                    <label>Choose type</label>
+                    {% comment %} Дергается чего-то {% endcomment %}
+                    <select id="typeId" name="type" class="select" required>
+                        {% for type, type_name in question_types %}
+                        <option value="{{type}}">{{type_name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {% if form.type.errors %}
+                    <div class="form-input-item">
+                        <label class="error-label">
+                            {% for error in form.type.errors%}
+                            {{ error|default:"" }}
+                            {% endfor %}
+                        </label>
+                    </div>
+                {% endif %}
+
+                <div class="form-input-item">
+                    <label>Description:</label>
+                    <input type="text" name="content" id="inputContent" class="glowing-border text-input" required
+                        value="{{form.initial.content}}">
+                </div>
+
+                {% if form.content.errors %}
+                    <div class="form-input-item">
+                        <label class="error-label">
+                            {% for error in form.content.errors %}
+                            {{ error|default:"" }}
+                            {% endfor %}
+                        </label>
+                    </div>
+                {% endif %}
+
+                {% if form.non_field_errors %}
+                    <label class="error-label">{{ form.non_field_errors|default:"" }}</label>
+                {% endif %}
+
+                {% if success_message %}
+                    <label class="success-label">{{success_message}}</label>
+                {% endif %}
+
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button" type="submit">Save changes</button>
+            
+            </div>
+            {% if 'edit' not in view %}
+            </div>
             {% endif %}
-
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
         </form>
+        {% if 'edit' in view %}
+        {% load course_extras %}
+        </div>
+        <div class="add-button-position">
+            <a href="{% url 'variant_create' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect add-button"
+                        type="submit">Add variant</button>
+            </a>
+        </div>
+        <div class="page-col">
+            <div class="table-wrapper">
+                <table id="questionTableId" class="cell-border stripe hover table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Is correct</th>
+                            <th scope="col">Variant</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for variant in variant_list %}
+                        <tr>
+                            <td>{{ variant.is_correct }}</td>
+                            <td>{{variant.content}}</td>
+                            <td><a href="{% url 'variant_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk variant_pk=variant.pk %}"><i class="far fa-edit"></i></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    {% if 'edit' in view %}
-    {% load course_extras %}
-    <div class="col">
-        <a href="{% url 'variant_create' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">
-            <button class="float-right btn btn-lg btn-primary" type="submit">Add</button>
-        </a>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Is correct</th>
-                    <th scope="col">Variant</th>
-                    <th scope="col">Edit</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for variant in variant_list %}
-                <tr>
-                    <th scope="row">{{ variant.is_correct }}</th>
-                    <td>{{variant.content}}</td>
-                    <td><a href="{% url 'variant_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk variant_pk=variant.pk %}">edit</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %}
-</div>
+{% endif %}
 {% endblock %}
 
 {% block js_scripts %}
+<script src="https://kit.fontawesome.com/e278b3cacc.js" crossorigin="anonymous"></script>
+<script type="text/javascript"
+    src="https://cdn.datatables.net/v/dt/dt-1.10.20/r-2.2.3/sc-2.0.1/datatables.min.js">
+</script>
+
 <script>
 $(document).ready(function() {
+    $("#questionTableId").DataTable( {
+        searching: false,
+        ordering: false
+    });
+
     selectElement('typeId', '{{ type }}')
+    addClassByName('questionTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect');
 
     function selectElement(id, valueToSelect) {
         let element = document.getElementById(id);
         element.value = valueToSelect;
+    }
+
+    function addClassByName(name, class_) {
+        var elements = document.getElementsByName(name);
+        elements.forEach(function (item, index) {
+            item.className += class_;
+        });
     }
 });
 </script>
