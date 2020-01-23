@@ -5,52 +5,72 @@ Variant detail
 {% endblock %}
 
 {% block styles %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/variant_edit.css' %}" />
 {% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="back-button-position">
     <a href="{% url 'question_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">
-        <button class="float-left btn btn-lg btn-primary" type="submit">Back to question edit</button>
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
+        type="button"><i class="fas fa-arrow-left arrow-left"></i></button>
     </a>
 </div>
-
-{% if 'edit' in view %}
-<form class="form-variant" id="variant_form" method="post" action="{% url 'variant_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk variant_pk=variant_pk %}">
-{% else %}
-<form class="form-variant" id="variant_form" method="post" action="{% url 'variant_create' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">
-{% endif %}
-    {% csrf_token %}
-    <h1 class="h3 mb-3 font-weight-normal">Variant</h1>
-
-    <div class="form-check">
-        <input class="form-check-input" name="is_correct" type="checkbox" id="checkboxId">
-        <label class="form-check-label" for="checkboxId">
-            Is correct
-        </label>
-    </div>
-    {% for error in form.is_correct.errors%}
-    <p style="color:red;">{{ error|default:"" }}</p>
-    {% endfor %}
-
-    <p><input type="text" name="content" id="inputContent" class="form-control" placeholder="Description" required
-        autofocus value="{{form.initial.content}}"></p>
-    {% for error in form.content.errors%}
-    <p style="color:red;">{{ error|default:"" }}</p>
-    {% endfor %}
-
-    {% if form.non_field_errors %}
-    <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
+<div class="container background">
+    {% if 'edit' in view %}
+    <form class="form-variant" id="variant_form" method="post" action="{% url 'variant_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk variant_pk=variant_pk %}">
+    {% else %}
+    <form class="form-variant" id="variant_form" method="post" action="{% url 'variant_create' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">
     {% endif %}
+        {% csrf_token %}
+        <div class="variant-form-grid">
 
-    {% if success_message %}
-    <p style="color: green; text-align: center;">{{success_message}}</p>
-    {% endif %}
+            <div class="form-input-item">
+                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect  checkbox-input" for="checkboxId">
+                    <input type="checkbox" id="checkboxId" name="is_correct"
+                        class="mdl-checkbox__input">
+                    <span class="mdl-checkbox__label">is correct</span>
+                </label>
+            </div>
 
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
-</form>
+            {% for error in form.is_correct.errors%}
+            <p style="color:red;">{{ error|default:"" }}</p>
+            {% endfor %}
+
+            <div class="form-input-item">
+                <label>Description</label>
+                <input type="text" name="content" id="inputContent" class="glowing-border text-input" required
+                        value="{{form.initial.content}}">
+            </div>
+
+            {% if form.name.errors %}
+            <div class="form-input-item">
+                <label class="error-label">
+                    {% for error in form.content.errors %}
+                    {{ error|default:"" }}
+                    {% endfor %}
+                </label>
+            </div>
+            {% endif %}
+
+            {% if form.non_field_errors %}
+            <label class="error-label">{{ form.non_field_errors|default:"" }}</label>
+            {% endif %}
+
+            {% if success_message %}
+            <label class="success-label">{{success_message}}</label>
+            {% endif %}
+
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button" type="submit">Save changes</button>
+        </div>
+    </form>
+</div>
 {% endblock %}
 
 {% block js_scripts %}
+<script src="https://kit.fontawesome.com/e278b3cacc.js" crossorigin="anonymous"></script>
+
 <script>
 $(document).ready(function() {
     checkElement('checkboxId', '{{ is_correct }}')
