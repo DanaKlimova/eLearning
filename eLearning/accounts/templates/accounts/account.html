@@ -6,37 +6,80 @@ Account
 {% block styles %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'accounts/css/base.css' %}"/>
+<link rel="stylesheet" href="{% static 'accounts/css/account.css' %}"/>
 {% endblock %}
 
 {% block content %}
-<form class="form-signin" id="account_form" method="post" action="{% url 'account' %}">
-    {% csrf_token %}
-    <h1 class="h3 mb-3 font-weight-normal">Account</h1>
+<div class="container background">
 
-    <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required
-        value="{{form.initial.email}}">
+    <h2 class="text-center">Account details</h2>
 
-    <input type="text" name="first_name" id="inputFirstName" class="form-control" placeholder="First name" required
-        autofocus value="{{form.initial.first_name}}">
+    <form id="account_form" method="post" action="{% url 'account' %}">
+        {% csrf_token %}
 
-    <input type="text" name="last_name" id="inputLastName" class="form-control" placeholder="Last name" required
-        value="{{form.initial.last_name}}">
+        <div class="account-form-grid">
 
-    {% for field in form %}
-    <p>
-        {% for error in field.errors%}
-        <p style="color:red;">{{ error|default:"" }}</p>
-        {% endfor %}
-    </p>
-    {% endfor %}
-    {% if form.non_field_errors %}
-    <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
-    {% endif %}
+            <div class="form-input-item">
+                <label>Email</label>
+                <input type="email" name="email" id="inputEmail" class="glowing-border text-input" required
+                value="{{form.initial.email}}">
+            </div>
 
-    {% if success_message %}
-    <p style="color: green; text-align: center;">{{success_message}}</p>
-    {% endif %}
+            {% if form.email.errors %}
+            <div class="form-input-item">
+                <label class="error-label">
+                    {% for error in form.email.errors%}
+                    {{ error|default:"" }}
+                    {% endfor %}
+                </label>
+            </div>
+            {% endif %}
 
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
-</form>
+            <div class="form-input-item">
+                <label>First name</label>
+                <input type="text" name="first_name" id="inputFirstName" class="glowing-border text-input" required
+                value="{{form.initial.first_name}}">
+            </div>
+
+            {% if form.first_name.errors %}
+            <div class="form-input-item">
+                <label class="error-label">
+                    {% for error in form.first_name.errors%}
+                    {{ error|default:"" }}
+                    {% endfor %}
+                </label>
+            </div>
+            {% endif %}
+
+            <div class="form-input-item">
+                <label>Last name</label>
+                <input type="text" name="last_name" id="inputLastName" class="glowing-border text-input" required
+                value="{{form.initial.last_name}}">
+            </div>
+
+            {% if form.last_name.errors %}
+            <div class="form-input-item">
+                <label class="error-label">
+                    {% for error in form.last_name.errors%}
+                    {{ error|default:"" }}
+                    {% endfor %}
+                </label>
+            </div>
+            {% endif %}
+
+            {% if form.non_field_errors %}
+            <label class="error-label">{{ form.non_field_errors|default:"" }}</label>
+            {% endif %}
+
+            {% if success_message %}
+            <label class="success-label">{{success_message}}</label>
+            {% endif %}
+
+        </div>
+
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button"
+            type="submit">Save changes</button>
+
+    </form>
+</div>
 {% endblock %}

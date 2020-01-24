@@ -1,0 +1,8 @@
+.container {
+    width: 40%;
+    margin: 0 auto;
+}
+
+.account-form-grid {
+    display: grid;
+}
