@@ -25,40 +25,42 @@ Home
     </div>
 </div>
 {% else %}
-<div class="home-grid">
-    {% for courses in courses_set%}
-    <div class="courses-block">
-        <div class="course-name">
-            {{ courses.name }}
+<div class="container">
+    <div class="home-grid">
+        {% for courses in courses_set%}
+        <div class="courses-block">
+            <div class="courses-name">
+                {{ courses.name }}
+            </div>
+            <div class="course-block">
+            {% for course in courses.courses %}
+                <div class="course-item">
+                    <a href="{% url 'course_detail' course_pk=course.pk %}">
+                        <img class="course-cover" src="{{ course.cover.url }}">
+                    </a>
+                    <a class="course-name" href="{% url 'course_detail' course_pk=course.pk %}">
+                        {{ course.name }}
+                    </a>
+                </div>
+            {% empty %}
+                <div class="no-courses">
+                    {% if "current" in courses.name|lower %}
+                    You haven't started learning.
+                    {% elif "users" in courses.name|lower %}
+                    There are no courses created by users.
+                    {% elif "starred" in courses.name|lower %}
+                    You haven't starred any course.
+                    {% elif "completed" in courses.name|lower %}
+                    You haven't completed any course.
+                    {% elif "recommended" in courses.name|lower %}
+                    There are no reated courses.
+                    {% endif %}
+                </div>
+            {% endfor %}
+            </div>
         </div>
-        <div class="course-block">
-        {% for course in courses.courses %}
-            <div class="course-item">
-                <a href="{% url 'course_detail' course_pk=course.pk %}">
-                    <img src="{{ course.cover.url }}">
-                </a>
-                <a href="{% url 'course_detail' course_pk=course.pk %}">
-                    {{ course.name }}
-                </a>
-            </div>
-        {% empty %}
-            <div class="no-courses">
-                {% if "current" in courses.name|lower %}
-                You haven't started learning.
-                {% elif "users" in courses.name|lower %}
-                There are no courses created by users.
-                {% elif "starred" in courses.name|lower %}
-                You haven't starred any course.
-                {% elif "completed" in courses.name|lower %}
-                You haven't completed any course.
-                {% elif "recommended" in courses.name|lower %}
-                There are no reated courses.
-                {% endif %}
-            </div>
         {% endfor %}
-        </div>
     </div>
-    {% endfor %}
 </div>
 {% endif %}
 {% endblock %}
