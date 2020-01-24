@@ -3,6 +3,11 @@ label {
     color: #343a40;
 }
 
+.container {
+    width: 35%;
+    margin: 0 auto;
+}
+
 .text-center {
     text-align: center;
 }
@@ -51,6 +56,8 @@ label {
 
 .submit-button {
     display: block;
-    margin: 10px auto;
+    margin: 20px auto;
     color: #343a40;
+    height: auto;
+    padding: 0 35px;
 }
