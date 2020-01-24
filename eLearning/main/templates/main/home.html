@@ -11,17 +11,66 @@ Home
 
 {% block content %}
 {% if not user.is_authenticated %}
-<div class="container">
-    <div class="img-banner">
-        <img class="img-fluid" src="{% static 'main/image/img-banner.jpg' %}" alt="img_banner" />
-        <div class="darker-img"></div>
+<div class="background">
+    <div class="image-container">
+        <div class="banner">
+            <div class="banner-content">
+                <h3>Your Course to success</h3>
+                <h3>Improve your skills with eLearning</h3>
+                <a href="{% url 'registration'  %}">
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect join-btn"
+                            type="submit">Join</button>
+                </a> 
+            </div>
+        </div>
     </div>
-    <div class="centered">
-        <h1 class="text-white">Your Course to success</h1>
-        <p class="text-white">Improve your skills with eLearning</p>
-        <p class="lead">
-            <a class="btn btn-primary btn-lg" href="{% url 'registration'  %}" role="button">Join</a>
-        </p>
+    <div class="advantages">
+        <div>
+            <i class="fas fa-user-friends pirple"></i>
+            <h4>Online Learning helps us stay relevant in a quickly changing world</h4>
+        </div>
+
+        <div>
+            <i class="fas fa-hourglass-half pirple"></i>
+            <h4>E-Learning is resource efficient</h4>
+        </div>
+
+        <div>
+            <i class="fas fa-laptop pirple"></i>
+            <h4>Online Learning is more accessible to all</h4>
+        </div>
+
+        <div>
+            <i class="fas fa-user-graduate pirple"></i>
+            <h4>Upskilling is becoming increasingly necessary</h4>
+        </div>
+    </div>
+    <div class="head">
+        <h3>World-class learning for anyone, anywhere
+    </div>
+    <div class="item-grid">
+        <div class="item-grid-cell">
+            <h4>Learn & Travel</h4>
+            <h6>
+                Discover the world and study! No need to attend classroom to learn! 
+                Just open your laptop and go!
+            </h6>
+        </div>
+        <div class="item-grid-cell">
+            <img class="travel-img" src="{% static 'main/image/travel.jpg' %}">
+        </div>
+    </div>
+    <div class="item-grid">
+        <div class="item-grid-cell">
+            <img class="travel-img" src="{% static 'main/image/time.jpg' %}">
+        </div>
+        <div class="item-grid-cell">
+            <h4>Learn when you can</h4>
+            <h6>
+                Pick your learning time! No need to waste time on the road! 
+                Just learn when you can!
+            </h6>
+        </div>
     </div>
 </div>
 {% else %}
@@ -66,6 +115,7 @@ Home
 {% endblock %}
 
 {% block js_scripts %}
+<script src="https://kit.fontawesome.com/e278b3cacc.js" crossorigin="anonymous"></script>
 <script>
 $(document).ready(function() {
     document.querySelectorAll("div.course-block").forEach(function(parent) {

@@ -67,3 +67,74 @@
     text-align: center;
     font-size: 1vw;
 }
+
+.image-container {
+    width: 100%;
+    position: relative;
+    text-align: left;
+    color: white;
+    margin: 0px auto;
+}
+
+.centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.banner {
+    padding: 2em;
+    background-image: linear-gradient(90deg, #271066, rgba(39, 16, 102, 0) 55%, rgba(39, 16, 102, 0) 70%, #271066), url('image/img-banner.jpg');
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 350px;
+    padding: 0 auto;
+}
+
+.banner-content {
+    text-align: left;
+    color: white;
+}
+
+.join-btn {
+    font-size: 1.5vw;
+    background-color: white;
+    padding: 10px 40px;
+    height: auto;
+}
+
+.advantages {
+    margin: 30px 0;
+    font-size: 7vw;
+    text-align: center;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.pirple {
+    color: #271066;
+}
+
+.item-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.item-grid-cell {
+    text-align: center;
+    justify-self: center;
+    align-self: center;
+    margin: 20px;
+}
+
+.travel-img {
+    max-width: 512;
+    max-height: 512;
+}
+
+.head {
+    text-align: center;
+    margin: 10px;
+}
