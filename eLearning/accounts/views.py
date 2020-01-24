@@ -99,7 +99,7 @@ class AccountView(FormView):
 
 
 class LogoutUser(LogoutView):
-    template_name = 'accounts/logout.html'
+    template_name = 'main/home.html'
 
     @never_cache
     def dispatch(self, request, *args, **kwargs):
