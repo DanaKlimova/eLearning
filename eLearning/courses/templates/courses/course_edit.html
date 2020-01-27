@@ -106,8 +106,7 @@ Course detail
 
                     <div class="form-input-item">
                         <label>Description</label>
-                        <input type="text" name="content" id="inputContent" class="glowing-border text-input" required
-                            value="{{form.initial.content}}">
+                        <textarea name="content" id="inputContent" class="glowing-border text-area" required>{{form.initial.content}}</textarea>
                     </div>
 
                     {% if form.content.errors %}
