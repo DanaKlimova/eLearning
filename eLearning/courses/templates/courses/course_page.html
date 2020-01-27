@@ -41,6 +41,12 @@ Course page
 </dialog>
 <div class="container background">
     <div class="page-content-wrapper">
+    
+        <a href="{% url 'course_welcom' course_pk=course_pk %}">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                    type="submit">To course</button>
+        </a>
+
         <label class="text-data">
             <div class="bold part">
                 Page content
