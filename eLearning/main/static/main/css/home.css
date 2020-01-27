@@ -20,6 +20,13 @@
     font-size: 1.4vw;
     margin-bottom: 5px;
     text-align: center;
+    color: rgba(0, 0, 0, .87);
+    text-decoration: none;
+}
+
+.courses-name:hover {
+    text-decoration-line: underline;
+    color: black;
 }
 
 .course-block {

@@ -79,7 +79,11 @@ Home
         {% for courses in courses_set%}
         <div class="courses-block">
             <div class="courses-name">
-                {{ courses.name }}
+            {% if "current" in courses.name|lower %}
+                <a class="courses-name" href="{% url 'current_courses' %}">
+            {% endif %}
+                    {{ courses.name }}
+                </a>
             </div>
             <div class="course-block">
             {% for course in courses.courses %}

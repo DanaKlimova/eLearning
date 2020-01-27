@@ -1,6 +1,7 @@
 from collections import namedtuple
 
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 from courses.models import Course
 
@@ -59,3 +60,20 @@ def home(request):
         pass
 
     return render(request, "main/home.html", context)
+
+
+@login_required
+def current_courses(request):
+    if request.method == "GET":
+        context = {}
+
+        user = request.user
+        current_course_enrollments = user.courseenrollment_set.filter(
+            finished_at__isnull=True
+        ).order_by('-course__rating')
+
+        current_courses = [course_enrollment.course for course_enrollment in current_course_enrollments]
+
+        context["courses"] = current_courses
+        context["courses_type"] = "current"
+    return render(request, "main/category_courses.html", context)
