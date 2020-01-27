@@ -41,7 +41,7 @@ Course page
 </dialog>
 <div class="container background">
     <div class="page-content-wrapper">
-    
+
         <a href="{% url 'course_welcom' course_pk=course_pk %}">
             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
                     type="submit">To course</button>
@@ -160,18 +160,6 @@ $(document).ready(function() {
             dialog.close();
         });
     }
-
-    //var dialog = document.querySelector('dialog');
-    //var showModalButton = document.querySelector('.show-modal');
-    //if (! dialog.showModal) {
-    //  dialogPolyfill.registerDialog(dialog);
-    //}
-    //showModalButton.addEventListener('click', function() {
-    //  dialog.showModal();
-    //});
-    //dialog.querySelector('.close').addEventListener('click', function() {
-    //  dialog.close();
-    //});
         
     $("#rateButtonId").click(async function() {
         let rate = $("input[name='rate']:checked").val();
