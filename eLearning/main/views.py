@@ -43,10 +43,11 @@ def home(request):
             [enrollment.course for enrollment in last_completed_course_enrollments]
         )
 
-        recomended_courses = NamedCourses(
-            'Recomended',
-            Course.objects.filter(type='pbl', status='rdy').order_by('rating')[:6]
-        )
+        recomended_courses = NamedCourses('Recomended', (
+            Course.objects.filter(type='pbl', status='rdy')[:6]
+            ).union(
+            user.individual_courses.filter(status='rdy')[:6]
+        ).order_by('rating'))
 
         context['courses_set'] = [
             current_courses,
@@ -130,4 +131,21 @@ def completed_courses(request):
 
         context["courses"] = completed_courses
         context["courses_type"] = "completed"
+    return render(request, "main/category_courses.html", context)
+
+
+@login_required
+def recomended_courses(request):
+    if request.method == "GET":
+        context = {}
+
+        user = request.user
+
+        recomended_courses = (Course.objects.filter(type='pbl', status='rdy')
+            ).union(
+            user.individual_courses.filter(status='rdy')
+        ).order_by('rating')
+
+        context["courses"] = recomended_courses
+        context["courses_type"] = "recomended"
     return render(request, "main/category_courses.html", context)

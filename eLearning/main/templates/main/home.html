@@ -87,6 +87,8 @@ Home
                 <a class="courses-name" href="{% url 'starred_courses' %}">
             {% elif "completed" in courses.name|lower %}
                 <a class="courses-name" href="{% url 'completed_courses' %}">
+            {% elif "recomended" in courses.name|lower %}
+                <a class="courses-name" href="{% url 'recomended_courses' %}">
             {% endif %}
                     {{ courses.name }}
                 </a>
