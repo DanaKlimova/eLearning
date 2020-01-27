@@ -53,6 +53,8 @@
 .course-cover {
     max-height: 128;
     max-width: 128;
+    width: 100%;
+    height: auto;
     display: block;
 }
 
