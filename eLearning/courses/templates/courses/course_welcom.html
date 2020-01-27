@@ -41,7 +41,7 @@ Course enrollment detail
                 <div class="bold inline">
                 Progress:
                 </div>
-                {{ course_enrollment.progress|default:"0" }}%
+                {{ course_enrollment.progress|default:"0"|floatformat:"0"  }}%
             </label>
             <div id="progressId" class="mdl-progress mdl-js-progress progress"></div>
                    
