@@ -85,6 +85,8 @@ Home
                 <a class="courses-name" href="{% url 'users_courses' %}">
             {% elif "starred" in courses.name|lower %}
                 <a class="courses-name" href="{% url 'starred_courses' %}">
+            {% elif "completed" in courses.name|lower %}
+                <a class="courses-name" href="{% url 'completed_courses' %}">
             {% endif %}
                     {{ courses.name }}
                 </a>

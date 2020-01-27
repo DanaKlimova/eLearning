@@ -112,3 +112,22 @@ def starred_courses(request):
         context["courses"] = starred_courses
         context["courses_type"] = "starred"
     return render(request, "main/category_courses.html", context)
+
+
+@login_required
+def completed_courses(request):
+    if request.method == "GET":
+        context = {}
+
+        user = request.user
+
+
+        completed_course_enrollments = user.courseenrollment_set.filter(
+            finished_at__isnull=False
+        ).order_by('course__rating')
+
+        completed_courses = [enrollment.course for enrollment in completed_course_enrollments]
+
+        context["courses"] = completed_courses
+        context["courses_type"] = "completed"
+    return render(request, "main/category_courses.html", context)
