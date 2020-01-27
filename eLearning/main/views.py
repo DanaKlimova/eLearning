@@ -99,3 +99,16 @@ def users_courses(request):
         context["courses"] = users_courses
         context["courses_type"] = "users"
     return render(request, "main/category_courses.html", context)
+
+
+@login_required
+def starred_courses(request):
+    if request.method == "GET":
+        context = {}
+
+        user = request.user
+        starred_courses = user.favorite_courses.order_by('rating')
+
+        context["courses"] = starred_courses
+        context["courses_type"] = "starred"
+    return render(request, "main/category_courses.html", context)
