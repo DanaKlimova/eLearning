@@ -19,6 +19,7 @@
 
 .image-position {
     grid-column: 1/2;
+    padding: 10px;
 }
 
 .course-data-position {
