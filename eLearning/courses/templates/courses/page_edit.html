@@ -13,7 +13,7 @@ Page detail
 {% endblock %}
 
 {% block content %}
-{% if 'edit' in view %}
+{% if 'edit' in view|lower %}
 <div class="page-grid">
     <div class="back-button-position">
         <a href="{% url 'course_edit' course_pk=course_pk %}">
@@ -23,14 +23,14 @@ Page detail
     </div>
     <div class="form-col background">
 {% endif %}
-        {% if 'edit' in view %}
+        {% if 'edit' in view|lower %}
         <form class="form-page" id="page_form" method="post" action="{% url 'page_edit' course_pk=course_pk page_pk=page_pk %}">
         {% else %}
         <form class="form-page" id="page_form" method="post" action="{% url 'page_create' course_pk=course_pk%}">
         {% endif %}
             {% csrf_token %}
 
-            {% if 'edit' not in view %}
+            {% if 'edit' not in view|lower %}
             <div class="back-button-position">
                 <a href="{% url 'course_edit' course_pk=course_pk %}">
                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
@@ -83,11 +83,11 @@ Page detail
 
                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button" type="submit">Save changes</button>
                 </div>
-            {% if 'edit' not in view %}
+            {% if 'edit' not in view|lower %}
             </div>
             {% endif %}
         </form>
-    {% if 'edit' in view %}
+    {% if 'edit' in view|lower %}
         </div>
         <div class="add-button-position">
             <a href="{% url 'question_create' course_pk=course_pk page_pk=page_pk %}">

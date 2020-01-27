@@ -91,7 +91,7 @@ Question detail
             </div>
             {% endif %}
         </form>
-        {% if 'edit' in view %}
+        {% if 'edit' in view|lower %}
         {% load course_extras %}
         </div>
         <div class="add-button-position">

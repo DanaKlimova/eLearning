@@ -58,7 +58,7 @@ Course page
             <div class="bold part">
                 Questions
             </div>
-            {% if 'Submit' in button_type %}
+            {% if 'submit' in button_type|lower %}
             <form method="post" action="{% url 'course_page' course_pk=course_pk page_pk=page_pk %}">
             {% endif %}
             {% csrf_token %}
@@ -73,7 +73,7 @@ Course page
                 <p>
                     <div class="variant" id="q_{{ task.question.pk}}_v_{{ variant_pk }}">
 
-                        {% if 'Submit' in button_type %}
+                        {% if 'submit' in button_type|lower %}
                             {% if task.question_types|get_item:task.question.type == 'checkbox' %}
                                 <label for="q_{{ task.question.pk}}_v_{{ variant_pk }}_"
                                         class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
@@ -104,12 +104,12 @@ Course page
                                     checked
                                 {% endif %}>
 
-                                {% if 'Submit' not in button_type %}
+                                {% if 'submit' not in button_type|lower %}
                                     {{ variant }}
                                 {% endif %}
                         </div>
 
-                        {% if 'Submit' in button_type %}
+                        {% if 'submit' in button_type|lower %}
                             {% if task.question_types|get_item:task.question.type == 'checkbox'%}
                                 <span class="mdl-checkbox__label">{{ variant }}</span>
                             {% elif task.question_types|get_item:task.question.type == 'radio' %}
@@ -126,16 +126,16 @@ Course page
             </p>
             {% endfor %}
 
-            {% if 'Next' in button_type %}
+            {% if 'next' in button_type|lower %}
             <a href="{% url 'course_page' course_pk=course_pk page_pk=next_page_pk %}">
-            {% elif 'Finish' in button_type or 'To course enrollment detail' in button_type %}
+            {% elif 'finish' in button_type|lower or 'to course enrollment detail' in button_type|lower %}
             <a href="{% url 'course_welcom' course_pk=course_pk %}">
             {% endif %}
 
             <button id="buttonId" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
                     type="submit">{{button_type}}</button>
 
-            {% if 'Submit' in button_type %}
+            {% if 'submit' in button_type|lower %}
             </form>
             {% else %}
             </a>

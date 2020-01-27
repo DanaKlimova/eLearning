@@ -18,7 +18,7 @@ Variant detail
     </a>
 </div>
 <div class="container background">
-    {% if 'edit' in view %}
+    {% if 'edit' in view|lower %}
     <form class="form-variant" id="variant_form" method="post" action="{% url 'variant_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk variant_pk=variant_pk %}">
     {% else %}
     <form class="form-variant" id="variant_form" method="post" action="{% url 'variant_create' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">

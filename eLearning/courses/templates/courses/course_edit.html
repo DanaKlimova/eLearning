@@ -13,11 +13,11 @@ Course detail
 {% endblock %}
 
 {% block content %}
-{% if 'edit' in view %}
+{% if 'edit' in view|lower %}
 <div class="course-grid">
     <div class="form-col background">
     {% endif %}
-        {% if 'edit' in view %}
+        {% if 'edit' in view|lower %}
         <form id="course_form" method="post" enctype="multipart/form-data"
             action="{% url 'course_edit' course_pk=course_pk %}">
         {% else %}
@@ -26,7 +26,7 @@ Course detail
         {% endif %}
             {% csrf_token %}
             
-            {% if 'edit' not in view %}
+            {% if 'edit' not in view|lower %}
             <div class="container background">
             {% endif %}
                 <div class="course-form-grid">
@@ -120,7 +120,7 @@ Course detail
                     {% endif %}
 
                     <div class="form-input-item">
-                        {% if 'edit' in view %}
+                        {% if 'edit' in view|lower %}
                             <label> Current cover:</label>
                             <p>
                                 <img class="course-cover" src="{{ cover_url }}" alt="{{ form.initial.name }}">
@@ -149,11 +149,11 @@ Course detail
                 {% endif %}
 
                 <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button" type="submit">Save changes</button>
-            {% if 'edit' not in view %}
+            {% if 'edit' not in view|lower %}
             </div>
             {% endif %}
         </form>
-    {% if 'edit' in view %}
+    {% if 'edit' in view|lower %}
         </div>
         <div class="page-col background">
             <a href="{% url 'page_create' course_pk=course_pk %}">
