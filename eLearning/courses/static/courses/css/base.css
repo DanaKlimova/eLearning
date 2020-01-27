@@ -107,3 +107,12 @@ th {
     border-radius: 1em;
     box-shadow: 0 0 1em rgba(0, 0, 0, .05);
 }
+
+.course-cover {
+    display: block;
+    margin: 0 auto;
+    max-height: 512;
+    max-width: 512;
+    width: 100%;
+    height: auto;
+}

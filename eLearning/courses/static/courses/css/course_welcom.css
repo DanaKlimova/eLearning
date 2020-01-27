@@ -33,13 +33,6 @@
     border-radius: 0.5em;
 }
 
-.course-cover {
-    display: block;
-    margin: 0 auto;
-    max-height: 512;
-    max-width: 512;
-}
-
 .done {
     color: green;
 }
