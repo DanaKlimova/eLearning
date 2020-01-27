@@ -77,3 +77,25 @@ def current_courses(request):
         context["courses"] = current_courses
         context["courses_type"] = "current"
     return render(request, "main/category_courses.html", context)
+
+
+@login_required
+def users_courses(request):
+    if request.method == "GET":
+        context = {}
+
+        user = request.user
+
+        users_courses = (Course.objects.filter(
+            type='pbl',
+            owner_type='usr',
+            status='rdy')
+            ).union(
+            user.individual_courses.filter(
+                owner_type='usr',
+                status='rdy'
+            )).order_by('rating')
+
+        context["courses"] = users_courses
+        context["courses_type"] = "users"
+    return render(request, "main/category_courses.html", context)

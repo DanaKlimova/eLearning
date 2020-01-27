@@ -81,6 +81,8 @@ Home
             <div class="courses-name">
             {% if "current" in courses.name|lower %}
                 <a class="courses-name" href="{% url 'current_courses' %}">
+            {% elif "users" in courses.name|lower %}
+                <a class="courses-name" href="{% url 'users_courses' %}">
             {% endif %}
                     {{ courses.name }}
                 </a>
