@@ -1,2 +1,2 @@
-web: gunicorn eLearning.eLearning.wsgi
+web: cd ./eLearning && gunicorn eLearning.wsgi
 
