@@ -1,2 +1,2 @@
-web: gunicorn eLearning.wsgi
+web: gunicorn eLearning.eLearning.wsgi
 
