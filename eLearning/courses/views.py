@@ -671,114 +671,88 @@ class CourseWelcomView(View):
 class CoursePageView(View):
     model = Page
     context_object_name = 'current_page'
-    template = 'courses/course_page.html'
+    get_template = 'courses/get_course_page.html'
+    post_template = 'courses/post_course_page.html'
     course_pk = None
     course_instance = None
     page_pk = None
     page_instance = None
     user = None
 
-    def get(self, request, *args, **kwargs):
-        self.course_pk = self.kwargs.get('course_pk')
-        self.page_pk = self.kwargs.get('page_pk')
-        self.page_instance = Page.objects.get(pk=self.page_pk)
-        self.user = self.request.user
-        self.course_instance = Course.objects.get(pk=self.course_pk)
-        try:
-            course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
-        except CourseEnrollment.DoesNotExist:
-            redirect_url = reverse('course_detail', kwargs={
-            'course_pk': self.course_pk,
-            })
-            return HttpResponseRedirect(redirect_url)
-        else:
-            results = Result.objects.filter(page=self.page_instance, user=self.user)
-            if results:
-                current_page_number = course_enrollment.current_page.number
-                next_page_number = current_page_number + 1
-                try:
-                    next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
-                # last page
-                except Page.DoesNotExist:
-                    button_type='Finish'
-                    if course_enrollment.finished_at:
-                        button_type='To course enrollment detail'
-                    next_page_pk = None
-                # next page
-                else:
-                    button_type = 'Next'
-                    next_page_pk = next_page.pk
-
-                tasks = self.get_tasks()
-
-                users_answers = self.get_users_answers(results)
-                correct_questions = self.get_correct_questions(results)
-
-                context = self.get_context_data(
-                    object_=self.page_instance,
-                    tasks=tasks,
-                    button_type=button_type,
-                    users_answers=users_answers,
-                    correct_questions=correct_questions,
-                    task_type='text',
-                )
-            else:
-                tasks = self.get_tasks()
-                context = self.get_context_data(
-                    object_=self.page_instance,
-                    tasks=tasks,
-                    button_type='Submit'
-                )
-            return render(request, self.template, context)
-
-    def get_users_answers(self, results):
-        users_answers = []
-        for result in results:
-            variants = result.results.split(Result.RESULTS_SEPARATOR)
-            for variant in variants:
-                users_answers.append(f'q_{result.question.pk}_v_{variant}')
-        return Result.RESULTS_SEPARATOR.join(users_answers)
-
-    def get_correct_questions(self, results):
-        correct_questions = []
-        for result in results:
-            if result.is_correct:
-                correct_questions.append(f'q_{result.question.pk}')
-        return Result.RESULTS_SEPARATOR.join(correct_questions)
-
-    @staticmethod
-    def create_task(question):
-        variants = [(variant.pk, variant.content) for variant in question.variant_set.all()]
-        question_types = dict(Question.QUESTION_TYPE_CHOICES)
-        task = {
-            'question': question,
-            'question_types': question_types,
-            'variants': variants,
-        }
-        return task
-
-    def get_tasks(self):
-        questions = self.page_instance.question_set.all()
-        tasks = []
-        for question in questions:
-            tasks.append(CoursePageView.create_task(question))
-        return tasks
+    # def get(self, request, *args, **kwargs):
+    #     self.course_pk = self.kwargs.get('course_pk')
+    #     self.course_instance = Course.objects.get(pk=self.course_pk)
+    #     self.page_pk = self.kwargs.get('page_pk')
+    #     self.page_instance = Page.objects.get(pk=self.page_pk)
+    #     self.user = self.request.user
+    #     try:
+    #         course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
+    #     except CourseEnrollment.DoesNotExist:
+    #         redirect_url = reverse('course_detail', kwargs={
+    #         'course_pk': self.course_pk,
+    #         })
+    #         return HttpResponseRedirect(redirect_url)
+    #     else:
+    #         pass
 
     def post(self, request, *args, **kwargs):
         self.course_pk = self.kwargs.get('course_pk')
+        self.course_instance = Course.objects.get(pk=self.course_pk)
         self.page_pk = self.kwargs.get('page_pk')
         self.page_instance = Page.objects.get(pk=self.page_pk)
         self.user = self.request.user
-        self.course_instance = Course.objects.get(pk=self.course_pk)
-        
+        self.course_enrollment = None
         try:
-            course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
+            self.course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
         except CourseEnrollment.DoesNotExist:
             redirect_url = reverse('course_detail', kwargs={
             'course_pk': self.course_pk,
             })
             return HttpResponseRedirect(redirect_url)
         else:
+            # ------ save user input ------
+            user_input = dict(request.POST)
+            del user_input['csrfmiddlewaretoken']
+
+            # iterate by each question and add Result to DB
+            for question_pk, variant_pks in user_input.items():
+                question = Question.objects.get(pk=question_pk)
+
+                # correct variants
+                # using dict for future comparation
+                correct_variants = {}
+                for variant in question.variant_set.all():
+                    if variant.is_correct:
+                        correct_variants[variant.pk] = variant
+
+                # users variants
+                # using dict for future comparation
+                user_variants = {}
+                for variant_pk in variant_pks:
+                    variant = Variant.objects.get(pk=variant_pk)
+                    user_variants[variant.pk] = variant
+
+                is_correct = True if users_variants == correct_variants else False
+
+                user_variant_pks = user_variants.keys()
+                user_variant_pks = Result.RESULTS_SEPARATOR.join(user_variant_pks)
+
+                Result.objects.create(
+                    user=self.user,
+                    question=question,
+                    results=user_variant_pks,
+                    is_correct=is_correct,
+                    page=self.page_instance,
+                )
+
+            # ------ get tasks and user answers(all and correct) ------
+            tasks = self.get_tasks()
+
+            results = Result.objects.filter(page=self.page_instance, user=self.user)
+            users_answers = self.get_user_answers(results)
+            correct_user_answers = self.get_correct_user_answers(results)
+
+            # ------ check page type - (last or next) ------
             current_page_number = course_enrollment.current_page.number
             next_page_number = current_page_number + 1
             try:
@@ -800,45 +774,9 @@ class CoursePageView(View):
                 button_type = 'Next'
                 next_page_pk = next_page.pk
 
-            user_input = dict(request.POST)
-            del user_input['csrfmiddlewaretoken']
-
-            correct_questions = []
-            for question_pk, variants_content in user_input.items():
-                question = Question.objects.get(pk=question_pk)
-                # users variants
-                users_variants = {}
-                for variant_content in variants_content:
-                    variant = Variant.objects.get(question=question, content=variant_content)
-                    users_variants[variant.pk] = variant
-                # correct variants
-                correct_variants = {}
-                for correct_variant in question.variant_set.all():
-                    if correct_variant.is_correct:
-                        correct_variants[correct_variant.pk] = correct_variant
-                
-                users_variant_pks = []
-                for _, variant in users_variants.items():
-                    users_variant_pks.append(str(variant.pk))
-
-                is_correct = True if users_variants == correct_variants else False
-
-                if is_correct:
-                    correct_questions.append(f'q_{question.pk}')
-                
-                separator = Result.RESULTS_SEPARATOR
-                users_variant_pks = separator.join(users_variant_pks)
-                Result.objects.create(
-                    user=self.user,
-                    question=question,
-                    results=users_variant_pks,
-                    is_correct=is_correct,
-                    page=self.page_instance,
-                )
-
-            tasks = self.get_tasks()
+            # calculate points
             points = course_enrollment.points
-            earned_points = len(correct_questions)
+            earned_points = len(correct_user_answers)
             if points:
                 course_enrollment.points += earned_points
             else:
@@ -846,21 +784,230 @@ class CoursePageView(View):
             if earned_points != 0:
                 course_enrollment.save()
 
-            correct_questions = ' '.join(correct_questions)
-
-            results = Result.objects.filter(page=self.page_instance, user=self.user)
-            users_answers = self.get_users_answers(results)
-
             context = self.get_context_data(
                 object_=self.page_instance,
-                tasks=tasks,
                 button_type=button_type,
                 next_page_pk=next_page_pk,
-                correct_questions=correct_questions,
-                task_type='text',
+                tasks=tasks,
                 users_answers=users_answers,
             )
-            return render(request, self.template, context) 
+            return render(request, self.post_template, context) 
+
+    def get_tasks(self):
+        questions = self.page_instance.question_set.all()
+        tasks = []
+        for question in questions:
+            tasks.append({
+                'question': question,
+                'variants': question.variant_set.all(),
+            })
+        return tasks
+
+    def get_user_answers(self, results):
+        users_answers = []
+        for result in results:
+            variant_pks = result.results.split(Result.RESULTS_SEPARATOR)
+            for variant_pk in variant_pks:
+                users_answers.append(
+                    Variant.objects.get(pk=variant_pk)
+                )
+        return users_answers
+    
+    def get_correct_user_answers(self, results):
+        correct_user_answers = []
+        for result in results:
+            if result.is_correct:
+                variant_pks = result.results.split(Result.RESULTS_SEPARATOR)
+                for variant_pk in variant_pks:
+                    correct_user_answers.append(
+                        Variant.objects.get(pk=variant_pk)
+                    )
+        return correct_user_answers
+
+    # def get(self, request, *args, **kwargs):
+    #     self.course_pk = self.kwargs.get('course_pk')
+    #     self.page_pk = self.kwargs.get('page_pk')
+    #     self.page_instance = Page.objects.get(pk=self.page_pk)
+    #     self.user = self.request.user
+    #     self.course_instance = Course.objects.get(pk=self.course_pk)
+    #     try:
+    #         course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
+    #     except CourseEnrollment.DoesNotExist:
+    #         redirect_url = reverse('course_detail', kwargs={
+    #         'course_pk': self.course_pk,
+    #         })
+    #         return HttpResponseRedirect(redirect_url)
+    #     else:
+    #         results = Result.objects.filter(page=self.page_instance, user=self.user)
+    #         if results:
+    #             current_page_number = course_enrollment.current_page.number
+    #             next_page_number = current_page_number + 1
+    #             try:
+    #                 next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
+    #             # last page
+    #             except Page.DoesNotExist:
+    #                 button_type='Finish'
+    #                 if course_enrollment.finished_at:
+    #                     button_type='To course enrollment detail'
+    #                 next_page_pk = None
+    #             # next page
+    #             else:
+    #                 button_type = 'Next'
+    #                 next_page_pk = next_page.pk
+
+    #             tasks = self.get_tasks()
+
+    #             users_answers = self.get_users_answers(results)
+    #             correct_questions = self.get_correct_questions(results)
+
+    #             context = self.get_context_data(
+    #                 object_=self.page_instance,
+    #                 tasks=tasks,
+    #                 button_type=button_type,
+    #                 users_answers=users_answers,
+    #                 correct_questions=correct_questions,
+    #                 task_type='text',
+    #             )
+    #         else:
+    #             tasks = self.get_tasks()
+    #             context = self.get_context_data(
+    #                 object_=self.page_instance,
+    #                 tasks=tasks,
+    #                 button_type='Submit'
+    #             )
+    #         return render(request, self.template, context)
+
+    # def get_users_answers(self, results):
+    #     users_answers = []
+    #     for result in results:
+    #         variants = result.results.split(Result.RESULTS_SEPARATOR)
+    #         for variant in variants:
+    #             users_answers.append(f'q_{result.question.pk}_v_{variant}')
+    #     return Result.RESULTS_SEPARATOR.join(users_answers)
+
+    # def get_correct_questions(self, results):
+    #     correct_questions = []
+    #     for result in results:
+    #         if result.is_correct:
+    #             correct_questions.append(f'q_{result.question.pk}')
+    #     return Result.RESULTS_SEPARATOR.join(correct_questions)
+
+    # @staticmethod
+    # def create_task(question):
+    #     variants = [(variant.pk, variant.content) for variant in question.variant_set.all()]
+    #     question_types = dict(Question.QUESTION_TYPE_CHOICES)
+    #     task = {
+    #         'question': question,
+    #         'question_types': question_types,
+    #         'variants': variants,
+    #     }
+    #     return task
+
+    # def get_tasks(self):
+    #     questions = self.page_instance.question_set.all()
+    #     tasks = []
+    #     for question in questions:
+    #         tasks.append(CoursePageView.create_task(question))
+    #     return tasks
+
+    # def post(self, request, *args, **kwargs):
+    #     self.course_pk = self.kwargs.get('course_pk')
+    #     self.page_pk = self.kwargs.get('page_pk')
+    #     self.page_instance = Page.objects.get(pk=self.page_pk)
+    #     self.user = self.request.user
+    #     self.course_instance = Course.objects.get(pk=self.course_pk)
+        
+    #     try:
+    #         course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
+    #     except CourseEnrollment.DoesNotExist:
+    #         redirect_url = reverse('course_detail', kwargs={
+    #         'course_pk': self.course_pk,
+    #         })
+    #         return HttpResponseRedirect(redirect_url)
+    #     else:
+    #         current_page_number = course_enrollment.current_page.number
+    #         next_page_number = current_page_number + 1
+    #         try:
+    #             next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
+    #         # last page
+    #         except Page.DoesNotExist:
+    #             course_enrollment.finished_at = date.today()
+    #             course_enrollment.is_active = False
+    #             course_enrollment.progress = 100
+    #             course_enrollment.save()
+    #             button_type='Finish'
+    #             next_page_pk = None
+    #         # next page
+    #         else:
+    #             course_enrollment.current_page = next_page
+    #             total_page_count = Page.objects.filter(course=self.course_instance).count()
+    #             course_enrollment.progress = current_page_number / total_page_count * 100
+    #             course_enrollment.save()
+    #             button_type = 'Next'
+    #             next_page_pk = next_page.pk
+
+    #         user_input = dict(request.POST)
+    #         del user_input['csrfmiddlewaretoken']
+    #         print(user_input)
+
+    #         correct_questions = []
+    #         for question_pk, variants_content in user_input.items():
+    #             question = Question.objects.get(pk=question_pk)
+    #             # users variants
+    #             users_variants = {}
+    #             for variant_content in variants_content:
+    #                 variant = Variant.objects.get(question=question, content=variant_content)
+    #                 users_variants[variant.pk] = variant
+    #             # correct variants
+    #             correct_variants = {}
+    #             for correct_variant in question.variant_set.all():
+    #                 if correct_variant.is_correct:
+    #                     correct_variants[correct_variant.pk] = correct_variant
+                
+    #             users_variant_pks = []
+    #             for _, variant in users_variants.items():
+    #                 users_variant_pks.append(str(variant.pk))
+
+    #             is_correct = True if users_variants == correct_variants else False
+
+    #             if is_correct:
+    #                 correct_questions.append(f'q_{question.pk}')
+                
+    #             separator = Result.RESULTS_SEPARATOR
+    #             users_variant_pks = separator.join(users_variant_pks)
+    #             Result.objects.create(
+    #                 user=self.user,
+    #                 question=question,
+    #                 results=users_variant_pks,
+    #                 is_correct=is_correct,
+    #                 page=self.page_instance,
+    #             )
+
+    #         tasks = self.get_tasks()
+    #         points = course_enrollment.points
+    #         earned_points = len(correct_questions)
+    #         if points:
+    #             course_enrollment.points += earned_points
+    #         else:
+    #             course_enrollment.points = earned_points
+    #         if earned_points != 0:
+    #             course_enrollment.save()
+
+    #         correct_questions = ' '.join(correct_questions)
+
+    #         results = Result.objects.filter(page=self.page_instance, user=self.user)
+    #         users_answers = self.get_users_answers(results)
+
+    #         context = self.get_context_data(
+    #             object_=self.page_instance,
+    #             tasks=tasks,
+    #             button_type=button_type,
+    #             next_page_pk=next_page_pk,
+    #             correct_questions=correct_questions,
+    #             task_type='text',
+    #             users_answers=users_answers,
+    #         )
+    #         return render(request, self.template, context) 
 
     def get_context_data(self, object_=None, **kwargs):
         context = kwargs
