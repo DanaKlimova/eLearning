@@ -671,29 +671,102 @@ class CourseWelcomView(View):
 class CoursePageView(View):
     model = Page
     context_object_name = 'current_page'
-    get_template = 'courses/get_course_page.html'
-    post_template = 'courses/post_course_page.html'
+    with_input_template = 'courses/course_page_with_input.html'
+    without_input_template = 'courses/course_page_without_input.html'
     course_pk = None
     course_instance = None
     page_pk = None
     page_instance = None
     user = None
 
-    # def get(self, request, *args, **kwargs):
-    #     self.course_pk = self.kwargs.get('course_pk')
-    #     self.course_instance = Course.objects.get(pk=self.course_pk)
-    #     self.page_pk = self.kwargs.get('page_pk')
-    #     self.page_instance = Page.objects.get(pk=self.page_pk)
-    #     self.user = self.request.user
-    #     try:
-    #         course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
-    #     except CourseEnrollment.DoesNotExist:
-    #         redirect_url = reverse('course_detail', kwargs={
-    #         'course_pk': self.course_pk,
-    #         })
-    #         return HttpResponseRedirect(redirect_url)
-    #     else:
-    #         pass
+    def get(self, request, *args, **kwargs):
+        self.course_pk = self.kwargs.get('course_pk')
+        self.course_instance = Course.objects.get(pk=self.course_pk)
+        self.page_pk = self.kwargs.get('page_pk')
+        self.page_instance = Page.objects.get(pk=self.page_pk)
+        self.user = self.request.user
+        try:
+            course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
+        except CourseEnrollment.DoesNotExist:
+            redirect_url = reverse('course_detail', kwargs={
+            'course_pk': self.course_pk,
+            })
+            return HttpResponseRedirect(redirect_url)
+        else:
+            # there are no questions
+            if not self.page_instance.question_set.all():
+                # ------ check page type - (last or next) ------
+                current_page_number = self.page_instance.number
+                next_page_number = current_page_number + 1
+                try:
+                    next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
+                # last page
+                except Page.DoesNotExist:
+                    course_enrollment.finished_at = date.today()
+                    course_enrollment.is_active = False
+                    course_enrollment.progress = 100
+                    course_enrollment.save()
+                    button_type='Finish'
+                    next_page_pk = None
+                # next page
+                else:
+                    course_enrollment.current_page = next_page
+                    total_page_count = Page.objects.filter(course=self.course_instance).count()
+                    course_enrollment.progress = current_page_number / total_page_count * 100
+                    course_enrollment.save()
+                    button_type = 'Next'
+                    next_page_pk = next_page.pk
+
+                context = self.get_context_data(
+                    object_=self.page_instance,
+                    button_type=button_type,
+                    next_page_pk=next_page_pk,
+                )
+                return render(request, self.without_input_template, context)
+            # there are questions
+            else:
+                results = Result.objects.filter(page=self.page_instance, user=self.user)
+                # questions was passed, show template without input
+                if results:
+                    # ------ get tasks and user answers(all and correct) ------
+                    tasks = self.get_tasks()
+                    users_answers = self.get_user_answers(results)
+                    correct_user_answers = self.get_correct_user_answers(results)
+
+                    # ------ check page type - (last or next) ------
+                    current_page_number = self.page_instance.number
+                    next_page_number = current_page_number + 1
+                    try:
+                        next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
+                    # last page
+                    except Page.DoesNotExist:
+                        course_enrollment.finished_at = date.today()
+                        course_enrollment.is_active = False
+                        course_enrollment.progress = 100
+                        course_enrollment.save()
+                        button_type='Finish'
+                        next_page_pk = None
+                    # next page
+                    else:
+                        course_enrollment.current_page = next_page
+                        total_page_count = Page.objects.filter(course=self.course_instance).count()
+                        course_enrollment.progress = current_page_number / total_page_count * 100
+                        course_enrollment.save()
+                        button_type = 'Next'
+                        next_page_pk = next_page.pk
+                    
+                    context = self.get_context_data(
+                        object_=self.page_instance,
+                        button_type=button_type,
+                        next_page_pk=next_page_pk,
+                        tasks=tasks,
+                        users_answers=users_answers,
+                    )
+                    return render(request, self.without_input_template, context)
+                # questions wasn't passed, show template with input
+                else:
+                    pass
+
 
     def post(self, request, *args, **kwargs):
         self.course_pk = self.kwargs.get('course_pk')
@@ -753,7 +826,7 @@ class CoursePageView(View):
             correct_user_answers = self.get_correct_user_answers(results)
 
             # ------ check page type - (last or next) ------
-            current_page_number = course_enrollment.current_page.number
+            current_page_number = self.page_instance.number
             next_page_number = current_page_number + 1
             try:
                 next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
@@ -791,7 +864,7 @@ class CoursePageView(View):
                 tasks=tasks,
                 users_answers=users_answers,
             )
-            return render(request, self.post_template, context) 
+            return render(request, self.without_input_template, context)
 
     def get_tasks(self):
         questions = self.page_instance.question_set.all()
