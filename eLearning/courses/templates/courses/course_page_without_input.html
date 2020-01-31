@@ -104,7 +104,6 @@ Course page
 <script>
 $(document).ready(function() {
     addClassById("{{ correct_questions }}", " correct");
-    // TODO" Ответы пользователя повторяются трижды
     addClassById("{{ user_variants }}", " user-answer");
 
     if ("{{ button_type }}" === "Finish" && "{{ finished }}" == "False") {
