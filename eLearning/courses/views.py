@@ -685,14 +685,26 @@ class CoursePageView(View):
         self.page_pk = self.kwargs.get('page_pk')
         self.page_instance = Page.objects.get(pk=self.page_pk)
         self.user = self.request.user
+        self.course_enrollment = None
+        self.is_course_enrollment_finished = None
+
         try:
-            course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
+            self.course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
+            self.is_course_enrollment_finished = True if self.course_enrollment.finished_at else False
         except CourseEnrollment.DoesNotExist:
             redirect_url = reverse('course_detail', kwargs={
-            'course_pk': self.course_pk,
+                'course_pk': self.course_pk,
             })
             return HttpResponseRedirect(redirect_url)
         else:
+            # unallowed page, redirect to current page
+            if self.page_instance.number > self.course_enrollment.current_page.number:
+                redirect_url = reverse('course_page', kwargs={
+                    'course_pk': self.course_pk,
+                    'page_pk': self.course_enrollment.current_page.pk,
+                })
+                return HttpResponseRedirect(redirect_url)
+
             # there are no questions
             if not self.page_instance.question_set.all():
                 # ------ check page type - (last or next) ------
@@ -702,18 +714,14 @@ class CoursePageView(View):
                     next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
                 # last page
                 except Page.DoesNotExist:
-                    course_enrollment.finished_at = date.today()
-                    course_enrollment.is_active = False
-                    course_enrollment.progress = 100
-                    course_enrollment.save()
+                    if not self.course_enrollment.finished_at:
+                        self.finish_course_enrollmet()
                     button_type='Finish'
                     next_page_pk = None
                 # next page
                 else:
-                    course_enrollment.current_page = next_page
-                    total_page_count = Page.objects.filter(course=self.course_instance).count()
-                    course_enrollment.progress = current_page_number / total_page_count * 100
-                    course_enrollment.save()
+                    if self.course_enrollment.current_page.number == current_page_number:
+                        self.update_course_enrollment(next_page)
                     button_type = 'Next'
                     next_page_pk = next_page.pk
 
@@ -721,8 +729,10 @@ class CoursePageView(View):
                     object_=self.page_instance,
                     button_type=button_type,
                     next_page_pk=next_page_pk,
+                    finished=self.is_course_enrollment_finished,
                 )
                 return render(request, self.without_input_template, context)
+
             # there are questions
             else:
                 results = Result.objects.filter(page=self.page_instance, user=self.user)
@@ -730,8 +740,8 @@ class CoursePageView(View):
                 if results:
                     # ------ get tasks and user answers(all and correct) ------
                     tasks = self.get_tasks()
-                    users_answers = self.get_user_answers(results)
-                    correct_user_answers = self.get_correct_user_answers(results)
+                    user_variants = self.get_user_variants(results)
+                    correct_user_questions = self.get_correct_user_questions(results)
 
                     # ------ check page type - (last or next) ------
                     current_page_number = self.page_instance.number
@@ -740,33 +750,49 @@ class CoursePageView(View):
                         next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
                     # last page
                     except Page.DoesNotExist:
-                        course_enrollment.finished_at = date.today()
-                        course_enrollment.is_active = False
-                        course_enrollment.progress = 100
-                        course_enrollment.save()
                         button_type='Finish'
                         next_page_pk = None
                     # next page
                     else:
-                        course_enrollment.current_page = next_page
-                        total_page_count = Page.objects.filter(course=self.course_instance).count()
-                        course_enrollment.progress = current_page_number / total_page_count * 100
-                        course_enrollment.save()
                         button_type = 'Next'
                         next_page_pk = next_page.pk
                     
+                    variant_ids = CoursePageView.convert_variants_to_ids(user_variants)
+                    questions_ids = CoursePageView.convert_questions_to_ids(correct_user_questions)
                     context = self.get_context_data(
                         object_=self.page_instance,
                         button_type=button_type,
                         next_page_pk=next_page_pk,
                         tasks=tasks,
-                        users_answers=users_answers,
+                        user_variants=variant_ids,
+                        correct_questions=questions_ids,
+                        finished=self.is_course_enrollment_finished,
                     )
                     return render(request, self.without_input_template, context)
                 # questions wasn't passed, show template with input
                 else:
-                    pass
+                    tasks = self.get_tasks()
+                    current_page_number = self.page_instance.number
+                    next_page_number = current_page_number + 1
+                    try:
+                        next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
+                    # last page
+                    except Page.DoesNotExist:
+                        button_type='Finish'
+                        next_page_pk = None
+                    # next page
+                    else:
+                        button_type = 'Next'
+                        next_page_pk = next_page.pk
 
+                    context = self.get_context_data(
+                        object_=self.page_instance,
+                        button_type=button_type,
+                        next_page_pk=next_page_pk,
+                        tasks=tasks,
+                        finished=self.is_course_enrollment_finished,
+                    )
+                    return render(request, self.with_input_template, context)
 
     def post(self, request, *args, **kwargs):
         self.course_pk = self.kwargs.get('course_pk')
@@ -775,14 +801,17 @@ class CoursePageView(View):
         self.page_instance = Page.objects.get(pk=self.page_pk)
         self.user = self.request.user
         self.course_enrollment = None
+        self.is_course_enrollment_finished = None
         try:
             self.course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
+            self.is_course_enrollment_finished = True if self.course_enrollment.finished_at else False
         except CourseEnrollment.DoesNotExist:
             redirect_url = reverse('course_detail', kwargs={
             'course_pk': self.course_pk,
             })
             return HttpResponseRedirect(redirect_url)
         else:
+            # НА ВСЯКИЙ МОЖНО ЗАПИХАТЬ ПРОВЕРКУ, ДЕЛАЛИ ЛИ ВООБЩЕ ЭТУ СТРАНИЦУ
             # ------ save user input ------
             user_input = dict(request.POST)
             del user_input['csrfmiddlewaretoken']
@@ -822,8 +851,8 @@ class CoursePageView(View):
             tasks = self.get_tasks()
 
             results = Result.objects.filter(page=self.page_instance, user=self.user)
-            users_answers = self.get_user_answers(results)
-            correct_user_answers = self.get_correct_user_answers(results)
+            user_variants = self.get_user_variants(results)
+            correct_user_questions = self.get_correct_user_questions(results)
 
             # ------ check page type - (last or next) ------
             current_page_number = self.page_instance.number
@@ -832,18 +861,12 @@ class CoursePageView(View):
                 next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
             # last page
             except Page.DoesNotExist:
-                course_enrollment.finished_at = date.today()
-                course_enrollment.is_active = False
-                course_enrollment.progress = 100
-                course_enrollment.save()
+                self.finish_course_enrollment()
                 button_type='Finish'
                 next_page_pk = None
             # next page
             else:
-                course_enrollment.current_page = next_page
-                total_page_count = Page.objects.filter(course=self.course_instance).count()
-                course_enrollment.progress = current_page_number / total_page_count * 100
-                course_enrollment.save()
+                self.update_course_enrollment(next_page)
                 button_type = 'Next'
                 next_page_pk = next_page.pk
 
@@ -851,18 +874,23 @@ class CoursePageView(View):
             points = course_enrollment.points
             earned_points = len(correct_user_answers)
             if points:
-                course_enrollment.points += earned_points
+                self.course_enrollment.points += earned_points
             else:
-                course_enrollment.points = earned_points
+                self.course_enrollment.points = earned_points
             if earned_points != 0:
-                course_enrollment.save()
+                self.course_enrollment.save()
+
+            variant_ids = CoursePageView.convert_variants_to_ids(user_variants)
+            questions_ids = CoursePageView.convert_questions_to_ids(correct_user_questions)
 
             context = self.get_context_data(
                 object_=self.page_instance,
                 button_type=button_type,
                 next_page_pk=next_page_pk,
                 tasks=tasks,
-                users_answers=users_answers,
+                user_variants=variant_ids,
+                correct_questions=questions_ids,
+                finished=self.is_course_enrollment_finished,
             )
             return render(request, self.without_input_template, context)
 
@@ -876,26 +904,50 @@ class CoursePageView(View):
             })
         return tasks
 
-    def get_user_answers(self, results):
-        users_answers = []
+    def get_user_variants(self, results):
+        user_variant = []
         for result in results:
             variant_pks = result.results.split(Result.RESULTS_SEPARATOR)
             for variant_pk in variant_pks:
-                users_answers.append(
+                user_variant.append(
                     Variant.objects.get(pk=variant_pk)
                 )
-        return users_answers
+        return user_variant
+
+    @staticmethod
+    def convert_variants_to_ids(variants):
+        ids = []
+        for variant in variants:
+            ids.append(f"v_{variant.pk}")
+        return Result.RESULTS_SEPARATOR.join(ids)
+
+    @staticmethod
+    def convert_questions_to_ids(questions):
+        ids = []
+        for question in questions:
+            ids.append(f"q_{question.pk}")
+        return Result.RESULTS_SEPARATOR.join(ids)
     
-    def get_correct_user_answers(self, results):
-        correct_user_answers = []
+    def get_correct_user_questions(self, results):
+        correct_user_questions = []
         for result in results:
             if result.is_correct:
-                variant_pks = result.results.split(Result.RESULTS_SEPARATOR)
-                for variant_pk in variant_pks:
-                    correct_user_answers.append(
-                        Variant.objects.get(pk=variant_pk)
-                    )
-        return correct_user_answers
+                correct_user_questions.append(
+                    Question.objects.get(pk=result.question.pk)
+                )
+        return correct_user_questions
+
+    def finish_course_enrollment(self):
+        self.course_enrollment.finished_at = date.today()
+        self.course_enrollment.is_active = False
+        self.course_enrollment.progress = 100
+        self.course_enrollment.save()
+
+    def update_course_enrollment(self, next_page):
+        self.course_enrollment.current_page = next_page
+        total_page_count = Page.objects.filter(course=self.course_instance).count()
+        self.course_enrollment.progress = self.page_instance.number / total_page_count * 100
+        self.course_enrollment.save()
 
     # def get(self, request, *args, **kwargs):
     #     self.course_pk = self.kwargs.get('course_pk')
