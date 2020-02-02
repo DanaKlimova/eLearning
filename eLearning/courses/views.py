@@ -742,6 +742,7 @@ class CoursePageView(View):
                     tasks = self.get_tasks()
                     user_variants = self.get_user_variants(results)
                     correct_user_questions = self.get_correct_user_questions(results)
+                    incorrect_user_questions = self.get_incorrect_user_questions(results)
 
                     # ------ check page type - (last or next) ------
                     current_page_number = self.page_instance.number
@@ -758,14 +759,16 @@ class CoursePageView(View):
                         next_page_pk = next_page.pk
                     
                     variant_ids = CoursePageView.convert_variants_to_ids(user_variants)
-                    questions_ids = CoursePageView.convert_questions_to_ids(correct_user_questions)
+                    correct_questions_ids = CoursePageView.convert_questions_to_ids(correct_user_questions)
+                    incorrect_questions_ids = CoursePageView.convert_questions_to_ids(incorrect_user_questions)
                     context = self.get_context_data(
                         object_=self.page_instance,
                         button_type=button_type,
                         next_page_pk=next_page_pk,
                         tasks=tasks,
                         user_variants=variant_ids,
-                        correct_questions=questions_ids,
+                        correct_questions=correct_questions_ids,
+                        incorrect_questions=incorrect_questions_ids,
                         finished=self.is_course_enrollment_finished,
                     )
                     return render(request, self.without_input_template, context)
@@ -853,6 +856,7 @@ class CoursePageView(View):
             results = Result.objects.filter(page=self.page_instance, user=self.user)
             user_variants = self.get_user_variants(results)
             correct_user_questions = self.get_correct_user_questions(results)
+            incorrect_user_questions = self.get_incorrect_user_questions(results)
 
             # ------ check page type - (last or next) ------
             current_page_number = self.page_instance.number
@@ -881,15 +885,16 @@ class CoursePageView(View):
                 self.course_enrollment.save()
 
             variant_ids = CoursePageView.convert_variants_to_ids(user_variants)
-            questions_ids = CoursePageView.convert_questions_to_ids(correct_user_questions)
-
+            correct_questions_ids = CoursePageView.convert_questions_to_ids(correct_user_questions)
+            incorrect_questions_ids = CoursePageView.convert_questions_to_ids(incorrect_user_questions)
             context = self.get_context_data(
                 object_=self.page_instance,
                 button_type=button_type,
                 next_page_pk=next_page_pk,
                 tasks=tasks,
                 user_variants=variant_ids,
-                correct_questions=questions_ids,
+                correct_questions=correct_questions_ids,
+                incorrect_questions=incorrect_questions_ids,
                 finished=self.is_course_enrollment_finished,
             )
             return render(request, self.without_input_template, context)
@@ -936,6 +941,15 @@ class CoursePageView(View):
                     Question.objects.get(pk=result.question.pk)
                 )
         return correct_user_questions
+
+    def get_incorrect_user_questions(self, results):
+        incorrect_user_questions = []
+        for result in results:
+            if not result.is_correct:
+                incorrect_user_questions.append(
+                    Question.objects.get(pk=result.question.pk)
+                )
+        return incorrect_user_questions
 
     def finish_course_enrollment(self):
         self.course_enrollment.finished_at = date.today()

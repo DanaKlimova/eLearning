@@ -104,6 +104,7 @@ Course page
 <script>
 $(document).ready(function() {
     addClassById("{{ correct_questions }}", " correct");
+    addClassById("{{ incorrect_questions }}", " incorrect");
     addClassById("{{ user_variants }}", " user-answer");
 
     if ("{{ button_type }}" === "Finish" && "{{ finished }}" == "False") {

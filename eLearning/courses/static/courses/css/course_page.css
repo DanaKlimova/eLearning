@@ -24,6 +24,10 @@
     background-color: rgb(153, 223, 153);
 }
 
+.incorrect {
+    background-color: rgb(223, 153, 153);
+}
+
 .user-answer {
     font-weight: bold;
 }
