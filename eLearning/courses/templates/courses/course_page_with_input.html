@@ -1,0 +1,90 @@
+{% extends 'main/base.html' %}
+{% load course_extras %}
+
+{% block title %}
+Course page
+{% endblock %}
+
+{% block styles %}
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+{% load static %}
+<link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/course_page.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="container background">
+    <div class="page-content-wrapper">
+
+        <a href="{% url 'course_welcom' course_pk=course_pk %}">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                    type="submit">To course</button>
+        </a>
+
+        <label class="text-data">
+            <div class="bold part">
+                Page content
+            </div>
+            {{ current_page.content }}
+        </label>
+
+        <div class="questions">
+            <div class="bold part">
+                Questions
+            </div>
+            <form method="post" action="{% url 'course_page' course_pk=course_pk page_pk=page_pk %}">
+                {% csrf_token %}
+                {% for task in tasks %}
+
+                    <label class="text-data bold" id="q_{{ task.question.pk }}">
+                        {{ forloop.counter }}. {{ task.question.content }}
+                    </label>
+
+                    {% for variant in task.variants %}
+                        <div class="variant" id="v_{{ variant.pk }}">
+                            {% if question_types|get_item:task.question.type == 'checkbox' %}
+                            <label for="v_{{ variant.pk }}"
+                                    class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
+                            {% elif question_types|get_item:task.question.type == 'radio' %}
+                            <label for="v_{{ variant.pk }}"
+                                    class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
+                            {% endif %}
+
+                            <div class="" id="v_{{ variant.pk }}">
+                                <input
+                                    type="{{ question_types|get_item:task.question.type }}"
+                                    value="{{ variant.pk }}" 
+                                    {% if question_types|get_item:task.question.type == 'checkbox' %}
+                                        class="mdl-checkbox__input"
+                                    {% else %}
+                                        class="mdl-radio__button"
+                                    {% endif %}
+                                    name="{{variant.pk}}"
+                                    id="v_{{ variant.pk }}"
+                                    {% if forloop.first and question_types|get_item:task.question.type == 'radio' %}
+                                        required
+                                        checked
+                                    {% endif %}>
+                            </div>
+
+                            {% if question_types|get_item:task.question.type == 'checkbox'%}
+                                <span class="mdl-checkbox__label">{{ variant.content }}</span>
+                            {% elif question_types|get_item:task.question.type == 'radio' %}
+                                <span class="mdl-radio__label">{{ variant.content }}</span>
+                            {% endif %}
+
+                            </label>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                <button id="buttonId" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                        type="submit">{{button_type}}</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_scripts %}
+{% endblock %}

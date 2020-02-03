@@ -715,7 +715,7 @@ class CoursePageView(View):
                 # last page
                 except Page.DoesNotExist:
                     if not self.course_enrollment.finished_at:
-                        self.finish_course_enrollmet()
+                        self.finish_course_enrollment()
                     button_type='Finish'
                     next_page_pk = None
                 # next page
@@ -781,19 +781,21 @@ class CoursePageView(View):
                         next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
                     # last page
                     except Page.DoesNotExist:
-                        button_type='Finish'
                         next_page_pk = None
                     # next page
                     else:
-                        button_type = 'Next'
                         next_page_pk = next_page.pk
 
+                    button_type = 'Submit'
+                    question_types = dict(Question.QUESTION_TYPE_CHOICES)
+                    print("QUESTION TYPES: ", question_types)
                     context = self.get_context_data(
                         object_=self.page_instance,
                         button_type=button_type,
                         next_page_pk=next_page_pk,
                         tasks=tasks,
                         finished=self.is_course_enrollment_finished,
+                        question_types=question_types,
                     )
                     return render(request, self.with_input_template, context)
 
@@ -804,10 +806,10 @@ class CoursePageView(View):
         self.page_instance = Page.objects.get(pk=self.page_pk)
         self.user = self.request.user
         self.course_enrollment = None
-        self.is_course_enrollment_finished = None
+        # self.is_course_enrollment_finished = None
         try:
             self.course_enrollment = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
-            self.is_course_enrollment_finished = True if self.course_enrollment.finished_at else False
+            # self.is_course_enrollment_finished = True if self.course_enrollment.finished_at else False
         except CourseEnrollment.DoesNotExist:
             redirect_url = reverse('course_detail', kwargs={
             'course_pk': self.course_pk,
@@ -895,7 +897,7 @@ class CoursePageView(View):
                 user_variants=variant_ids,
                 correct_questions=correct_questions_ids,
                 incorrect_questions=incorrect_questions_ids,
-                finished=self.is_course_enrollment_finished,
+                # finished=self.is_course_enrollment_finished,
             )
             return render(request, self.without_input_template, context)
 
