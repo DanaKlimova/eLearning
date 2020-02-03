@@ -980,3 +980,27 @@ def course_rate(request, course_pk):
             course.save()
 
             return HttpResponse("Success!")
+
+
+@login_required
+def course_statistics_view(request, course_pk):
+    try:
+        course = Course.objects.get(pk=course_pk)
+    except Course.DoesNotExist:
+        pass
+    else:
+        finished_enrollments = CourseEnrollment.objects.filter(course=course, finished_at__isnull=False)
+        failed = 0
+        success = 0
+        for finished_enrollment in finished_enrollments:
+            if finished_enrollment.grade < course.min_pass_grade:
+                failed += 1
+            else:
+                success += 1
+        students = CourseEnrollment.objects.filter(course=course, finished_at__isnull=True)
+        context = {
+            'failed': failed,
+            'success': success,
+            'students': students,
+        }
+        return render(request, 'courses/statistics', context)
