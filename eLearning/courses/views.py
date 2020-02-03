@@ -9,6 +9,7 @@ from django.views.generic import ListView, DetailView, FormView, View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.db import transaction
 
 
 from courses.models import (
@@ -648,15 +649,6 @@ class CourseWelcomView(View):
         else:
             grade = None
 
-        total_rate = 0.0
-        course_enrollments = CourseEnrollment.objects.filter(course=self.course_instance).all()
-        for course_enrollment in course_enrollments:
-            rate = course_enrollment.rate
-            if rate:
-                total_rate += rate
-        
-        total_rate = total_rate / len(course_enrollments)
-
         context = {
             self.context_object_name: object_,
             'page_list': course_pages,
@@ -664,12 +656,12 @@ class CourseWelcomView(View):
             'total_points': total_points,
             'grade': grade,
             'total_grade': TOTAL_GRADE,
-            'total_rate': total_rate,
         }
         return context
 
 
 @method_decorator(login_required, name='dispatch')
+@method_decorator(transaction.atomic, name='post')
 class CoursePageView(View):
     model = Page
     context_object_name = 'current_page'
@@ -969,4 +961,22 @@ def course_rate(request, course_pk):
             logger.info("Rate ajax was success.")
             course_enrollment.rate = rate
             course_enrollment.save()
+
+            # recalculate course rating
+            rating = 0.0
+            rating_amount = 0
+            course_enrollments = CourseEnrollment.objects.filter(course=course).all()
+            for course_enrollment in course_enrollments:
+                rate = course_enrollment.rate
+                if rate:
+                    rating_amount += 1
+                    rating += rate
+            try:
+                rating = rating / rating_amount
+            except ZeroDivisionError:
+                rating = 0.0
+
+            course.rating = rating
+            course.save()
+
             return HttpResponse("Success!")
