@@ -1,0 +1,47 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Course detail
+{% endblock %}
+
+{% block styles %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/statistics.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+<div class="container-grid background">
+    <div id="piechart"></div>
+</div>
+
+{% endblock %}
+
+{% block js_scripts %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    // Load google charts
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    // Draw the chart and set the chart values
+    function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+    ['Student status', 'Amount'],
+    ['failed', {{ failed }}],
+    ['success', {{ success }}],
+    ['students', {{ students }}],
+    ]);
+
+    // Optional; add a title and set the width and height of the chart
+    var options = {'title':'Course statistics', 'width':550, 'height':400};
+
+    // Display the chart inside the <div> element with id="piechart"
+    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+    chart.draw(data, options);
+    }
+});
+</script>
+{% endblock %}

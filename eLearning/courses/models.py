@@ -1,5 +1,6 @@
 import logging
 import os
+import math
 
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -9,7 +10,6 @@ from django.conf import settings
 from accounts.models import Account
 
 logger = logging.getLogger('eLearning')
-
 
 def validate_image_size(img):
         img_size = img.file.size
@@ -48,6 +48,7 @@ class Course(models.Model):
     MB = 2 ** 20
     MAX_IMAGE_SIZE = 5 * MB
     DEFAULT_COURSE_COVER = 'courses/default.png'
+    TOTAL_GRADE = 10
 
     owner_type = models.CharField(max_length=3, choices=COURSE_OWNER_TYPE_CHOICES,)
     owner_user = models.ForeignKey(
@@ -109,6 +110,19 @@ class CourseEnrollment(models.Model):
     progress = models.FloatField(null=True)
     rate = models.FloatField(null=True)
     is_active = models.BooleanField(default=True)
+    _grade = models.IntegerField(db_column='grade', null=True)
+
+    @property
+    def grade(self):
+        course_pages = self.course.page_set.all()
+        total_points = 0.0
+        for page in course_pages:
+            total_points += Question.objects.filter(page=page).count()
+        if self.points:
+            grade = math.ceil(self.points * Course.TOTAL_GRADE / total_points)
+        else:
+            grade = None
+        return grade
 
 
 class Result(models.Model):
