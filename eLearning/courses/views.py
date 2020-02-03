@@ -1,6 +1,7 @@
 import logging
 from datetime import date
 import json
+import math
 
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, resolve
@@ -643,7 +644,7 @@ class CourseWelcomView(View):
         for page in course_pages:
             total_points += Question.objects.filter(page=page).count()
         if self.course_enrollment_instance.points:
-            grade = self.course_enrollment_instance.points * TOTAL_GRADE / total_points
+            grade = math.ceil(self.course_enrollment_instance.points * TOTAL_GRADE / total_points)
         else:
             grade = None
 
@@ -653,6 +654,8 @@ class CourseWelcomView(View):
             rate = course_enrollment.rate
             if rate:
                 total_rate += rate
+        
+        total_rate = total_rate / len(course_enrollments)
 
         context = {
             self.context_object_name: object_,

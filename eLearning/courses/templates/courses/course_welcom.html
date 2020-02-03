@@ -132,7 +132,7 @@ Course enrollment detail
                     <div class="bold">
                         Course rating:
                     </div>
-                    {{ total_rate|default:"course wasn't rated" }}
+                    {{ total_rate|default:"course wasn't rated"|floatformat:"1" }}
                 </label>
 
                 <label class="text-data">
