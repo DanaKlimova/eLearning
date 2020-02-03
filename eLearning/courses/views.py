@@ -8,7 +8,6 @@ from django.views.generic import ListView, DetailView, FormView, View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 
 
 from courses.models import (
@@ -947,7 +946,6 @@ class CoursePageView(View):
         return context
 
 
-@csrf_exempt
 def course_rate(request, course_pk):
     if request.method == 'POST':
         body = json.loads(request.body)
