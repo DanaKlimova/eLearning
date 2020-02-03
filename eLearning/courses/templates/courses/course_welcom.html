@@ -158,10 +158,7 @@ Course enrollment detail
                         <div class="bold">
                             Points:
                         </div>
-                        {{ course_enrollment.points|default:"you haven't started to study" }}
-                        {% if course_enrollment.points %}
-                        of {{ total_points }}
-                        {% endif %}
+                        {{ course_enrollment.points }} of {{ total_points }}
                     </label>
                 {% endif %}
 
