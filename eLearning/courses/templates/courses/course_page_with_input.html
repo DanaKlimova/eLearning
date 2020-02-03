@@ -32,54 +32,53 @@ Course page
             <div class="bold part">
                 Questions
             </div>
-            <form method="post" action="{% url 'course_page' course_pk=course_pk page_pk=page_pk %}">
+            <form>
                 {% csrf_token %}
                 {% for task in tasks %}
+                    <div id="task_{{ task.question.pk }}" data-value="{{ task.question.pk }}">
+                        <label class="text-data bold" id="q_{{ task.question.pk }}">
+                            {{ forloop.counter }}. {{ task.question.content }}
+                        </label>
 
-                    <label class="text-data bold" id="q_{{ task.question.pk }}">
-                        {{ forloop.counter }}. {{ task.question.content }}
-                    </label>
+                        {% for variant in task.variants %}
+                            <div class="variant" id="v_{{ variant.pk }}_">
+                                {% if question_types|get_item:task.question.type == 'checkbox' %}
+                                <label for="v_{{ variant.pk }}"
+                                        class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
+                                {% elif question_types|get_item:task.question.type == 'radio' %}
+                                <label for="v_{{ variant.pk }}"
+                                        class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
+                                {% endif %}
 
-                    {% for variant in task.variants %}
-                        <div class="variant" id="v_{{ variant.pk }}">
-                            {% if question_types|get_item:task.question.type == 'checkbox' %}
-                            <label for="v_{{ variant.pk }}"
-                                    class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
-                            {% elif question_types|get_item:task.question.type == 'radio' %}
-                            <label for="v_{{ variant.pk }}"
-                                    class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
-                            {% endif %}
-
-                            <div class="" id="v_{{ variant.pk }}">
                                 <input
+                                    name="q_{{ task.question.pk }}_v"
+                                    id="v_{{ variant.pk }}"
+                                    value="{{ variant.pk }}"
                                     type="{{ question_types|get_item:task.question.type }}"
-                                    value="{{ variant.pk }}" 
                                     {% if question_types|get_item:task.question.type == 'checkbox' %}
                                         class="mdl-checkbox__input"
                                     {% else %}
                                         class="mdl-radio__button"
                                     {% endif %}
-                                    name="{{variant.pk}}"
-                                    id="v_{{ variant.pk }}"
                                     {% if forloop.first and question_types|get_item:task.question.type == 'radio' %}
                                         required
                                         checked
                                     {% endif %}>
+
+                                {% if question_types|get_item:task.question.type == 'checkbox'%}
+                                    <span class="mdl-checkbox__label">{{ variant.content }}</span>
+                                {% elif question_types|get_item:task.question.type == 'radio' %}
+                                    <span class="mdl-radio__label">{{ variant.content }}</span>
+                                {% endif %}
+
+                                </label>
                             </div>
-
-                            {% if question_types|get_item:task.question.type == 'checkbox'%}
-                                <span class="mdl-checkbox__label">{{ variant.content }}</span>
-                            {% elif question_types|get_item:task.question.type == 'radio' %}
-                                <span class="mdl-radio__label">{{ variant.content }}</span>
-                            {% endif %}
-
-                            </label>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 {% endfor %}
 
                 <button id="buttonId" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                        type="submit">{{button_type}}</button>
+                        type="button">Submit</button>
             </form>
         </div>
     </div>
@@ -87,4 +86,54 @@ Course page
 {% endblock %}
 
 {% block js_scripts %}
+<script>
+$(document).ready(function() {
+
+    function getFormData() {
+        let formData = {};
+
+        tasks=document.querySelectorAll('[id^="task_"]');
+        tasks.forEach(function(task){
+            let question = task.getAttribute('data-value');
+            let variants = [];
+            let inputs = task.querySelectorAll('input');
+            inputs.forEach(function(input){
+                if (input.checked === true) {
+                    variants.push(input.value);
+                }
+            });
+            formData[question] = variants;
+        });
+        return formData;
+    }
+
+    $("#buttonId").click(async function() {
+        formData = getFormData();
+        let csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0];
+        //formData[csrf_token.name] = csrf_token.value;
+        //console.log(formData);
+
+        let response = await fetch("{% url 'course_page' course_pk=course_pk page_pk=page_pk %}", {
+                    method: 'POST',
+                    headers: {
+                        "X-CSRFToken": csrf_token.value,
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    //data: formData
+                    body: JSON.stringify(formData)
+        });
+
+        let result = response.json().then(function(serverData){
+            //console.log(serverData);
+            if (serverData.view_status === true) {
+                window.location.replace("{% url 'course_page' course_pk=course_pk page_pk=page_pk %}")
+            }
+            else {
+                alert("PROBLEMS WITH VIEW!");
+            }
+        });
+        
+    });
+});
+</script>
 {% endblock %}

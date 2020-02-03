@@ -7,7 +7,7 @@ from django.urls import reverse, resolve
 from django.views.generic import ListView, DetailView, FormView, View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -738,6 +738,7 @@ class CoursePageView(View):
                 results = Result.objects.filter(page=self.page_instance, user=self.user)
                 # questions was passed, show template without input
                 if results:
+
                     # ------ get tasks and user answers(all and correct) ------
                     tasks = self.get_tasks()
                     user_variants = self.get_user_variants(results)
@@ -751,10 +752,12 @@ class CoursePageView(View):
                         next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
                     # last page
                     except Page.DoesNotExist:
+                        self.finish_course_enrollment()
                         button_type='Finish'
                         next_page_pk = None
                     # next page
                     else:
+                        self.update_course_enrollment(next_page)
                         button_type = 'Next'
                         next_page_pk = next_page.pk
                     
@@ -786,12 +789,9 @@ class CoursePageView(View):
                     else:
                         next_page_pk = next_page.pk
 
-                    button_type = 'Submit'
                     question_types = dict(Question.QUESTION_TYPE_CHOICES)
-                    print("QUESTION TYPES: ", question_types)
                     context = self.get_context_data(
                         object_=self.page_instance,
-                        button_type=button_type,
                         next_page_pk=next_page_pk,
                         tasks=tasks,
                         finished=self.is_course_enrollment_finished,
@@ -818,11 +818,17 @@ class CoursePageView(View):
         else:
             # НА ВСЯКИЙ МОЖНО ЗАПИХАТЬ ПРОВЕРКУ, ДЕЛАЛИ ЛИ ВООБЩЕ ЭТУ СТРАНИЦУ
             # ------ save user input ------
-            user_input = dict(request.POST)
-            del user_input['csrfmiddlewaretoken']
+            user_input = json.loads(request.body.decode('utf-8'))
 
             # iterate by each question and add Result to DB
             for question_pk, variant_pks in user_input.items():
+                try:
+                    question_pk = int(question_pk)
+                    variant_pks = list(map(lambda x : int(x), variant_pks))
+                except ValueError:
+                    # TODO: what should I do?
+                    status = False
+                    raise ValueError("Exeption was accur during post invalid data to CoursePageView. It shouldn't happend.")
                 question = Question.objects.get(pk=question_pk)
 
                 # correct variants
@@ -839,9 +845,10 @@ class CoursePageView(View):
                     variant = Variant.objects.get(pk=variant_pk)
                     user_variants[variant.pk] = variant
 
-                is_correct = True if users_variants == correct_variants else False
+                is_correct = True if user_variants == correct_variants else False
 
                 user_variant_pks = user_variants.keys()
+                user_variant_pks = list(map(lambda x : str(x), user_variant_pks))
                 user_variant_pks = Result.RESULTS_SEPARATOR.join(user_variant_pks)
 
                 Result.objects.create(
@@ -852,33 +859,11 @@ class CoursePageView(View):
                     page=self.page_instance,
                 )
 
-            # ------ get tasks and user answers(all and correct) ------
-            tasks = self.get_tasks()
-
-            results = Result.objects.filter(page=self.page_instance, user=self.user)
-            user_variants = self.get_user_variants(results)
-            correct_user_questions = self.get_correct_user_questions(results)
-            incorrect_user_questions = self.get_incorrect_user_questions(results)
-
-            # ------ check page type - (last or next) ------
-            current_page_number = self.page_instance.number
-            next_page_number = current_page_number + 1
-            try:
-                next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
-            # last page
-            except Page.DoesNotExist:
-                self.finish_course_enrollment()
-                button_type='Finish'
-                next_page_pk = None
-            # next page
-            else:
-                self.update_course_enrollment(next_page)
-                button_type = 'Next'
-                next_page_pk = next_page.pk
-
             # calculate points
-            points = course_enrollment.points
-            earned_points = len(correct_user_answers)
+            points = self.course_enrollment.points
+            results = Result.objects.filter(page=self.page_instance, user=self.user)
+            correct_user_questions = self.get_correct_user_questions(results)
+            earned_points = len(correct_user_questions)
             if points:
                 self.course_enrollment.points += earned_points
             else:
@@ -886,20 +871,9 @@ class CoursePageView(View):
             if earned_points != 0:
                 self.course_enrollment.save()
 
-            variant_ids = CoursePageView.convert_variants_to_ids(user_variants)
-            correct_questions_ids = CoursePageView.convert_questions_to_ids(correct_user_questions)
-            incorrect_questions_ids = CoursePageView.convert_questions_to_ids(incorrect_user_questions)
-            context = self.get_context_data(
-                object_=self.page_instance,
-                button_type=button_type,
-                next_page_pk=next_page_pk,
-                tasks=tasks,
-                user_variants=variant_ids,
-                correct_questions=correct_questions_ids,
-                incorrect_questions=incorrect_questions_ids,
-                # finished=self.is_course_enrollment_finished,
-            )
-            return render(request, self.without_input_template, context)
+            return JsonResponse({
+                "view_status": True,
+            })
 
     def get_tasks(self):
         questions = self.page_instance.question_set.all()
