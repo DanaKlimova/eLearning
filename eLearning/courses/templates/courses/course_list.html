@@ -33,7 +33,10 @@ Course list
             <td>{{ forloop.counter }}</td>
             <td>{{ course.name }}</td>
             <td>{{ course.rating|default:"course wasn't rated" }}</td>
-            <td><a href="{% url 'course_edit' course_pk=course.pk %}"><i class="far fa-edit"></i></a></td>
+            <td>
+              <a href="{% url 'course_edit' course_pk=course.pk %}"><i class="far fa-edit" title="edit"></i></a>
+              <a href="{% url 'course_statistics' course_pk=course.pk %}"><i class="fas fa-signal" title="statistics"></i></a>
+            </td>
         </tr>
         {% endfor %}
       </tbody>
