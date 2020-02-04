@@ -53,7 +53,7 @@ def seed_courses():
 def seed_page(course):
     for i in list(range(0, 6)):
         Page.objects.create(
-            number=i,
+            number=i + 1,
             content=fake.text(),
             course=course,
         )
@@ -68,7 +68,7 @@ def seed_question(page):
     for i in list(range(0, 6)):
         type = random.choice(types)
         Question.objects.create(
-            type=type[0],
+            type=type,
             content=fake.text(),
             page=page,
         )
@@ -83,9 +83,9 @@ def seed_variant(question):
             content=fake.text(),
             is_correct=False,
         ))
-    if question.type == 'c':
+    if question.type == 'chb':
         correct_variants = random.choices(variants, k=2)
-    elif question.type == 'r':
+    elif question.type == 'rad':
         correct_variants = [random.choice(variants)]
 
     for variant in correct_variants:
@@ -96,26 +96,26 @@ def seed_variant(question):
 
 
 # ------------ seed courses ------------
-# seed_courses()
+seed_courses()
 
 
 # ------------ seed pages ------------
-# courses = Course.objects.all()
-# for course in courses:
-#     seed_page(course)
+courses = Course.objects.all()
+for course in courses:
+    seed_page(course)
 
 
 # ------------ seed questions ------------
-# pages = Page.objects.all()
-# pages_amount = pages.count() // 3
-# pages = random.choices(pages, k=pages_amount)
-# for page in pages:
-#     seed_question(page)
+pages = Page.objects.all()
+pages_amount = pages.count() // 3
+pages = random.choices(pages, k=pages_amount)
+for page in pages:
+    seed_question(page)
 
 
 # ------------ seed variants ------------
-# questions = Question.objects.all()
-# variants = Variant.objects.all()
-# for question in questions:
-#     seed_variant(question)
+questions = Question.objects.all()
+variants = Variant.objects.all()
+for question in questions:
+    seed_variant(question)
 print("done")
