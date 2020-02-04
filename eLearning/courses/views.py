@@ -983,7 +983,9 @@ def course_statistics_view(request, course_pk):
         try:
             course = Course.objects.get(pk=course_pk)
         except Course.DoesNotExist:
-            pass
+            logger.info("Request statistics for not existing course.")
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
         else:
             finished_enrollments = CourseEnrollment.objects.filter(course=course, finished_at__isnull=False)
             failed = 0
