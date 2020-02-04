@@ -13,7 +13,9 @@ Course detail
 {% block content %}
 
 <div class="container-grid background">
-    <div id="piechart"></div>
+    {% comment %} <div id="generalStatistics" class="stat-table"></div> {% endcomment %}
+    <div id="courseStatistics" class="stat-chart"></div>
+    <div id="courseRating" class="stat-chart"></div>
 </div>
 
 {% endblock %}
@@ -22,26 +24,81 @@ Course detail
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+    // Options for charts
+    let legendTextStyle = {
+        color: "#343a40",
+        fontSize: 20,
+        bold: false,
+        italic: false
+    }
+    
+    let titleTextStyle = {
+        color: "#343a40",
+        fontSize: 25,
+        bold: false,
+        italic: false
+    }
+    
     // Load google charts
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawChart);
+    google.charts.load('current', {'packages':['corechart', 'table']});
+    google.charts.setOnLoadCallback(drawChartCourseStatistics);
+    google.charts.setOnLoadCallback(drawChartCourseRating);
+    //google.charts.setOnLoadCallback(drawGeneralStatistics);
 
     // Draw the chart and set the chart values
-    function drawChart() {
-    var data = google.visualization.arrayToDataTable([
-    ['Student status', 'Amount'],
-    ['failed', {{ failed }}],
-    ['success', {{ success }}],
-    ['students', {{ students }}],
-    ]);
+    function drawChartCourseStatistics() {
+        let data = google.visualization.arrayToDataTable([
+        ['Student status', 'Amount'],
+        ['failed', {{ failed }}],
+        ['success', {{ success }}],
+        ['students', {{ students }}],
+        ]);
 
-    // Optional; add a title and set the width and height of the chart
-    var options = {'title':'Course statistics', 'width':550, 'height':400};
+        let options = {
+            'title':'Course statistics',
+            'legend.textStyle': legendTextStyle,
+            'titleTextStyle':titleTextStyle,
+            'colors': ['#eb4034', '#7deb34', '#3496eb']
+        };
 
-    // Display the chart inside the <div> element with id="piechart"
-    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-    chart.draw(data, options);
+        // Display the chart inside the <div> element with id="courseStatistics"
+        var chart = new google.visualization.PieChart(document.getElementById('courseStatistics'));
+        chart.draw(data, options);
+    } 
+    
+    function drawChartCourseRating() {
+        let data = google.visualization.arrayToDataTable([
+        ['Rating', ''],
+        ['1', {{ rating.0 }}],
+        ['2', {{ rating.1 }}],
+        ['3', {{ rating.2 }}],
+        ['4', {{ rating.3 }}],
+        ['5', {{ rating.4 }}],
+        ]);
+
+        let options = {
+            'title':'Course rating',
+            'legend.textStyle': legendTextStyle,
+            'titleTextStyle':titleTextStyle
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('courseRating'));
+        chart.draw(data, options);
     }
+
+    //function drawGeneralStatistics() {
+    //    var data = new google.visualization.DataTable();
+    //    data.addColumn('string', 'Statistic');
+    //    data.addColumn('number', 'Amount');
+    //    data.addRows([
+    //      ['Students amount',  {{ students_amount }}],
+    //      ['Average rating',  {{ average_rating|default:"0" }}],
+    //   ]);
+
+    //    var table = new google.visualization.Table(document.getElementById('generalStatistics'));
+
+    //    table.draw(data, {showRowNumber: true, 'allowHtml': true});
+    //  }
 });
 </script>
 {% endblock %}

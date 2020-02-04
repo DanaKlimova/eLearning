@@ -1,0 +1,16 @@
+.stat-chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 500px;
+    margin: 0 auto !important;
+}
+
+
+/* .stat-table {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 10px auto !important;
+    font-size: 1.3vw;
+} */
