@@ -14,8 +14,15 @@ Course detail
 
 <div class="container-grid background">
     {% comment %} <div id="generalStatistics" class="stat-table"></div> {% endcomment %}
+    {% if students_amount %}
     <div id="courseStatistics" class="stat-chart"></div>
+    {% endif %}
+    {% if average_rating %}
     <div id="courseRating" class="stat-chart"></div>
+    {% endif %}
+    {% if not students_amount and not average_rating %}
+    <h4 style="text-align:center">Course statistics is not available.</h4>
+    {% endif %}
 </div>
 
 {% endblock %}

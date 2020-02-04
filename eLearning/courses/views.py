@@ -1003,13 +1003,13 @@ def course_statistics_view(request, course_pk):
                 if course_enrollment.rate:
                     rating[int(course_enrollment.rate) - 1] += 1
 
-            # students_amount = CourseEnrollment.objects.filter(course=course).count()
+            students_amount = CourseEnrollment.objects.filter(course=course).count()
             context = {
                 'failed': failed,
                 'success': success,
                 'students': students,
                 'rating': rating,
-                # 'students_amount': students_amount,
-                # 'average_rating': course.rating,
+                'students_amount': students_amount,
+                'average_rating': course.rating,
             }
             return render(request, 'courses/statistics.html', context)
