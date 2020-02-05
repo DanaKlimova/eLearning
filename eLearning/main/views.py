@@ -128,8 +128,10 @@ def completed_courses(request):
         ).order_by('course__rating')
 
         completed_courses = [enrollment.course for enrollment in completed_course_enrollments]
+        grades = [enrollment.grade for enrollment in completed_course_enrollments]
 
         context["courses"] = completed_courses
+        context["grades"] = grades
         context["courses_type"] = "completed"
     return render(request, "main/category_courses.html", context)
 
