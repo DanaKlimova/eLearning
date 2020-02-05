@@ -987,29 +987,34 @@ def course_statistics_view(request, course_pk):
             redirect_url = reverse('home', kwargs={})
             return HttpResponseRedirect(redirect_url)
         else:
-            finished_enrollments = CourseEnrollment.objects.filter(course=course, finished_at__isnull=False)
-            failed = 0
-            success = 0
-            for finished_enrollment in finished_enrollments:
-                if finished_enrollment.grade < course.min_pass_grade:
-                    failed += 1
-                else:
-                    success += 1
-            students = CourseEnrollment.objects.filter(course=course, finished_at__isnull=True).count()
+            if not request.user == course.owner_user:
+                logger.info("User requested statistics not for his course.")
+                redirect_url = reverse('home', kwargs={})
+                return HttpResponseRedirect(redirect_url)
+            else:
+                finished_enrollments = CourseEnrollment.objects.filter(course=course, finished_at__isnull=False)
+                failed = 0
+                success = 0
+                for finished_enrollment in finished_enrollments:
+                    if finished_enrollment.grade < course.min_pass_grade:
+                        failed += 1
+                    else:
+                        success += 1
+                students = CourseEnrollment.objects.filter(course=course, finished_at__isnull=True).count()
 
-            course_enrollments = CourseEnrollment.objects.filter(course=course).all()
-            rating = [0, 0, 0, 0, 0]
-            for course_enrollment in course_enrollments:
-                if course_enrollment.rate:
-                    rating[int(course_enrollment.rate) - 1] += 1
+                course_enrollments = CourseEnrollment.objects.filter(course=course).all()
+                rating = [0, 0, 0, 0, 0]
+                for course_enrollment in course_enrollments:
+                    if course_enrollment.rate:
+                        rating[int(course_enrollment.rate) - 1] += 1
 
-            students_amount = CourseEnrollment.objects.filter(course=course).count()
-            context = {
-                'failed': failed,
-                'success': success,
-                'students': students,
-                'rating': rating,
-                'students_amount': students_amount,
-                'average_rating': course.rating,
-            }
-            return render(request, 'courses/statistics.html', context)
+                students_amount = CourseEnrollment.objects.filter(course=course).count()
+                context = {
+                    'failed': failed,
+                    'success': success,
+                    'students': students,
+                    'rating': rating,
+                    'students_amount': students_amount,
+                    'average_rating': course.rating,
+                }
+                return render(request, 'courses/statistics.html', context)
