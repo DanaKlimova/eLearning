@@ -805,64 +805,72 @@ class CoursePageView(View):
             })
             return HttpResponseRedirect(redirect_url)
         else:
-            # НА ВСЯКИЙ МОЖНО ЗАПИХАТЬ ПРОВЕРКУ, ДЕЛАЛИ ЛИ ВООБЩЕ ЭТУ СТРАНИЦУ
-            # ------ save user input ------
-            user_input = json.loads(request.body.decode('utf-8'))
-
-            # iterate by each question and add Result to DB
-            for question_pk, variant_pks in user_input.items():
-                try:
-                    question_pk = int(question_pk)
-                    variant_pks = list(map(lambda x : int(x), variant_pks))
-                except ValueError:
-                    # TODO: what should I do?
-                    status = False
-                    raise ValueError("Exeption was accur during post invalid data to CoursePageView. It shouldn't happend.")
-                question = Question.objects.get(pk=question_pk)
-
-                # correct variants
-                # using dict for future comparation
-                correct_variants = {}
-                for variant in question.variant_set.all():
-                    if variant.is_correct:
-                        correct_variants[variant.pk] = variant
-
-                # users variants
-                # using dict for future comparation
-                user_variants = {}
-                for variant_pk in variant_pks:
-                    variant = Variant.objects.get(pk=variant_pk)
-                    user_variants[variant.pk] = variant
-
-                is_correct = True if user_variants == correct_variants else False
-
-                user_variant_pks = user_variants.keys()
-                user_variant_pks = list(map(lambda x : str(x), user_variant_pks))
-                user_variant_pks = Result.RESULTS_SEPARATOR.join(user_variant_pks)
-
-                Result.objects.create(
-                    user=self.user,
-                    question=question,
-                    results=user_variant_pks,
-                    is_correct=is_correct,
-                    page=self.page_instance,
-                )
-
-            # calculate points
-            points = self.course_enrollment.points
             results = Result.objects.filter(page=self.page_instance, user=self.user)
-            correct_user_questions = self.get_correct_user_questions(results)
-            earned_points = len(correct_user_questions)
-            if points:
-                self.course_enrollment.points += earned_points
-            else:
-                self.course_enrollment.points = earned_points
-            if earned_points != 0:
-                self.course_enrollment.save()
+            if not results:
+                # ------ save user input ------
+                user_input = json.loads(request.body.decode('utf-8'))
 
-            return JsonResponse({
-                "view_status": True,
-            })
+                # iterate by each question and add Result to DB
+                for question_pk, variant_pks in user_input.items():
+                    try:
+                        question_pk = int(question_pk)
+                        variant_pks = list(map(lambda x : int(x), variant_pks))
+                    except ValueError:
+                        # TODO: what should I do?
+                        status = False
+                        raise ValueError("Exeption was accur during post invalid data to CoursePageView. It shouldn't happend.")
+                    question = Question.objects.get(pk=question_pk)
+
+                    # correct variants
+                    # using dict for future comparation
+                    correct_variants = {}
+                    for variant in question.variant_set.all():
+                        if variant.is_correct:
+                            correct_variants[variant.pk] = variant
+
+                    # users variants
+                    # using dict for future comparation
+                    user_variants = {}
+                    for variant_pk in variant_pks:
+                        variant = Variant.objects.get(pk=variant_pk)
+                        user_variants[variant.pk] = variant
+
+                    is_correct = True if user_variants == correct_variants else False
+
+                    user_variant_pks = user_variants.keys()
+                    user_variant_pks = list(map(lambda x : str(x), user_variant_pks))
+                    user_variant_pks = Result.RESULTS_SEPARATOR.join(user_variant_pks)
+
+                    Result.objects.create(
+                        user=self.user,
+                        question=question,
+                        results=user_variant_pks,
+                        is_correct=is_correct,
+                        page=self.page_instance,
+                    )
+
+                # calculate points
+                points = self.course_enrollment.points
+                results = Result.objects.filter(page=self.page_instance, user=self.user)
+                correct_user_questions = self.get_correct_user_questions(results)
+                earned_points = len(correct_user_questions)
+                if points:
+                    self.course_enrollment.points += earned_points
+                else:
+                    self.course_enrollment.points = earned_points
+                if earned_points != 0:
+                    self.course_enrollment.save()
+                print("first time")
+                return JsonResponse({
+                    "view_status": True,
+                    "data_saved": True,
+                })
+            else:
+                print("second time")
+                return JsonResponse({
+                    "view_status": True,
+                    "data_saved": False,
+                })
 
     def get_tasks(self):
         questions = self.page_instance.question_set.all()
