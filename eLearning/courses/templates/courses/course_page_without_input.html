@@ -55,9 +55,11 @@ Course page
         </label>
 
         <div class="questions">
+            {% if task %}
             <div class="bold part">
                 Questions
             </div>
+            {% endif %}
             {% for task in tasks %}
 
             <label class="text-data bold" id="q_{{ task.question.pk }}">

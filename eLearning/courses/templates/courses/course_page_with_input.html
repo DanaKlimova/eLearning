@@ -88,6 +88,22 @@ Course page
 {% block js_scripts %}
 <script>
 $(document).ready(function() {
+    setInputLabelClass();
+
+    function setInputLabelClass() {
+        checkboxes = document.querySelectorAll("span.mdl-checkbox__label");
+        radio_buttons = document.querySelectorAll("span.mdl-radio__label");
+
+        console.log(radio_buttons);
+
+        checkboxes.forEach(function(item) {
+            item.classList.add("input-label")
+        });
+        
+        radio_buttons.forEach(function(item) {
+            item.classList.add("input-label")
+        });
+    }
 
     function getFormData() {
         let formData = {};
