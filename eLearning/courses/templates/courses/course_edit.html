@@ -106,7 +106,7 @@ Course detail
 
                     <div class="form-input-item">
                         <label>Description</label>
-                        <textarea name="content" id="inputContent" class="glowing-border text-area" required>{{form.initial.content}}</textarea>
+                        <textarea id="inputContent" name="content" required>{{form.initial.content}}</textarea>
                     </div>
 
                     {% if form.content.errors %}
@@ -189,9 +189,15 @@ Course detail
 <script type="text/javascript"
     src="https://cdn.datatables.net/v/dt/dt-1.10.20/r-2.2.3/sc-2.0.1/datatables.min.js">
 </script>
-
+<script type="text/javascript" src="{% static 'courses/tinymce/js/tinymce/tinymce.min.js' %}">
+</script>
 <script>
 $(document).ready(function() {
+    tinymce.init({
+        selector: "textarea",
+        height: "480",
+        plugins: "codesample, link, lists"
+    });
     $("#pageTableId").DataTable( {
         searching: false,
         ordering: false

@@ -29,7 +29,7 @@ th {
 
 .form-input-item {
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: 25% 75%;
     margin: 10px;
 }
 
