@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.db import transaction
+from django.template.loader import get_template
 
 
 from courses.models import (
@@ -30,6 +31,7 @@ from courses.forms import (
 )
 
 from accounts.models import Account
+from courses.utils import render_to_pdf
 
 
 START_PAGE_NUMBER = 1
@@ -1026,3 +1028,17 @@ def course_statistics_view(request, course_pk):
                     'average_rating': course.rating,
                 }
                 return render(request, 'courses/statistics.html', context)
+
+
+@method_decorator(login_required, name='get')
+class GeneratePDF(View):
+    def get(self, request, *args, **kwargs):
+        context = {
+            'name': 'Dana Klimova',
+            'course': 'The best course ever',
+            'date': 'today',
+        }
+        template_name = 'courses/certificate.html'
+        pdf = render_to_pdf(template_name, request, context)
+        return HttpResponse(pdf, content_type='application/pdf')
+        # return render(request, template_name, context)

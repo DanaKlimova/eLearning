@@ -1,0 +1,28 @@
+@font-face {
+    font-family: DejaMono;
+    src: url("font/Chilanka-Regular");
+}
+
+@page {
+    size: A4 landscape;
+    margin: 0px;
+}
+
+.grid {
+    display: grid;
+    font-family: 'Chilanka', cursive;
+    font-size: 26px;
+}
+
+.cert-header {
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.cert-text {
+    text-align: center;
+}
+
+.cert-person-data {
+    font-weight: bold;
+}

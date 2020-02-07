@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Certificate</title>
+        {% load static %}
+        {% comment %} <link rel="stylesheet" href="{% static 'courses/css/certificate.css' %}" /> {% endcomment %}
+    </head>
+    <body>
+       <div class="grid">
+            <img class="" src="{% static "courses/image/cert_header.png" %}">
+            <div class="cert-text">
+                <div class="cert-header">
+                Certificate of
+                </div>
+                <p>This is to certify that</p>
+                <p class="cert-person-data">{{ name }}</p>
+                <p>has successfully completed</p>
+                <p class="cert-person-data">{{ course }}</p>
+                <p>on {{ date }}</p>
+            </div>
+            <img class="" src="{% static "courses/image/cert_footer.png" %}">
+       </div>
+    </body>
+</html>
