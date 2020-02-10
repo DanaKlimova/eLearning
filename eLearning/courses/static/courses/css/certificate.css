@@ -21,11 +21,11 @@ body {
     height: 100%;
     font-family: 'Chilanka', cursive;
     src: url("font/Chilanka-Regular.ttf");
-    font-size: 26px;
+    font-size: 35px;
 }
 
 .cert-text-header {
-    font-size: 40px;
+    font-size: 50px;
 }
 
 .cert-text {
@@ -47,5 +47,5 @@ body {
     left: 0;
     bottom: 0;
     width: 100%;
-    margin: -10px;
+    margin: -15px;
 }
