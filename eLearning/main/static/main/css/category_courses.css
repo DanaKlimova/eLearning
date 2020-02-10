@@ -17,3 +17,10 @@
 .not-done {
     color: red;
 }
+
+.medal,
+.download {
+    max-width: 14px;
+    max-height: auto;
+    color: blue;
+}

@@ -9,4 +9,5 @@ urlpatterns = [
     path("starred_courses/", views.starred_courses, name="starred_courses"),
     path("completed_courses/", views.completed_courses, name="completed_courses"),
     path("recomended_courses/", views.recomended_courses, name="recomended_courses"),
+    path('cert/<int:course_pk>/', views.generate_cert, name="course_cert"),
 ]

@@ -24,6 +24,7 @@
             <th scope="col">Rating</th>
             {% if courses_type|lower == 'completed' %}
             <th scope="col">Result</th>
+            <th scope="col">Certificate</th>
             {% endif %}
             <th scope="col">Action</th>
             </tr>
@@ -37,8 +38,11 @@
                 {% if courses_type|lower == 'completed' %}
                     {% if grades|get_list_item:forloop.counter0 >= course.min_pass_grade %}
                     <td><i class="fas fa-check done"></i></td>
+                    {% comment %} <td><a href="{% url 'course_cert' course_pk=course.pk %}"><img class="medal" src="{% static 'main/image/medal.svg' %}"/></a></td> {% endcomment %}
+                    <td><a href="{% url 'course_cert' course_pk=course.pk %}"><i class="fas fa-arrow-circle-down download"></i></a></td>
                     {% else %}
                     <td><i class="fas fa-times not-done"></i></td>
+                    <td></td>
                     {% endif %}
                 {% endif %}
                 <td><a href="{% url 'course_detail' course_pk=course.pk %}"><i class="fas fa-info"></i></a></td>
