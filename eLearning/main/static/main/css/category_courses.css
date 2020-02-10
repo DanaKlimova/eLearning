@@ -18,9 +18,12 @@
     color: red;
 }
 
-.medal,
-.download {
+.medal {
     max-width: 14px;
     max-height: auto;
+    color: blue;
+}
+
+.download {
     color: blue;
 }
