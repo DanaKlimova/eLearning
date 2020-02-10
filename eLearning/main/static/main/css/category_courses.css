@@ -27,3 +27,9 @@
 .download {
     color: blue;
 }
+
+.table {
+    background-color: white;
+    color: #343a40;
+    font-size: 1vw;
+}
