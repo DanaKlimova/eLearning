@@ -3,22 +3,26 @@
     <head>
         <title>Certificate</title>
         {% load static %}
-        {% comment %} <link rel="stylesheet" href="{% static 'courses/css/certificate.css' %}" /> {% endcomment %}
+        <link rel="stylesheet" href="{% static 'courses/css/certificate.css' %}" />
     </head>
     <body>
        <div class="grid">
-            <img class="" src="{% static "courses/image/cert_header.png" %}">
+            <div>
+                <img class="header-image" src="{% static "courses/image/cert_header.png" %}">
+            </div>
             <div class="cert-text">
-                <div class="cert-header">
+                <div class="cert-text-header bold-text">
                 Certificate of
                 </div>
                 <p>This is to certify that</p>
-                <p class="cert-person-data">{{ name }}</p>
+                <p class="bold-text">{{ name }}</p>
                 <p>has successfully completed</p>
-                <p class="cert-person-data">{{ course }}</p>
+                <p class="bold-text">{{ course }}</p>
                 <p>on {{ date }}</p>
             </div>
-            <img class="" src="{% static "courses/image/cert_footer.png" %}">
+            <div class="footer">
+                <img class="footer-image" src="{% static "courses/image/cert_footer.png" %}">
+            </div>
        </div>
     </body>
 </html>

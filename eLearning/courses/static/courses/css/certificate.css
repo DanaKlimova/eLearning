@@ -1,28 +1,51 @@
-@font-face {
-    font-family: DejaMono;
-    src: url("font/Chilanka-Regular");
+@media print {
+    /* TODO: bad solution */
+    @page {
+        size: landscape;
+        width: 297mm;
+        height: 210mm;
+        margin: 0px;
+    }
 }
 
-@page {
-    size: A4 landscape;
+html,
+body {
+    width: 297mm;
+    height: 210mm;
     margin: 0px;
 }
 
 .grid {
     display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100%;
     font-family: 'Chilanka', cursive;
+    src: url("font/Chilanka-Regular.ttf");
     font-size: 26px;
 }
 
-.cert-header {
+.cert-text-header {
     font-size: 40px;
-    font-weight: bold;
 }
 
 .cert-text {
     text-align: center;
 }
 
-.cert-person-data {
+.bold-text {
     font-weight: bold;
+}
+
+.header-image,
+.footer-image {
+    width: 100%;
+    height: auto;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    margin: -10px;
 }
