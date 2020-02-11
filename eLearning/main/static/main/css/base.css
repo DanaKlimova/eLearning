@@ -1,6 +1,7 @@
 body {
     background-color: #f8f9fa;
     font-size: calc(14px + .5vw);
+    line-height: calc(16px + .5vw);
 }
 
 .main-grid {

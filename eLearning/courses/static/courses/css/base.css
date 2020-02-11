@@ -1,5 +1,15 @@
+input {
+    font-size: calc(12px + .5vw);
+}
+
+
+/* For tinymce header */
+
+div>button>span {
+    font-size: calc(12px + .5vw) !important;
+}
+
 label {
-    font-size: 1vw;
     color: #343a40;
 }
 
@@ -7,19 +17,20 @@ th {
     background-color: rgba(158, 158, 158, .2);
 }
 
+td {
+    line-height: calc(16px + .6vw);
+}
+
 .table {
     background-color: white;
     color: #343a40;
-    font-size: 1vw;
 }
 
 .table-wrapper {
     margin: 10px;
-    font-size: 0.8vw;
 }
 
 .table-select {
-    font-size: 1vw;
     height: auto;
     width: auto;
     margin: 5px;
@@ -37,19 +48,18 @@ th {
     border: 1px solid #ced4da;
     border-radius: 0.25rem .5rem;
     padding: 5px;
-    font-size: 1vw;
+    font-size: calc(12px + .5vw);
 }
 
 .text-input {
     padding: 5px;
-    font-size: 1vw;
+    font-size: calc(12px + .5vw);
 }
 
-.text-area {
-    padding: 5px;
-    font-size: 1vw;
-    font-family: "Helvetica", "Arial", sans-serif;
-    min-height: 150px;
+.text-data {
+    display: block;
+    margin: 15px 0;
+    line-height: calc(16px + .6vw);
 }
 
 .bold {
@@ -85,16 +95,20 @@ th {
     display: block;
 }
 
+.button {
+    color: #343a40;
+    font-size: calc(14px + .5vw);
+}
+
 .add-button {
     float: right;
-    margin-bottom: 10px;
-    color: #343a40;
+    margin: 20px;
+    margin-right: 10px;
 }
 
 .submit-button {
     display: block;
-    margin: 10px auto;
-    color: #343a40;
+    margin: 15px auto;
 }
 
 .arrow-left {
@@ -111,8 +125,8 @@ th {
 .course-cover {
     display: block;
     margin: 0 auto;
-    max-height: 512;
-    max-width: 512;
+    max-height: 512px;
+    max-width: 512px;
     width: 100%;
     height: auto;
 }

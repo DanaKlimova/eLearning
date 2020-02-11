@@ -18,7 +18,7 @@ Course enrollment detail
 
         {% if not course_enrollment.finished_at %}
         <a href="{% url 'course_page' course_pk=course_enrollment.course.pk page_pk=current_page.pk%}">
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect continue-button"
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect continue-button button"
                 type="button">Continue</button>
         </a>
         {% endif %}
@@ -187,7 +187,7 @@ $(document).ready(function(){
         this.MaterialProgress.setProgress("{{ course_enrollment.progress }}");
     });
 
-  addClassByName('pageTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect');
+  addClassByName('pageTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button');
 
   function addClassByName(name, class_) {
         var elements = document.getElementsByName(name);

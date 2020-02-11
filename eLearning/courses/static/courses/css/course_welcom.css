@@ -41,11 +41,6 @@
     color: red;
 }
 
-.text-data {
-    display: block;
-    margin: 10px 0;
-}
-
 .progress {
     height: 10px;
     margin: 10px 0;
@@ -87,5 +82,4 @@
 
 .continue-button {
     margin: 10px;
-    color: #343a40;
 }

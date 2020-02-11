@@ -17,7 +17,7 @@ Page detail
 <div class="page-grid">
     <div class="back-button-position">
         <a href="{% url 'course_edit' course_pk=course_pk %}">
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button" 
                     type="button"><i class="fas fa-arrow-left arrow-left"></i></button>
         </a>
     </div>
@@ -33,7 +33,7 @@ Page detail
             {% if 'edit' not in view|lower %}
             <div class="back-button-position">
                 <a href="{% url 'course_edit' course_pk=course_pk %}">
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button" 
                     type="button"><i class="fas fa-arrow-left arrow-left"></i></button>
                  </a>
             </div>
@@ -81,7 +81,7 @@ Page detail
                     <label class="success-label">{{success_message}}</label>
                     {% endif %}
 
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button" type="submit">Save changes</button>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button button" type="submit">Save changes</button>
                 </div>
             {% if 'edit' not in view|lower %}
             </div>
@@ -91,7 +91,7 @@ Page detail
         </div>
         <div class="add-button-position">
             <a href="{% url 'question_create' course_pk=course_pk page_pk=page_pk %}">
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect add-button"
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect add-button button"
                         type="submit">Add question</button>
             </a>
         </div>
@@ -135,14 +135,15 @@ $(document).ready(function() {
     tinymce.init({
         selector: "textarea",
         height: "480",
-        plugins: "codesample, link, lists"
+        plugins: "codesample, link, lists",
+        content_style: 'body { font-size: calc(16px + .6vw) !important };'
     });
 
     $("#questionTableId").DataTable( {
         searching: false,
         ordering: false
     });
-    addClassByName('questionTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect');
+    addClassByName('questionTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button');
 
     function addClassByName(name, class_) {
         var elements = document.getElementsByName(name);

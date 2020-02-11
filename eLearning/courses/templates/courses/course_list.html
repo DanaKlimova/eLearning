@@ -14,7 +14,7 @@ Course list
 {% block content %}
 <div class="container background">
   <a href="{% url 'course_create' %}">
-      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect add-button">add course</button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect add-button button">add course</button>
   </a>
   <div class="table-wrapper">
     <table id="courseTableId" class="cell-border stripe hover table">
@@ -53,7 +53,7 @@ Course list
 <script>
 $(document).ready(function(){
   $("#courseTableId").DataTable();
-  addClassByName('courseTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect');
+  addClassByName('courseTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button');
 
   function addClassByName(name, class_) {
         var elements = document.getElementsByName(name);

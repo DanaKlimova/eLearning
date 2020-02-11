@@ -13,7 +13,7 @@ Variant detail
 {% block content %}
 <div class="back-button-position">
     <a href="{% url 'question_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">
-        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button" 
         type="button"><i class="fas fa-arrow-left arrow-left"></i></button>
     </a>
 </div>
@@ -62,7 +62,7 @@ Variant detail
             <label class="success-label">{{success_message}}</label>
             {% endif %}
 
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button" type="submit">Save changes</button>
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button button" type="submit">Save changes</button>
         </div>
     </form>
 </div>
@@ -78,7 +78,8 @@ $(document).ready(function() {
     tinymce.init({
         selector: "textarea",
         height: "480",
-        plugins: "codesample, link, lists"
+        plugins: "codesample, link, lists",
+        content_style: 'body { font-size: calc(16px + .6vw) !important };'
     });
     checkElement('checkboxId', '{{ is_correct }}')
 
