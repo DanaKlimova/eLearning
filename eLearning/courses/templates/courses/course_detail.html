@@ -50,7 +50,7 @@ Course detail
                 <div class="bold">
                     Course content:
                 </div>
-                {{ course.content }}
+                {% autoescape off %}{{ course.content }}{% endautoescape %}
             </label>
         </div>
     </div>

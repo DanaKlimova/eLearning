@@ -2,6 +2,10 @@ input {
     font-size: calc(12px + .5vw);
 }
 
+p {
+    font-size: inherit;
+}
+
 
 /* For tinymce header */
 

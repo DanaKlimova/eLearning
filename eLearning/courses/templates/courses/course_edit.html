@@ -172,7 +172,7 @@ Course detail
                         {% for page in page_list %}
                         <tr>
                             <td>{{ page.number }}</td>
-                            <td>{{ page.content }}</td>
+                            <td>{% autoescape off %}{{ page.content }}{% endautoescape %}</td>
                             <td><a href="{% url 'page_edit' course_pk=course_pk page_pk=page.pk %}"><i class="far fa-edit"></i></a></td>
                         </tr>
                         {% endfor %}
