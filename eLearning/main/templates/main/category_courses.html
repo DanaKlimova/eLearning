@@ -38,13 +38,13 @@
                     {% if grades|get_list_item:forloop.counter0 >= course.min_pass_grade %}
                     <td><i class="fas fa-check done"></i></td>
                     {% comment %} <td><a href="{% url 'course_cert' course_pk=course.pk %}"><img class="medal" src="{% static 'main/image/medal.svg' %}"/></a></td> {% endcomment %}
-                    <td><a href="{% url 'course_cert' course_pk=course.pk %}"><i class="fas fa-arrow-circle-down download"></i></a></td>
+                    <td><a href="{% url 'course_cert' course_pk=course.pk %}"><i class="fas fa-arrow-circle-down download"  title="download certificate"></i></a></td>
                     {% else %}
                     <td><i class="fas fa-times not-done"></i></td>
                     <td></td>
                     {% endif %}
                 {% endif %}
-                <td><a href="{% url 'course_detail' course_pk=course.pk %}"><i class="fas fa-info"></i></a></td>
+                <td><a href="{% url 'course_detail' course_pk=course.pk %}"><i class="fas fa-info"  title="course info"></i></a></td>
             </tr>
             {% endfor %}
         </tbody>
