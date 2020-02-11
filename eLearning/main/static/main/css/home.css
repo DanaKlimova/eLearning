@@ -17,8 +17,9 @@
 }
 
 .courses-name {
-    font-size: 1.4vw;
-    margin: 10px 0;
+    font-size: calc(14px + .6vw);
+    font-weight: bold;
+    margin: 15px 0;
     text-align: center;
     color: rgba(0, 0, 0, .87);
     text-decoration: none;
@@ -37,7 +38,6 @@
 }
 
 .course-name {
-    font-size: 1.1vw;
     text-align: center;
     text-decoration: none;
     color: rgba(0, 0, 0, .87);
@@ -73,7 +73,6 @@
 
 .no-courses {
     text-align: center;
-    font-size: 1vw;
 }
 
 .image-container {
@@ -107,7 +106,7 @@
 }
 
 .join-btn {
-    font-size: 1.5vw;
+    font-size: calc(20px + .5vw);
     background-color: white;
     padding: 10px 40px;
     height: auto;
@@ -115,7 +114,7 @@
 
 .advantages {
     margin: 30px 0;
-    font-size: 7vw;
+    font-size: calc(125px + 1vw);
     text-align: center;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
