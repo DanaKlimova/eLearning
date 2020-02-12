@@ -708,7 +708,7 @@ class CoursePageView(View):
                     next_page_pk = None
                 # next page
                 else:
-                    if self.course_enrollment.current_page.number == current_page_number:
+                    if self.course_enrollment.current_page.number == current_page_number and not self.course_enrollment.finished_at:
                         self.update_course_enrollment(next_page)
                     button_type = 'Next'
                     next_page_pk = next_page.pk
@@ -740,12 +740,14 @@ class CoursePageView(View):
                         next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
                     # last page
                     except Page.DoesNotExist:
-                        self.finish_course_enrollment()
+                        if not self.course_enrollment.finished_at:
+                            self.finish_course_enrollment()
                         button_type='Finish'
                         next_page_pk = None
                     # next page
                     else:
-                        self.update_course_enrollment(next_page)
+                        if self.course_enrollment.current_page.number == current_page_number and not self.course_enrollment.finished_at:
+                            self.update_course_enrollment(next_page)
                         button_type = 'Next'
                         next_page_pk = next_page.pk
                     

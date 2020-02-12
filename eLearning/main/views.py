@@ -192,3 +192,9 @@ def generate_cert(request, course_pk):
             pdf = render_to_pdf(template_name, request, context)
             return HttpResponse(pdf, content_type='application/pdf')
             # return render(request, template_name, context)
+
+
+# ERRORS
+def error_404(request, exception):
+    context = {}
+    return render(request, 'main/errors//error_404.html', context)
