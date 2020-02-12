@@ -16,8 +16,9 @@
 /* не подстараивается под несколько строк! */
 
 .variant {
-    margin: 55px 0;
     margin-left: 10px;
+    height: 7vh;
+    margin-top: 10px;
 }
 
 .part {
