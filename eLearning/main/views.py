@@ -1,11 +1,15 @@
 from collections import namedtuple
+import logging
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse
 
 from courses.models import Course, CourseEnrollment
 from main.utils import render_to_pdf
+
+logger = logging.getLogger('eLearning')
 
 
 # TODO: think about course ordering.
@@ -198,3 +202,8 @@ def generate_cert(request, course_pk):
 def error_404(request, exception):
     context = {}
     return render(request, 'main/errors//error_404.html', context)
+
+
+def error_500(request):
+    context = {}
+    return render(request, 'main/errors//error_500.html', context)

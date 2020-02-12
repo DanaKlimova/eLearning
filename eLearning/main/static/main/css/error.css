@@ -7,3 +7,14 @@ body {
     text-align: center;
     height: 100%;
 }
+
+.error-image {
+    width: auto;
+    height: 100%;
+    max-height: fit-content;
+}
+
+.error-text {
+    font-size: 6vh;
+    margin: 1vh auto;
+}
