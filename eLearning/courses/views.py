@@ -679,7 +679,11 @@ class CourseWelcomView(View):
     def get(self, request, *args, **kwargs):
         self.course_pk = self.kwargs.get('course_pk')
         self.user = request.user
-        self.course_instance = Course.objects.get(pk=self.course_pk)
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+        except Course.DoesNotExist:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
         try:
             self.course_enrollment_instance = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
         except CourseEnrollment.DoesNotExist:
