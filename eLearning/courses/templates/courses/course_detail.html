@@ -15,7 +15,7 @@ Course detail
 <div class="container-grid background">
     <div class="btn-grid">
         <div class="fav-div">
-            <i class="fav-i"></i>
+            <i id="favId" class="fav-i"></i>
         </div>
         <form id="follow_form" method="post" action="{% url 'course_welcom' course_pk=course_pk%}">
             {% csrf_token %}
@@ -66,8 +66,45 @@ Course detail
 {% block js_scripts %}
 <script>
 $(document).ready(function() {
-    $( "i" ).click(function() {
-      $( "i,span" ).toggleClass( "press", 1000 );
+    addPressClass("{{ is_fav }}");
+
+    function addPressClass(is_fav) {
+        if (is_fav === "True") {
+            i_el = document.getElementById('favId');
+            i_el.classList.add("press");
+        }
+
+    }
+
+    $( "i" ).click(async function() {
+        $( "i,span" ).toggleClass( "press", 1000 );
+
+        data = {}
+        data["is_pressed"] = false;
+        document.getElementById('favId').classList.forEach(function(item){
+                if (item === "press") {
+                    data["is_pressed"] = true;
+                }
+            });
+
+        let csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0];
+
+        let response = await fetch("{% url 'course_add_favorite' course_pk=course_pk %}", {
+                    method: 'POST',
+                    headers: {
+                        "X-CSRFToken": csrf_token.value,
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    //data: formData
+                    body: JSON.stringify(data)
+        });
+
+        let result = response.json().then(function(serverData){
+            //console.log(serverData);
+            if (serverData.view_status === false) {
+                alert("PROBLEMS WITH VIEW!");
+            }
+        });
     });
 })
 </script>

@@ -586,6 +586,11 @@ class CourseDetailView(DetailView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs['course_pk'] = self.course_pk
+        kwargs['is_fav'] = "False"
+        for fav_course in self.request.user.favorite_courses.all():
+            if fav_course == self.object:
+                kwargs['is_fav'] = "True"
+                break
         return kwargs
 
 
@@ -999,6 +1004,29 @@ def course_rate(request, course_pk):
             course.save()
 
             return HttpResponse("Success!")
+
+
+def course_add_favorite(request, course_pk):
+    if request.method == 'POST':
+        user = request.user
+        try:
+            course = Course.objects.get(pk=course_pk)
+        except Course.DoesNotExist:
+            logger.info("Request statistics for not existing course.")
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        else:
+            body = json.loads(request.body)
+            status = body['is_pressed']
+            print(status)
+            if status:
+                user.favorite_courses.add(course)
+            else:
+                user.favorite_courses.remove(course)
+            return JsonResponse({
+                    "view_status": True,
+                    "data_saved": True,
+                })
 
 
 @login_required
