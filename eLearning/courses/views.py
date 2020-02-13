@@ -200,7 +200,14 @@ class  CreatePageView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.course_pk = kwargs['course_pk']
-        self.course_instance = Course.objects.get(pk=self.course_pk)
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+        except Course.DoesNotExist:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if self.course_instance.owner_user != request.user:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
         self.page_number = Page.objects.filter(course=self.course_instance).count() + 1
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
