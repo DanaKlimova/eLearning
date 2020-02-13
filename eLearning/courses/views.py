@@ -470,7 +470,19 @@ class  CreateVariantView(FormView):
         self.course_pk = kwargs['course_pk']
         self.page_pk = kwargs['page_pk']
         self.question_pk = kwargs['question_pk']
-        self.question_instance = Question.objects.get(pk=self.question_pk)
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+            self.page_instance = Page.objects.get(pk=self.page_pk)
+            self.question_instance = Question.objects.get(pk=self.question_pk)
+        except (Course.DoesNotExist, Page.DoesNotExist, Question.DoesNotExist):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if (self.course_instance.owner_user != request.user
+                or self.page_instance.course != self.course_instance
+                or self.question_instance.page != self.page_instance):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
@@ -542,7 +554,22 @@ class EditVariantView(FormView):
         self.page_pk = kwargs['page_pk']
         self.question_pk = kwargs['question_pk']
         self.variant_pk = kwargs['variant_pk']
-        self.variant_instance = Variant.objects.get(pk=self.variant_pk)
+
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+            self.page_instance = Page.objects.get(pk=self.page_pk)
+            self.question_instance = Question.objects.get(pk=self.question_pk)
+            self.variant_instance = Variant.objects.get(pk=self.variant_pk)
+        except (Course.DoesNotExist, Page.DoesNotExist, Question.DoesNotExist, Variant.DoesNotExist):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if (self.course_instance.owner_user != request.user 
+                or self.page_instance.course != self.course_instance
+                or self.question_instance.page != self.page_instance
+                or self.variant_instance.question != self.question_instance):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
