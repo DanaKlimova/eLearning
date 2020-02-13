@@ -929,6 +929,20 @@ class CoursePageView(View):
     def finish_course_enrollment(self):
         self.course_enrollment.finished_at = date.today()
         self.course_enrollment.is_active = False
+
+        # count questions
+        questions = 0
+        for page in self.course_enrollment.course.page_set.all():
+            if page.question_set.count() != 0:
+                questions += 1
+                break
+        # course without questions will be passed automaticaly
+        if not questions:
+            self.course_enrollment.is_pass = True
+        # if course have questions then user will pass course enrollmnt if his grade => minimal pass grade
+        else:
+            if self.course_enrollment.grade >= self.course_enrollment.course.min_pass_grade:
+                self.course_enrollment.is_pass = True
         self.course_enrollment.progress = 100
         self.course_enrollment.save()
 
@@ -1006,10 +1020,10 @@ def course_statistics_view(request, course_pk):
                 failed = 0
                 success = 0
                 for finished_enrollment in finished_enrollments:
-                    if finished_enrollment.grade < course.min_pass_grade:
-                        failed += 1
-                    else:
+                    if finished_enrollment.is_pass:
                         success += 1
+                    else:
+                        failed += 1
                 students = CourseEnrollment.objects.filter(course=course, finished_at__isnull=True).count()
 
                 course_enrollments = CourseEnrollment.objects.filter(course=course).all()
