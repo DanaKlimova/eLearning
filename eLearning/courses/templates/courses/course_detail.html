@@ -13,11 +13,16 @@ Course detail
 {% block content %}
 
 <div class="container-grid background">
-    <form id="follow_form" method="post" action="{% url 'course_welcom' course_pk=course_pk%}">
-        {% csrf_token %}
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect follow-button button"
-                    type="submit">Follow</button>
-    </form>
+    <div class="btn-grid">
+        <div class="fav-div">
+            <i class="fav-i"></i>
+        </div>
+        <form id="follow_form" method="post" action="{% url 'course_welcom' course_pk=course_pk%}">
+            {% csrf_token %}
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect follow-button button"
+                        type="submit">Follow</button>
+        </form>
+    </div>
 
     <div class="course-grid ">
         <div class="image-position">
@@ -58,3 +63,12 @@ Course detail
 
 {% endblock %}
 
+{% block js_scripts %}
+<script>
+$(document).ready(function() {
+    $( "i" ).click(function() {
+      $( "i,span" ).toggleClass( "press", 1000 );
+    });
+})
+</script>
+{% endblock %}
