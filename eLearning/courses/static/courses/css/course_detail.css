@@ -32,7 +32,7 @@
 
 .fav-div {
     text-align: left;
-    padding: 10px;
+    padding-left: 20px;
     height: 20px;
 }
 
@@ -51,15 +51,15 @@
     color: #666;
 }
 
-.fav-i:before {
+/* .fav-i:before {
     font-family: fontawesome;
     content: '\f004';
     font-style: normal;
-}
+} */
 
 .fav-i.press {
     animation: size .4s;
-    color: #e23b3b;
+    color: #ebc934;
 }
 
 @keyframes size {

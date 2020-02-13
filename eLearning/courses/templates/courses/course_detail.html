@@ -15,7 +15,7 @@ Course detail
 <div class="container-grid background">
     <div class="btn-grid">
         <div class="fav-div">
-            <i id="favId" class="fav-i"></i>
+            <i id="favId" class="fas fa-star fav-i"></i>
         </div>
         <form id="follow_form" method="post" action="{% url 'course_welcom' course_pk=course_pk%}">
             {% csrf_token %}
@@ -64,6 +64,7 @@ Course detail
 {% endblock %}
 
 {% block js_scripts %}
+<script src="https://kit.fontawesome.com/e278b3cacc.js" crossorigin="anonymous"></script>
 <script>
 $(document).ready(function() {
     addPressClass("{{ is_fav }}");
