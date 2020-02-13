@@ -648,6 +648,12 @@ class CourseWelcomView(View):
         for page in course_pages:
             total_points += Question.objects.filter(page=page).count()
 
+        is_fav = "False"
+        for fav_course in self.request.user.favorite_courses.all():
+            if fav_course == self.course_instance:
+                is_fav = "True"
+                break
+
         context = {
             self.context_object_name: object_,
             'page_list': course_pages,
@@ -655,6 +661,7 @@ class CourseWelcomView(View):
             'total_points': total_points,
             'grade': self.course_enrollment_instance.grade,
             'total_grade': Course.TOTAL_GRADE,
+            "is_fav": is_fav,
         }
         return context
 
