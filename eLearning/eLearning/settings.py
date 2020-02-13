@@ -131,7 +131,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Media files (uploaded images)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'eLearning/media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # SET DEFAULT USER MODEL
 AUTH_USER_MODEL = 'accounts.Account'
