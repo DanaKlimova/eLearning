@@ -1048,6 +1048,7 @@ class CoursePageView(View):
         return context
 
 
+@login_required
 def course_rate(request, course_pk):
     if request.method == 'POST':
         body = json.loads(request.body)
@@ -1089,6 +1090,7 @@ def course_rate(request, course_pk):
             return HttpResponse("Success!")
 
 
+@login_required
 def course_add_favorite(request, course_pk):
     if request.method == 'POST':
         user = request.user
