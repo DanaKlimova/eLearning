@@ -63,7 +63,7 @@ Question detail
 
                 <div class="form-input-item">
                     <label>Description:</label>
-                    <textarea name="content" id="inputContent">{{form.initial.content}}</textarea>
+                    <textarea name="content" class="glowing-border text-input" id="inputContent" required>{{form.initial.content}}</textarea>
                 </div>
 
                 {% if form.content.errors %}
@@ -131,17 +131,9 @@ Question detail
 <script type="text/javascript"
     src="{% static 'courses/datatables/light/datatables.min.js' %}">
 </script>
-<script type="text/javascript" src="{% static 'courses/tinymce/js/tinymce/tinymce.min.js' %}">
-</script>
 
 <script>
 $(document).ready(function() {
-    tinymce.init({
-        selector: "textarea",
-        height: "480",
-        plugins: "codesample, link, lists",
-        content_style: 'body { font-size: calc(16px + .6vw) !important };'
-    });
     $("#questionTableId").DataTable( {
         searching: false,
         ordering: false
