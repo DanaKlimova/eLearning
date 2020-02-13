@@ -324,7 +324,17 @@ class  CreateQuestionView(FormView):
     def dispatch(self, request, *args, **kwargs):
         self.course_pk = kwargs['course_pk']
         self.page_pk = kwargs['page_pk']
-        self.page_instance = Page.objects.get(pk=self.page_pk)
+
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+            self.page_instance = Page.objects.get(pk=self.page_pk)
+        except (Course.DoesNotExist, Page.DoesNotExist):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if self.course_instance.owner_user != request.user or self.page_instance.course != self.course_instance:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
