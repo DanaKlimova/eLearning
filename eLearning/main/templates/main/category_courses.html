@@ -33,7 +33,7 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ course.name }}</td>
-                <td>{{ course.rating|default:"course wasn't rated" }}</td>
+                <td>{{ course.rating|floatformat:"1"|default:"course wasn't rated" }}</td>
                 {% if courses_type|lower == 'completed' %}
                     {% if is_passed|get_list_item:forloop.counter0 %}
                     <td><i class="fas fa-check done"></i></td>
