@@ -592,12 +592,20 @@ class EditVariantView(FormView):
         form = self.get_form()
         question_instance = Question.objects.get(pk=self.question_pk)
         content = form['content'].value()
-        if form.is_valid():
-            self.extra_context["success_message"] = "Variant updated"
-            logger.info(f'{request.user} updated variant - {self.variant_pk}.')
-            return self.form_valid(form)
+        variants = Variant.objects.filter(
+            question=question_instance,
+            content=content,
+        )
+        if variants.count() == 1:
+            if form.is_valid():
+                self.extra_context["success_message"] = "Variant updated"
+                logger.info(f'{request.user} updated variant - {self.variant_pk}.')
+                return self.form_valid(form)
+            else:
+                logger.info(f"{request.user} didn't update variant - {self.variant_pk}.")
+                return self.form_invalid(form)
         else:
-            logger.info(f"{request.user} didn't update variant - {self.variant_pk}.")
+            form.add_error(None, f'A variant with "{content}" content already exists.')
             return self.form_invalid(form)
 
     def get(self, request, *args, **kwargs):
