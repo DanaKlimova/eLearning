@@ -596,7 +596,7 @@ class EditVariantView(FormView):
             question=question_instance,
             content=content,
         )
-        if variants.count() == 1:
+        if variants.count() == 0 or variants[0] == self.variant_instance:
             if form.is_valid():
                 self.extra_context["success_message"] = "Variant updated"
                 logger.info(f'{request.user} updated variant - {self.variant_pk}.')
