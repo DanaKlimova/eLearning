@@ -51,6 +51,11 @@ class RegistrationView(FormView):
 
     def form_invalid(self, form):
         logger.info("User entered invalid credentions. User didn't register.")
+        form.initial = {
+            "email": self.request.POST.get("email"),
+            "first_name": self.request.POST.get("first_name"),
+            "last_name": self.request.POST.get("last_name"),
+        }
         return self.render_to_response(self.get_context_data(form=form))
 
 @method_decorator(login_required, name='dispatch')
