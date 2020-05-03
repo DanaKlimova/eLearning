@@ -27,8 +27,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = error_404
 handler500 = error_500

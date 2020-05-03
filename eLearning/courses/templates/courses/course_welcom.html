@@ -26,7 +26,7 @@ Course enrollment detail
         <div class="table-wrapper">
 
             {% if course_enrollment.finished_at %}
-                {% if course_enrollment.course.min_pass_grade <= grade %}
+                {% if course_enrollment.is_pass %}
                     <span class=" is-approved stamp ">
                         Approved
                     </span>
@@ -73,6 +73,10 @@ Course enrollment detail
         </div>
     </div>
     <div class="course-data-col background">
+        <form class="fav-form">
+        {% csrf_token %}
+            <i id="favId" class="fas fa-star fav-i"></i>
+        </form>
         <div class="course-description-block">
             <div class="border-content">
                 
@@ -98,19 +102,21 @@ Course enrollment detail
                     {{ course_enrollment.finished_at }}
                 </label>
 
-                <label class="text-data">
-                    <div class="bold">
-                        Grade:
-                    </div>
-                    {{ grade|default:"0" }} of {{ total_grade }}
-                </label>
+                {% if total_points %}
+                    <label class="text-data">
+                        <div class="bold">
+                            Grade:
+                        </div>
+                        {{ grade|default:"0" }} of {{ total_grade }}
+                    </label>
 
-                <label class="text-data">
-                    <div class="bold">
-                        Minimum pass grade:
-                    </div>
-                    {{ course_enrollment.course.min_pass_grade|floatformat:"0" }}
-                </label>
+                    <label class="text-data">
+                        <div class="bold">
+                            Minimum pass grade:
+                        </div>
+                        {{ course_enrollment.course.min_pass_grade|floatformat:"0" }}
+                    </label>
+                    {% endif %}
                 {% endif %}
 
                 <label class="text-data">
@@ -153,13 +159,14 @@ Course enrollment detail
                         </div>
                         {{ course_enrollment.current_page.number|default:"you haven't started to study" }}
                     </label>
-
-                    <label class="text-data">
-                        <div class="bold">
-                            Points:
-                        </div>
-                        {{ course_enrollment.points|default:"0" }} of {{ total_points }}
-                    </label>
+                    {% if total_points %}
+                        <label class="text-data">
+                            <div class="bold">
+                                Points:
+                            </div>
+                            {{ course_enrollment.points|default:"0" }} of {{ total_points }}
+                        </label>
+                    {% endif %}
                 {% endif %}
 
 
@@ -178,7 +185,9 @@ Course enrollment detail
 
 <script>
 $(document).ready(function(){
-  $("#pageTableId").DataTable( {
+    addPressClass("{{ is_fav }}");
+
+    $("#pageTableId").DataTable( {
         searching: false,
         ordering: false
     });
@@ -187,13 +196,52 @@ $(document).ready(function(){
         this.MaterialProgress.setProgress("{{ course_enrollment.progress }}");
     });
 
-  addClassByName('pageTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button');
+    addClassByName('pageTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button');
 
-  function addClassByName(name, class_) {
+    $( "i" ).click(async function() {
+        $( "i,span" ).toggleClass( "press", 1000 );
+
+        data = {}
+        data["is_pressed"] = false;
+        document.getElementById('favId').classList.forEach(function(item){
+                if (item === "press") {
+                    data["is_pressed"] = true;
+                }
+            });
+
+        let csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0];
+
+        let response = await fetch("{% url 'course_add_favorite' course_pk=course_enrollment.course.pk %}", {
+                    method: 'POST',
+                    headers: {
+                        "X-CSRFToken": csrf_token.value,
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    //data: formData
+                    body: JSON.stringify(data)
+        });
+
+        let result = response.json().then(function(serverData){
+            //console.log(serverData);
+            if (serverData.view_status === false) {
+                alert("PROBLEMS WITH VIEW!");
+            }
+        });
+    });
+    
+    function addClassByName(name, class_) {
         var elements = document.getElementsByName(name);
         elements.forEach(function (item, index) {
             item.className += class_;
         });
+    }
+
+    function addPressClass(is_fav) {
+        if (is_fav === "True") {
+            i_el = document.getElementById('favId');
+            i_el.classList.add("press");
+        }
+
     }
 });
 </script>

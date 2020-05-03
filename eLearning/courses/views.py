@@ -65,7 +65,14 @@ class EditCourseView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.course_pk = kwargs['course_pk']
-        self.course_instance = Course.objects.get(pk=self.course_pk)
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+        except Course.DoesNotExist:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if self.course_instance.owner_user != request.user:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
@@ -193,7 +200,14 @@ class  CreatePageView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.course_pk = kwargs['course_pk']
-        self.course_instance = Course.objects.get(pk=self.course_pk)
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+        except Course.DoesNotExist:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if self.course_instance.owner_user != request.user:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
         self.page_number = Page.objects.filter(course=self.course_instance).count() + 1
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
@@ -238,7 +252,16 @@ class EditPageView(FormView):
     def dispatch(self, request, *args, **kwargs):
         self.page_pk = kwargs['page_pk']
         self.course_pk = kwargs['course_pk']
-        self.page_instance = Page.objects.get(pk=self.page_pk)
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+            self.page_instance = Page.objects.get(pk=self.page_pk)
+        except (Course.DoesNotExist, Page.DoesNotExist):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if self.course_instance.owner_user != request.user or self.page_instance.course != self.course_instance:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
@@ -301,7 +324,17 @@ class  CreateQuestionView(FormView):
     def dispatch(self, request, *args, **kwargs):
         self.course_pk = kwargs['course_pk']
         self.page_pk = kwargs['page_pk']
-        self.page_instance = Page.objects.get(pk=self.page_pk)
+
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+            self.page_instance = Page.objects.get(pk=self.page_pk)
+        except (Course.DoesNotExist, Page.DoesNotExist):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if self.course_instance.owner_user != request.user or self.page_instance.course != self.course_instance:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
@@ -358,7 +391,19 @@ class EditQuestionView(FormView):
         self.course_pk = kwargs['course_pk']
         self.page_pk = kwargs['page_pk']
         self.question_pk = kwargs['question_pk']
-        self.question_instance = Question.objects.get(pk=self.question_pk)
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+            self.page_instance = Page.objects.get(pk=self.page_pk)
+            self.question_instance = Question.objects.get(pk=self.question_pk)
+        except (Course.DoesNotExist, Page.DoesNotExist, Question.DoesNotExist):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if (self.course_instance.owner_user != request.user 
+                or self.page_instance.course != self.course_instance
+                or self.question_instance.page != self.page_instance):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
@@ -425,7 +470,19 @@ class  CreateVariantView(FormView):
         self.course_pk = kwargs['course_pk']
         self.page_pk = kwargs['page_pk']
         self.question_pk = kwargs['question_pk']
-        self.question_instance = Question.objects.get(pk=self.question_pk)
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+            self.page_instance = Page.objects.get(pk=self.page_pk)
+            self.question_instance = Question.objects.get(pk=self.question_pk)
+        except (Course.DoesNotExist, Page.DoesNotExist, Question.DoesNotExist):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if (self.course_instance.owner_user != request.user
+                or self.page_instance.course != self.course_instance
+                or self.question_instance.page != self.page_instance):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
@@ -497,7 +554,22 @@ class EditVariantView(FormView):
         self.page_pk = kwargs['page_pk']
         self.question_pk = kwargs['question_pk']
         self.variant_pk = kwargs['variant_pk']
-        self.variant_instance = Variant.objects.get(pk=self.variant_pk)
+
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+            self.page_instance = Page.objects.get(pk=self.page_pk)
+            self.question_instance = Question.objects.get(pk=self.question_pk)
+            self.variant_instance = Variant.objects.get(pk=self.variant_pk)
+        except (Course.DoesNotExist, Page.DoesNotExist, Question.DoesNotExist, Variant.DoesNotExist):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if (self.course_instance.owner_user != request.user 
+                or self.page_instance.course != self.course_instance
+                or self.question_instance.page != self.page_instance
+                or self.variant_instance.question != self.question_instance):
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
@@ -520,12 +592,11 @@ class EditVariantView(FormView):
         form = self.get_form()
         question_instance = Question.objects.get(pk=self.question_pk)
         content = form['content'].value()
-        try:
-            Variant.objects.get(
-                question=question_instance,
-                content=content,
-            )
-        except Variant.DoesNotExist:
+        variants = Variant.objects.filter(
+            question=question_instance,
+            content=content,
+        )
+        if variants.count() == 0 or variants[0] == self.variant_instance:
             if form.is_valid():
                 self.extra_context["success_message"] = "Variant updated"
                 logger.info(f'{request.user} updated variant - {self.variant_pk}.')
@@ -586,6 +657,11 @@ class CourseDetailView(DetailView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs['course_pk'] = self.course_pk
+        kwargs['is_fav'] = "False"
+        for fav_course in self.request.user.favorite_courses.all():
+            if fav_course == self.object:
+                kwargs['is_fav'] = "True"
+                break
         return kwargs
 
 
@@ -602,7 +678,11 @@ class CourseWelcomView(View):
     def get(self, request, *args, **kwargs):
         self.course_pk = self.kwargs.get('course_pk')
         self.user = request.user
-        self.course_instance = Course.objects.get(pk=self.course_pk)
+        try:
+            self.course_instance = Course.objects.get(pk=self.course_pk)
+        except Course.DoesNotExist:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
         try:
             self.course_enrollment_instance = CourseEnrollment.objects.get(user=self.user, course=self.course_instance)
         except CourseEnrollment.DoesNotExist:
@@ -643,6 +723,12 @@ class CourseWelcomView(View):
         for page in course_pages:
             total_points += Question.objects.filter(page=page).count()
 
+        is_fav = "False"
+        for fav_course in self.request.user.favorite_courses.all():
+            if fav_course == self.course_instance:
+                is_fav = "True"
+                break
+
         context = {
             self.context_object_name: object_,
             'page_list': course_pages,
@@ -650,6 +736,7 @@ class CourseWelcomView(View):
             'total_points': total_points,
             'grade': self.course_enrollment_instance.grade,
             'total_grade': Course.TOTAL_GRADE,
+            "is_fav": is_fav,
         }
         return context
 
@@ -929,6 +1016,20 @@ class CoursePageView(View):
     def finish_course_enrollment(self):
         self.course_enrollment.finished_at = date.today()
         self.course_enrollment.is_active = False
+
+        # count questions
+        questions = 0
+        for page in self.course_enrollment.course.page_set.all():
+            if page.question_set.count() != 0:
+                questions += 1
+                break
+        # course without questions will be passed automaticaly
+        if not questions:
+            self.course_enrollment.is_pass = True
+        # if course have questions then user will pass course enrollmnt if his grade => minimal pass grade
+        else:
+            if self.course_enrollment.grade >= self.course_enrollment.course.min_pass_grade:
+                self.course_enrollment.is_pass = True
         self.course_enrollment.progress = 100
         self.course_enrollment.save()
 
@@ -946,6 +1047,7 @@ class CoursePageView(View):
         return context
 
 
+@login_required
 def course_rate(request, course_pk):
     if request.method == 'POST':
         body = json.loads(request.body)
@@ -988,6 +1090,30 @@ def course_rate(request, course_pk):
 
 
 @login_required
+def course_add_favorite(request, course_pk):
+    if request.method == 'POST':
+        user = request.user
+        try:
+            course = Course.objects.get(pk=course_pk)
+        except Course.DoesNotExist:
+            logger.info("Request statistics for not existing course.")
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        else:
+            body = json.loads(request.body)
+            status = body['is_pressed']
+            print(status)
+            if status:
+                user.favorite_courses.add(course)
+            else:
+                user.favorite_courses.remove(course)
+            return JsonResponse({
+                    "view_status": True,
+                    "data_saved": True,
+                })
+
+
+@login_required
 def course_statistics_view(request, course_pk):
     if request.method == "GET":
         try:
@@ -1006,10 +1132,10 @@ def course_statistics_view(request, course_pk):
                 failed = 0
                 success = 0
                 for finished_enrollment in finished_enrollments:
-                    if finished_enrollment.grade < course.min_pass_grade:
-                        failed += 1
-                    else:
+                    if finished_enrollment.is_pass:
                         success += 1
+                    else:
+                        failed += 1
                 students = CourseEnrollment.objects.filter(course=course, finished_at__isnull=True).count()
 
                 course_enrollments = CourseEnrollment.objects.filter(course=course).all()

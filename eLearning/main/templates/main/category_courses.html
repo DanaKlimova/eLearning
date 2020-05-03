@@ -33,9 +33,9 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ course.name }}</td>
-                <td>{{ course.rating|default:"course wasn't rated" }}</td>
+                <td>{{ course.rating|floatformat:"1"|default:"course wasn't rated" }}</td>
                 {% if courses_type|lower == 'completed' %}
-                    {% if grades|get_list_item:forloop.counter0 >= course.min_pass_grade %}
+                    {% if is_passed|get_list_item:forloop.counter0 %}
                     <td><i class="fas fa-check done"></i></td>
                     {% comment %} <td><a href="{% url 'course_cert' course_pk=course.pk %}"><img class="medal" src="{% static 'main/image/medal.svg' %}"/></a></td> {% endcomment %}
                     <td><a href="{% url 'course_cert' course_pk=course.pk %}"><i class="fas fa-arrow-circle-down download"  title="download certificate"></i></a></td>

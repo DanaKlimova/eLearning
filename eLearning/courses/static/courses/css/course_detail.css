@@ -24,3 +24,54 @@
 .course-data-position {
     grid-column: 2/3;
 }
+
+.btn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.fav-div {
+    text-align: left;
+    padding-left: 20px;
+    height: 20px;
+}
+
+.fav-i {
+    cursor: pointer;
+    padding: 10px 12px 8px;
+    background: #fff;
+    border-radius: 50%;
+    display: inline-block;
+    color: #aaa;
+    transition: .2s;
+    font-size: 35px;
+}
+
+.fav-i:hover {
+    color: #666;
+}
+
+/* .fav-i:before {
+    font-family: fontawesome;
+    content: '\f004';
+    font-style: normal;
+} */
+
+.fav-i.press {
+    animation: size .4s;
+    color: #ebc934;
+}
+
+@keyframes size {
+    0% {
+        padding: 10px 12px;
+    }
+    50% {
+        padding: 14px 12px;
+        font-size: 45px;
+        /* margin-top: -4px; */
+    }
+    100% {
+        padding: 10px 12px;
+    }
+}

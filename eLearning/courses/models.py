@@ -110,6 +110,7 @@ class CourseEnrollment(models.Model):
     progress = models.FloatField(null=True)
     rate = models.FloatField(null=True)
     is_active = models.BooleanField(default=True)
+    is_pass = models.BooleanField(default=False)
     _grade = models.IntegerField(db_column='grade', null=True)
 
     @property

@@ -19,7 +19,8 @@ Register
 
             <div class="form-input-item">
                 <label>Email</label>
-                <input type="email" name="email" id="inputEmail" class="glowing-border text-input" required>
+                <input type="email" name="email" id="inputEmail" class="glowing-border text-input" 
+                value="{{form.initial.email}}" required>
             </div>
 
             {% if form.email.errors %}
@@ -35,7 +36,8 @@ Register
 
             <div class="form-input-item">
                 <label>First name</label>
-                <input type="text" name="first_name" id="inputFirstName" class="glowing-border text-input" required>
+                <input type="text" name="first_name" id="inputFirstName" class="glowing-border text-input" 
+                value="{{form.initial.first_name}}" required>
             </div>
 
             {% if form.first_name.errors %}
@@ -50,7 +52,8 @@ Register
 
             <div class="form-input-item">
                 <label>Last name</label>
-                <input type="text" name="last_name" id="inputLastName" class="glowing-border text-input" required>
+                <input type="text" name="last_name" id="inputLastName" class="glowing-border text-input" 
+                value="{{form.initial.last_name}}" required>
             </div>
 
             {% if form.last_name.errors %}

@@ -1,3 +1,7 @@
+textarea {
+    font-family: inherit;
+}
+
 .question-grid {
     display: grid;
     grid-template-columns: 40% 60%;

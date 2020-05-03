@@ -32,10 +32,10 @@ def home(request):
         )
 
         users_courses = NamedCourses('Users courses', (
-            Course.objects.filter(type='pbl', owner_type='usr', status='rdy')[:6]
+            Course.objects.filter(type='pbl', owner_type='usr', status='rdy')
         ).union(
-            user.individual_courses.filter(owner_type='usr', status='rdy')[:6]
-        ).order_by('rating'))
+            user.individual_courses.filter(owner_type='usr', status='rdy')
+        ).order_by('rating')[:6])
 
         starred_courses = NamedCourses(
             'Starred courses',
@@ -51,10 +51,10 @@ def home(request):
         )
 
         recomended_courses = NamedCourses('Recomended', (
-            Course.objects.filter(type='pbl', status='rdy')[:6]
+            Course.objects.filter(type='pbl', status='rdy')
             ).union(
-            user.individual_courses.filter(status='rdy')[:6]
-        ).order_by('rating'))
+            user.individual_courses.filter(status='rdy')
+        ).order_by('rating')[:6])
 
         context['courses_set'] = [
             current_courses,
@@ -135,10 +135,10 @@ def completed_courses(request):
         ).order_by('course__rating')
 
         completed_courses = [enrollment.course for enrollment in completed_course_enrollments]
-        grades = [enrollment.grade for enrollment in completed_course_enrollments]
+        is_passed = [enrollment.is_pass for enrollment in completed_course_enrollments]
 
         context["courses"] = completed_courses
-        context["grades"] = grades
+        context["is_passed"] = is_passed
         context["courses_type"] = "completed"
     return render(request, "main/category_courses.html", context)
 
