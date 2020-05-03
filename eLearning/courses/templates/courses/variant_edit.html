@@ -40,7 +40,7 @@ Variant detail
 
             <div class="form-input-item">
                 <label>Description</label>
-                <textarea name="content" id="inputContent" class="glowing-border text-area" required>{{form.initial.content}}</textarea>
+                <textarea name="content" id="inputContent" required>{{form.initial.content}}</textarea>
             </div>
             </div>
 
@@ -70,9 +70,16 @@ Variant detail
 
 {% block js_scripts %}
 <script src="https://kit.fontawesome.com/e278b3cacc.js" crossorigin="anonymous"></script>
+<script type="text/javascript" src="{% static 'courses/tinymce/js/tinymce/tinymce.min.js' %}">
+</script>
 
 <script>
 $(document).ready(function() {
+    tinymce.init({
+        selector: "textarea",
+        height: "480",
+        plugins: "codesample, link, lists"
+    });
     checkElement('checkboxId', '{{ is_correct }}')
 
     function checkElement(id, is_correct) {
