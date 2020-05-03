@@ -13,6 +13,7 @@
 {% endblock %}
 
 {% block content %}
+{% load main_extras %}
 <div class="container background">
     <h3>{{ courses_type|title }} courses</h3>
     <table id="courseTableId" class="cell-border stripe hover table">
@@ -21,6 +22,9 @@
             <th scope="col">№</th>
             <th scope="col">Course</th>
             <th scope="col">Rating</th>
+            {% if courses_type|lower == 'completed' %}
+            <th scope="col">Result</th>
+            {% endif %}
             <th scope="col">Action</th>
             </tr>
         </thead>
@@ -30,6 +34,13 @@
                 <td>{{ forloop.counter }}</td>
                 <td>{{ course.name }}</td>
                 <td>{{ course.rating|default:"course wasn't rated" }}</td>
+                {% if courses_type|lower == 'completed' %}
+                    {% if grades|get_list_item:forloop.counter0 >= course.min_pass_grade %}
+                    <td><i class="fas fa-check done"></i></td>
+                    {% else %}
+                    <td><i class="fas fa-times not-done"></i></td>
+                    {% endif %}
+                {% endif %}
                 <td><a href="{% url 'course_detail' course_pk=course.pk %}"><i class="fas fa-info"></i></a></td>
             </tr>
             {% endfor %}
