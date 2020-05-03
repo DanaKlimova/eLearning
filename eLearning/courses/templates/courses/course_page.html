@@ -90,7 +90,7 @@ Course page
                                     hidden
                                 {% else %}
                                     type="{{ task.question_types|get_item:task.question.type }}"
-                                    value="{{ variant }}" 
+                                    value="{{ variant }}"
                                         {% if task.question_types|get_item:task.question.type == 'checkbox'%}
                                         class="mdl-checkbox__input"
                                         {% else %}
@@ -121,7 +121,7 @@ Course page
                             {% endif %}
                         {% endif %}
                     </div>
-                </p>  
+                </p>
                 {% endfor %}
             </p>
             {% endfor %}
