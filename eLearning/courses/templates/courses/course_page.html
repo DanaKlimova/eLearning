@@ -6,19 +6,18 @@ Course page
 {% endblock %}
 
 {% block styles %}
-{% load static %}
-<link rel="stylesheet" href="{% static 'courses/css/course_page.css' %}" />
 <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+{% load static %}
+<link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/course_page.css' %}" />
 {% endblock %}
 
 {% block content %}
-<div id="modalId" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">Please, rate course</h4>
-      </div>
-      <div class="modal-body">
+<dialog class="mdl-dialog">
+    <div class="mdl-dialog__content">
+        <p>
+            Please, rate course
+        </p>
         <form>
             {% csrf_token %}
             <div class="rate">
@@ -34,85 +33,132 @@ Course page
                 <label for="star1" title="1">1 star</label>
             </div>
         </form>
-      </div>
-       <div class="modal-footer">
-        <button id="closeButtonId" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button id="rateButtonId" type="button" class="btn btn-primary">Rate</button>
-      </div> 
     </div>
-  </div>
-</div>
-<p>
-    <label>Page number:</label>
-    {{ current_page.number }}
-</p>
-<p>
-    <label>Page content:</label>
-    {{ current_page.content }}
-</p>
+    <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+        <button id="closeButtonId" type="button" class="mdl-button close">Close</button>
+        <button id="rateButtonId" type="button" class="mdl-button">Rate</button>
+    </div>
+</dialog>
+<div class="container background">
+    <div class="page-content-wrapper">
 
-{% if 'Submit' in button_type %}
-<form method="post" action="{% url 'course_page' course_pk=course_pk page_pk=page_pk %}">
-{% endif %}
-{% csrf_token %}
-{% for task in tasks %}
-<p>
-    <label id="q_{{ task.question.pk }}">
-        Question:
-    </label>
-    {{ task.question.content }}
-</p>
-<p>
-    <label>Variants:</label>
-    {% for variant_pk, variant in task.variants %}
-    <p>
-        <div class="" id="q_{{ task.question.pk}}_v_{{ variant_pk }}">
-            <input
-                {% if task_type %}
-                type="{{ task_type }}"
-                hidden
-                {% else %}
-                type="{{ task.question_types|get_item:task.question.type }}"
-                value="{{ variant }}" 
-                {% endif %}
-                name="{{task.question.pk}}"
-                id="q_{{ task.question.pk}}_v_{{ variant_pk }}_"
-                {% if forloop.first and task.question_types|get_item:task.question.type == 'radio' %}
-                required
-                checked
-                {% endif %}>
-            {{ variant }}
+        <a href="{% url 'course_welcom' course_pk=course_pk %}">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                    type="submit">To course</button>
+        </a>
+
+        <label class="text-data">
+            <div class="bold part">
+                Page content
+            </div>
+            {{ current_page.content }}
+        </label>
+
+        <div class="questions">
+            <div class="bold part">
+                Questions
+            </div>
+            {% if 'submit' in button_type|lower %}
+            <form method="post" action="{% url 'course_page' course_pk=course_pk page_pk=page_pk %}">
+            {% endif %}
+            {% csrf_token %}
+            {% for task in tasks %}
+
+            <label class="text-data bold" id="q_{{ task.question.pk }}">
+                {{ forloop.counter }}. {{ task.question.content }}
+            </label>
+
+            <p>
+                {% for variant_pk, variant in task.variants %}
+                <p>
+                    <div class="variant" id="q_{{ task.question.pk}}_v_{{ variant_pk }}">
+
+                        {% if 'submit' in button_type|lower %}
+                            {% if task.question_types|get_item:task.question.type == 'checkbox' %}
+                                <label for="q_{{ task.question.pk}}_v_{{ variant_pk }}_"
+                                        class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
+                            {% elif task.question_types|get_item:task.question.type == 'radio' %}
+                                <label for="q_{{ task.question.pk}}_v_{{ variant_pk }}_"
+                                        class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
+                            {% endif %}
+                        {% endif %}
+
+                        <div class="" id="q_{{ task.question.pk}}_v_{{ variant_pk }}">
+                            <input
+                                {% if task_type %}
+                                    type="{{ task_type }}"
+                                    hidden
+                                {% else %}
+                                    type="{{ task.question_types|get_item:task.question.type }}"
+                                    value="{{ variant }}"
+                                        {% if task.question_types|get_item:task.question.type == 'checkbox'%}
+                                        class="mdl-checkbox__input"
+                                        {% else %}
+                                        class="mdl-radio__button"
+                                        {% endif %}
+                                {% endif %}
+                                name="{{task.question.pk}}"
+                                id="q_{{ task.question.pk}}_v_{{ variant_pk }}_"
+                                {% if forloop.first and task.question_types|get_item:task.question.type == 'radio' %}
+                                    required
+                                    checked
+                                {% endif %}>
+
+                                {% if 'submit' not in button_type|lower %}
+                                    {{ variant }}
+                                {% endif %}
+                        </div>
+
+                        {% if 'submit' in button_type|lower %}
+                            {% if task.question_types|get_item:task.question.type == 'checkbox'%}
+                                <span class="mdl-checkbox__label">{{ variant }}</span>
+                            {% elif task.question_types|get_item:task.question.type == 'radio' %}
+                                <span class="mdl-radio__label">{{ variant }}</span>
+                            {% endif %}
+
+                            {% if task.question_types|get_item:task.question.type == 'checkbox' or task.question_types|get_item:task.question.type == 'radio'%}
+                                </label>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </p>
+                {% endfor %}
+            </p>
+            {% endfor %}
+
+            {% if 'next' in button_type|lower %}
+            <a href="{% url 'course_page' course_pk=course_pk page_pk=next_page_pk %}">
+            {% elif 'finish' in button_type|lower or 'to course enrollment detail' in button_type|lower %}
+            <a href="{% url 'course_welcom' course_pk=course_pk %}">
+            {% endif %}
+
+            <button id="buttonId" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                    type="submit">{{button_type}}</button>
+
+            {% if 'submit' in button_type|lower %}
+            </form>
+            {% else %}
+            </a>
+            {% endif %}
         </div>
-    </p>  
-    {% endfor %}
-</p>
-{% endfor %}
-
-{% if 'Next' in button_type %}
-<a href="{% url 'course_page' course_pk=course_pk page_pk=next_page_pk %}">
-{% elif 'Finish' in button_type or 'To course enrollment detail' in button_type %}
-<a href="{% url 'course_welcom' course_pk=course_pk %}">
-{% endif %}
-
-<button id="buttonId" class="float-left btn btn-lg btn-primary"
-        type="submit">{{button_type}}</button>
-
-{% if 'Submit' in button_type %}
-</form>
-{% else %}
-</a>
-{% endif %}
-
+    </div>
+</div>
 {% endblock %}
 
 {% block js_scripts %}
 <script>
 $(document).ready(function() {
-    addClassById("{{ correct_questions }}", "correct");
-    addClassById("{{ users_answers }}", "user-answer");
+    addClassById("{{ correct_questions }}", " correct");
+    // TODO" Ответы пользователя повторяются трижды
+    addClassById("{{ users_answers }}", " user-answer");
 
     if ("{{ button_type }}" === "Finish") {
-        $("#modalId").modal('show');
+        var dialog = document.querySelector('dialog');
+        dialog.showModal();
+
+        dialog.querySelector('.close').addEventListener('click', function() {
+            dialog.close();
+        });
     }
         
     $("#rateButtonId").click(async function() {
@@ -132,17 +178,20 @@ $(document).ready(function() {
             },
             body: JSON.stringify(post_data)
         });
-        $("#modalId").modal('toggle');
+
+        var dialog = document.querySelector('dialog');
+        dialog.close();
     });
 
     function addClassById(element_ids, class_) {
-        console.log(element_ids)
+        //console.log(element_ids)
         if (element_ids != "None" && element_ids) {
             element_ids_ = element_ids.split(' ');
             element_ids_.forEach(function (item, index) {
-            element_id = document.getElementById(item);
-            element_id.className += class_;
-        });
+                console.log(item)
+                element = document.getElementById(item);
+                element.className += class_;
+            });
         }
     }
 });

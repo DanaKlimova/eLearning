@@ -1,0 +1,118 @@
+label {
+    font-size: 1vw;
+    color: #343a40;
+}
+
+th {
+    background-color: rgba(158, 158, 158, .2);
+}
+
+.table {
+    background-color: white;
+    color: #343a40;
+    font-size: 1vw;
+}
+
+.table-wrapper {
+    margin: 10px;
+    font-size: 0.8vw;
+}
+
+.table-select {
+    font-size: 1vw;
+    height: auto;
+    width: auto;
+    margin: 5px;
+    padding: 2px;
+    color: #343a40;
+}
+
+.form-input-item {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    margin: 10px;
+}
+
+.select {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem .5rem;
+    padding: 5px;
+    font-size: 1vw;
+}
+
+.text-input {
+    padding: 5px;
+    font-size: 1vw;
+}
+
+.text-area {
+    padding: 5px;
+    font-size: 1vw;
+    font-family: "Helvetica", "Arial", sans-serif;
+    min-height: 150px;
+}
+
+.bold {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.inline {
+    display: inline;
+}
+
+.glowing-border {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem .5rem;
+}
+
+.glowing-border:focus,
+.glowing-border:hover {
+    outline: none;
+    border-color: #4f9cee;
+    box-shadow: 0 0 10px #4f9cee;
+}
+
+.error-label {
+    color: red;
+    grid-column: 2/3;
+}
+
+.success-label {
+    color: green;
+    text-align: center;
+    margin: 10px auto;
+    display: block;
+}
+
+.add-button {
+    float: right;
+    margin-bottom: 10px;
+    color: #343a40;
+}
+
+.submit-button {
+    display: block;
+    margin: 10px auto;
+    color: #343a40;
+}
+
+.arrow-left {
+    color: rgb(255, 64, 129);
+}
+
+.background {
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 1em;
+    box-shadow: 0 0 1em rgba(0, 0, 0, .05);
+}
+
+.course-cover {
+    display: block;
+    margin: 0 auto;
+    max-height: 512;
+    max-width: 512;
+    width: 100%;
+    height: auto;
+}

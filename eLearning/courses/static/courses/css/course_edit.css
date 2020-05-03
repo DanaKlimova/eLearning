@@ -1,0 +1,34 @@
+.course-grid {
+    display: grid;
+}
+
+.form-col {
+    grid-column: 1/2;
+    margin: 0 10px;
+}
+
+.page-col {
+    grid-column: 2/3;
+    margin: 0 10px;
+}
+
+.container {
+    margin: 0 auto;
+    width: 60%;
+}
+
+.course-form-grid {
+    display: grid;
+}
+
+.upload-file {
+    padding: 10px 0;
+    color: #343a40;
+}
+
+.course-cover {
+    max-height: 256;
+    max-width: 256;
+    justify-self: center;
+    align-self: center;
+}

@@ -9,24 +9,52 @@ Login
 {% endblock %}
 
 {% block content %}
-<form class="form-signin" id="login_form" method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    <h1 class="h3 mb-3 font-weight-normal">Login</h1>
-    <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required
-        autofocus>
-    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+<div class="container background">
+    <h2 class="text-center">Login</h2>
+    <form class="form-signin" id="login_form" method="post" action="{% url 'login' %}">
+        {% csrf_token %}
 
-    {% for field in form %}
-    <p>
-        {% for error in field.errors%}
-        <p style="color:red;">{{ error|default:"" }}</p>
-        {% endfor %}
-    </p>
-    {% endfor %}
-    {% if form.non_field_errors %}
-    <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
-    {% endif %}
+        <div class="login-form-grid">
 
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
-</form>
+            <div class="form-input-item">
+                <label>Email</label>
+                <input type="email" name="email" id="inputEmail" class="glowing-border text-input" required>
+            </div>
+
+            {% if form.email.errors %}
+            <div class="form-input-item">
+                <label class="error-label">
+                    {% for error in form.email.errors%}
+                    {{ error|default:"" }}
+                    {% endfor %}
+                </label>
+            </div>
+            {% endif %}
+
+            <div class="form-input-item">
+                <label>Password</label>
+                <input type="password" name="password" id="inputPassword" class="glowing-border text-input" required>
+            </div>
+
+            {% if form.password.errors %}
+            <div class="form-input-item">
+                <label class="error-label">
+                    {% for error in form.password.errors%}
+                    {{ error|default:"" }}
+                    {% endfor %}
+                </label>
+            </div>
+            {% endif %}
+            
+
+            {% if form.non_field_errors %}
+            <label class="error-label">{{ form.non_field_errors|default:"" }}</label>
+            {% endif %}
+        </div>
+
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button"
+            type="submit">Login</button>
+
+    </form>
+</div>
 {% endblock %}

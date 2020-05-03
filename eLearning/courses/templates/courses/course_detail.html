@@ -5,36 +5,54 @@ Course detail
 {% endblock %}
 
 {% block styles %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/course_detail.css' %}" />
 {% endblock %}
 
 {% block content %}
-<form id="follow_form" method="post" action="{% url 'course_welcom' course_pk=course_pk%}">
-    {% csrf_token %}
-    <button class="float-right btn btn-lg btn-primary" type="submit">Follow</button>
-</form>
 
-<div class="row">
-    <div class="col">
-    <img src="{{ course.cover.url }}" alt="{{ course.name }}">
-    </div>
-    <div class="col">
-    <p>
-        <label>Course name:</label>
-        {{ course.name }}
-    </p>
-    <p>
-        <label>Course author:</label>
-        {{ course.owner_user.first_name}}
-        {{ course.owner_user.last_name}}
-    </p>
-    <p>
-        <label>Course rating:</label>
-        {{ course.rating|default:"course wasn't rated" }}
-    </p>
-    <p>
-        <label>Course content:</label>
-        {{ course.content }}
-    </p>
+<div class="container-grid background">
+    <form id="follow_form" method="post" action="{% url 'course_welcom' course_pk=course_pk%}">
+        {% csrf_token %}
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect follow-button"
+                    type="submit">Follow</button>
+    </form>
+
+    <div class="course-grid ">
+        <div class="image-position">
+            <img class="course-cover" src="{{ course.cover.url }}" alt="{{ course.name }}">
+        </div>
+        <div class="course-data-position">
+            <label class="text-data">
+                <div class="bold">
+                    Course name:
+                </div>
+                {{ course.name }}
+            </label>
+
+            <label class="text-data">
+                <div class="bold">
+                    Course author:
+                </div>
+                {{ course.owner_user.first_name}}
+                {{ course.owner_user.last_name}}
+            </label>
+
+            <label class="text-data">
+                <div class="bold">
+                    Course rating:
+                </div>
+                {{ course.rating|default:"course wasn't rated" }}
+            </label>
+
+            <label class="text-data">
+                <div class="bold">
+                    Course content:
+                </div>
+                {{ course.content }}
+            </label>
+        </div>
     </div>
 </div>
 

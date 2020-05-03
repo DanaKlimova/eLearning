@@ -1,3 +1,4 @@
-.footer {
-    min-height: 100px;
+.footer-text {
+    text-align: center;
+    padding: 10px;
 }

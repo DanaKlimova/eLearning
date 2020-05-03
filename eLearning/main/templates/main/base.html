@@ -6,34 +6,37 @@
     Base
     {% endblock %}
     </title>
-    <!-- HEADER-->
-    {% include 'main/snippets/header.html' %}
-    <!-- END HEADER-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> {% endcomment %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+   <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.purple-pink.min.css" />
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main/css/base.css' %}" />
     <!-- CSS -->
     {% block styles %}
     {% endblock %}
     <!-- END CSS -->
 </head>
 
-<body class="p-3 mb-2 bg-light text-dark">
-    <!-- BODY-->
-    <style type='text/css'>
-        .main{
-            min-height: 100vh;
-            height: 100%;
-        }
-    </style>
-    <div class='main'>
-        {% block content %}
-            Base
-        {% endblock %}
+<body>
+    <div class="main-grid">
+        <div class="header">
+            {% include 'main/snippets/header.html' %}
+        </div>
+        <div class="main">
+            {% block content %}
+                Base
+            {% endblock %}
+        </div>
+        <div class="footer">
+            {% include 'main/snippets/footer.html' %}
+        </div>
     </div>
-
-    <!-- END BODY-->
-    <!-- FOOTER -->
-    {% include 'main/snippets/footer.html' %}
-    <!-- END FOOTER -->
     <!-- JS -->
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
     {% block js_scripts %}
     {% endblock %}
     <!-- END JS -->

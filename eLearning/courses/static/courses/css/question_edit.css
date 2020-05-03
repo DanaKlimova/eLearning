@@ -1,0 +1,38 @@
+.question-grid {
+    display: grid;
+    grid-template-columns: 40% 60%;
+}
+
+.form-col {
+    grid-row: 2/3;
+    grid-column: 1/2;
+    margin: 0 10px;
+}
+
+.page-col {
+    grid-row: 2/3;
+    grid-column: 2/3;
+    margin: 0 10px;
+}
+
+.add-button-position {
+    grid-row: 1/2;
+    grid-column: 2/3;
+    margin-right: 10px;
+}
+
+.back-button-position {
+    grid-row: 1/2;
+    grid-column: 1/2;
+    float: left;
+    margin-left: 10px;
+}
+
+.container {
+    margin: 0 auto;
+    width: 60%;
+}
+
+.question-form-grid {
+    display: grid;
+}
