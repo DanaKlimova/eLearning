@@ -33,7 +33,6 @@ from accounts.models import Account
 
 
 START_PAGE_NUMBER = 1
-TOTAL_GRADE = 10
 logger = logging.getLogger('eLearning')
 
 
@@ -644,18 +643,14 @@ class CourseWelcomView(View):
         total_points = 0.0
         for page in course_pages:
             total_points += Question.objects.filter(page=page).count()
-        if self.course_enrollment_instance.points:
-            grade = math.ceil(self.course_enrollment_instance.points * TOTAL_GRADE / total_points)
-        else:
-            grade = None
 
         context = {
             self.context_object_name: object_,
             'page_list': course_pages,
             'current_page': current_page,
             'total_points': total_points,
-            'grade': grade,
-            'total_grade': TOTAL_GRADE,
+            'grade': self.course_enrollment_instance.grade,
+            'total_grade': Course.TOTAL_GRADE,
         }
         return context
 
@@ -980,3 +975,41 @@ def course_rate(request, course_pk):
             course.save()
 
             return HttpResponse("Success!")
+
+
+@login_required
+def course_statistics_view(request, course_pk):
+    if request.method == "GET":
+        try:
+            course = Course.objects.get(pk=course_pk)
+        except Course.DoesNotExist:
+            logger.info("Request statistics for not existing course.")
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        else:
+            finished_enrollments = CourseEnrollment.objects.filter(course=course, finished_at__isnull=False)
+            failed = 0
+            success = 0
+            for finished_enrollment in finished_enrollments:
+                if finished_enrollment.grade < course.min_pass_grade:
+                    failed += 1
+                else:
+                    success += 1
+            students = CourseEnrollment.objects.filter(course=course, finished_at__isnull=True).count()
+
+            course_enrollments = CourseEnrollment.objects.filter(course=course).all()
+            rating = [0, 0, 0, 0, 0]
+            for course_enrollment in course_enrollments:
+                if course_enrollment.rate:
+                    rating[int(course_enrollment.rate) - 1] += 1
+
+            students_amount = CourseEnrollment.objects.filter(course=course).count()
+            context = {
+                'failed': failed,
+                'success': success,
+                'students': students,
+                'rating': rating,
+                'students_amount': students_amount,
+                'average_rating': course.rating,
+            }
+            return render(request, 'courses/statistics.html', context)

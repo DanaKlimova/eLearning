@@ -25,7 +25,7 @@ Course detail
             action="{% url 'course_create' %}">
         {% endif %}
             {% csrf_token %}
-
+            
             {% if 'edit' not in view|lower %}
             <div class="container background">
             {% endif %}
@@ -133,7 +133,7 @@ Course detail
                     </div>
                 </div>
 
-                {% comment %}
+                {% comment %} 
                 # TODO: Always displays error "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
                 # Is it because of bound form?
                 {% for error in form.cover.errors%}

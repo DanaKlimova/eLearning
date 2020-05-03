@@ -1,0 +1,111 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Course detail
+{% endblock %}
+
+{% block styles %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/statistics.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+<div class="container-grid background">
+    {% comment %} <div id="generalStatistics" class="stat-table"></div> {% endcomment %}
+    {% if students_amount %}
+    <div id="courseStatistics" class="stat-chart"></div>
+    {% endif %}
+    {% if average_rating %}
+    <div id="courseRating" class="stat-chart"></div>
+    {% endif %}
+    {% if not students_amount and not average_rating %}
+    <h4 style="text-align:center">Course statistics is not available.</h4>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block js_scripts %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    // Options for charts
+    let legendTextStyle = {
+        color: "#343a40",
+        fontSize: 20,
+        bold: false,
+        italic: false
+    }
+    
+    let titleTextStyle = {
+        color: "#343a40",
+        fontSize: 25,
+        bold: false,
+        italic: false
+    }
+    
+    // Load google charts
+    google.charts.load('current', {'packages':['corechart', 'table']});
+    google.charts.setOnLoadCallback(drawChartCourseStatistics);
+    google.charts.setOnLoadCallback(drawChartCourseRating);
+    //google.charts.setOnLoadCallback(drawGeneralStatistics);
+
+    // Draw the chart and set the chart values
+    function drawChartCourseStatistics() {
+        let data = google.visualization.arrayToDataTable([
+        ['Student status', 'Amount'],
+        ['failed', {{ failed }}],
+        ['success', {{ success }}],
+        ['students', {{ students }}],
+        ]);
+
+        let options = {
+            'title':'Course statistics',
+            'legend.textStyle': legendTextStyle,
+            'titleTextStyle':titleTextStyle,
+            'colors': ['#eb4034', '#7deb34', '#3496eb']
+        };
+
+        // Display the chart inside the <div> element with id="courseStatistics"
+        var chart = new google.visualization.PieChart(document.getElementById('courseStatistics'));
+        chart.draw(data, options);
+    } 
+    
+    function drawChartCourseRating() {
+        let data = google.visualization.arrayToDataTable([
+        ['Rating', ''],
+        ['1', {{ rating.0 }}],
+        ['2', {{ rating.1 }}],
+        ['3', {{ rating.2 }}],
+        ['4', {{ rating.3 }}],
+        ['5', {{ rating.4 }}],
+        ]);
+
+        let options = {
+            'title':'Course rating',
+            'legend.textStyle': legendTextStyle,
+            'titleTextStyle':titleTextStyle
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('courseRating'));
+        chart.draw(data, options);
+    }
+
+    //function drawGeneralStatistics() {
+    //    var data = new google.visualization.DataTable();
+    //    data.addColumn('string', 'Statistic');
+    //    data.addColumn('number', 'Amount');
+    //    data.addRows([
+    //      ['Students amount',  {{ students_amount }}],
+    //      ['Average rating',  {{ average_rating|default:"0" }}],
+    //   ]);
+
+    //    var table = new google.visualization.Table(document.getElementById('generalStatistics'));
+
+    //    table.draw(data, {showRowNumber: true, 'allowHtml': true});
+    //  }
+});
+</script>
+{% endblock %}
