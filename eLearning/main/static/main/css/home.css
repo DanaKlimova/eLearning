@@ -20,6 +20,13 @@
     font-size: 1.4vw;
     margin-bottom: 5px;
     text-align: center;
+    color: rgba(0, 0, 0, .87);
+    text-decoration: none;
+}
+
+.courses-name:hover {
+    text-decoration-line: underline;
+    color: black;
 }
 
 .course-block {
@@ -72,37 +79,7 @@
 .image-container {
     width: 100%;
     position: relative;
-    text-align: left;
-    color: white;
-    margin: 0px auto;
-}
-
-.centered {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.banner {
-    padding: 2em;
-    background-image: linear-gradient(90deg, #271066, rgba(39, 16, 102, 0) 55%, rgba(39, 16, 102, 0) 70%, #271066), url('image/img-banner.jpg');
-    background-position: center center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    height: 350px;
-    padding: 0 auto;
-}
-
-.banner-content {
-    text-align: left;
-    color: white;
-}
-
-.join-btn {
-    font-size: 1.5vw;
-    background-color: white;
-    padding: 10px 40px;
+    box-sizing: border-box;
     height: auto;
 }
 

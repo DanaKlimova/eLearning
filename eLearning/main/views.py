@@ -1,6 +1,7 @@
 from collections import namedtuple
 
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 from courses.models import Course
 
@@ -17,35 +18,36 @@ def home(request):
 
         current_course_enrollments = user.courseenrollment_set.filter(
             finished_at__isnull=True
-        ).order_by('-course__rating')[:6]
+        ).order_by('course__rating')[:6]
         current_courses = NamedCourses(
             'Current courses',
             [enrollment.course for enrollment in current_course_enrollments]
         )
 
         users_courses = NamedCourses('Users courses', (
-            Course.objects.filter(type='pbl', owner_type='usr', status='rdy').order_by('-rating')[:6]
+            Course.objects.filter(type='pbl', owner_type='usr', status='rdy')[:6]
         ).union(
-            user.individual_courses.filter(owner_type='usr', status='rdy').order_by('-rating')[:6]
-        ))
+            user.individual_courses.filter(owner_type='usr', status='rdy')[:6]
+        ).order_by('rating'))
 
         starred_courses = NamedCourses(
             'Starred courses',
-            user.favorite_courses.order_by('-rating')[:6]
+            user.favorite_courses.order_by('rating')[:6]
         )
 
         last_completed_course_enrollments = user.courseenrollment_set.filter(
             finished_at__isnull=False
-        ).order_by('-course__rating')[:6]
+        ).order_by('course__rating')[:6]
         last_completed_courses = NamedCourses(
             'Last completed courses',
             [enrollment.course for enrollment in last_completed_course_enrollments]
         )
 
-        recomended_courses = NamedCourses(
-            'Recomended',
-            Course.objects.filter(type='pbl', status='rdy').order_by('-rating')[:6]
-        )
+        recomended_courses = NamedCourses('Recomended', (
+            Course.objects.filter(type='pbl', status='rdy')[:6]
+            ).union(
+            user.individual_courses.filter(status='rdy')[:6]
+        ).order_by('rating'))
 
         context['courses_set'] = [
             current_courses,
@@ -59,3 +61,91 @@ def home(request):
         pass
 
     return render(request, "main/home.html", context)
+
+
+@login_required
+def current_courses(request):
+    if request.method == "GET":
+        context = {}
+
+        user = request.user
+        current_course_enrollments = user.courseenrollment_set.filter(
+            finished_at__isnull=True
+        ).order_by('-course__rating')
+
+        current_courses = [course_enrollment.course for course_enrollment in current_course_enrollments]
+
+        context["courses"] = current_courses
+        context["courses_type"] = "current"
+    return render(request, "main/category_courses.html", context)
+
+
+@login_required
+def users_courses(request):
+    if request.method == "GET":
+        context = {}
+
+        user = request.user
+
+        users_courses = (Course.objects.filter(
+            type='pbl',
+            owner_type='usr',
+            status='rdy')
+            ).union(
+            user.individual_courses.filter(
+                owner_type='usr',
+                status='rdy'
+            )).order_by('rating')
+
+        context["courses"] = users_courses
+        context["courses_type"] = "users"
+    return render(request, "main/category_courses.html", context)
+
+
+@login_required
+def starred_courses(request):
+    if request.method == "GET":
+        context = {}
+
+        user = request.user
+        starred_courses = user.favorite_courses.order_by('rating')
+
+        context["courses"] = starred_courses
+        context["courses_type"] = "starred"
+    return render(request, "main/category_courses.html", context)
+
+
+@login_required
+def completed_courses(request):
+    if request.method == "GET":
+        context = {}
+
+        user = request.user
+
+
+        completed_course_enrollments = user.courseenrollment_set.filter(
+            finished_at__isnull=False
+        ).order_by('course__rating')
+
+        completed_courses = [enrollment.course for enrollment in completed_course_enrollments]
+
+        context["courses"] = completed_courses
+        context["courses_type"] = "completed"
+    return render(request, "main/category_courses.html", context)
+
+
+@login_required
+def recomended_courses(request):
+    if request.method == "GET":
+        context = {}
+
+        user = request.user
+
+        recomended_courses = (Course.objects.filter(type='pbl', status='rdy')
+            ).union(
+            user.individual_courses.filter(status='rdy')
+        ).order_by('rating')
+
+        context["courses"] = recomended_courses
+        context["courses_type"] = "recomended"
+    return render(request, "main/category_courses.html", context)

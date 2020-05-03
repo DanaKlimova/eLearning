@@ -79,7 +79,19 @@ Home
         {% for courses in courses_set%}
         <div class="courses-block">
             <div class="courses-name">
-                {{ courses.name }}
+            {% if "current" in courses.name|lower %}
+                <a class="courses-name" href="{% url 'current_courses' %}">
+            {% elif "users" in courses.name|lower %}
+                <a class="courses-name" href="{% url 'users_courses' %}">
+            {% elif "starred" in courses.name|lower %}
+                <a class="courses-name" href="{% url 'starred_courses' %}">
+            {% elif "completed" in courses.name|lower %}
+                <a class="courses-name" href="{% url 'completed_courses' %}">
+            {% elif "recomended" in courses.name|lower %}
+                <a class="courses-name" href="{% url 'recomended_courses' %}">
+            {% endif %}
+                    {{ courses.name }}
+                </a>
             </div>
             <div class="course-block">
             {% for course in courses.courses %}
