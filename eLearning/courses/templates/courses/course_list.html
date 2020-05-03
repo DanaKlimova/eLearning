@@ -5,9 +5,8 @@ Course list
 {% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" type="text/css"
-      href="https://cdn.datatables.net/v/dt/dt-1.10.20/cr-1.5.2/rr-1.2.6/sc-2.0.1/sp-1.0.1/sl-1.3.1/datatables.min.css"/>
 {% load static %}
+<link rel="stylesheet" href="{% static 'courses/datatables/heavy/datatables.min.css' %}" />
 <link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
 <link rel="stylesheet" href="{% static 'courses/css/course_list.css' %}" />
 {% endblock %}
@@ -48,7 +47,7 @@ Course list
 {% block js_scripts %}
 <script src="https://kit.fontawesome.com/e278b3cacc.js" crossorigin="anonymous"></script>
 <script type="text/javascript"
-        src="https://cdn.datatables.net/v/dt/dt-1.10.20/cr-1.5.2/rr-1.2.6/sc-2.0.1/sp-1.0.1/sl-1.3.1/datatables.min.js">
+        src="{% static 'courses/datatables/heavy/datatables.min.js' %}">
 </script>
 
 <script>
