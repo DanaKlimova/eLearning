@@ -1,0 +1,67 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Variant detail
+{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <a href="{% url 'question_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">
+        <button class="float-left btn btn-lg btn-primary" type="submit">Back to question edit</button>
+    </a>
+</div>
+
+{% if 'edit' in view %}
+<form class="form-variant" id="variant_form" method="post" action="{% url 'variant_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk variant_pk=variant_pk %}">
+{% else %}
+<form class="form-variant" id="variant_form" method="post" action="{% url 'variant_create' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">
+{% endif %}
+    {% csrf_token %}
+    <h1 class="h3 mb-3 font-weight-normal">Variant</h1>
+
+    <div class="form-check">
+        <input class="form-check-input" name="is_correct" type="checkbox" id="checkboxId">
+        <label class="form-check-label" for="checkboxId">
+            Is correct
+        </label>
+    </div>
+    {% for error in form.is_correct.errors%}
+    <p style="color:red;">{{ error|default:"" }}</p>
+    {% endfor %}
+
+    <p><input type="text" name="content" id="inputContent" class="form-control" placeholder="Description" required
+        autofocus value="{{form.initial.content}}"></p>
+    {% for error in form.content.errors%}
+    <p style="color:red;">{{ error|default:"" }}</p>
+    {% endfor %}
+
+    {% if form.non_field_errors %}
+    <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
+    {% endif %}
+
+    {% if success_message %}
+    <p style="color: green; text-align: center;">{{success_message}}</p>
+    {% endif %}
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
+</form>
+{% endblock %}
+
+{% block js_scripts %}
+<script>
+$(document).ready(function() {
+    checkElement('checkboxId', '{{ is_correct }}')
+
+    function checkElement(id, is_correct) {
+        let element = document.getElementById(id);
+        console.log(is_correct);
+        if (is_correct == "True") {
+            element.checked = true;
+        }
+    }
+});
+</script>
+{% endblock %}

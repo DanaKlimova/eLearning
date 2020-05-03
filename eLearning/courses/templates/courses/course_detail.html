@@ -1,0 +1,42 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Course detail
+{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+<form id="follow_form" method="post" action="{% url 'course_welcom' course_pk=course_pk%}">
+    {% csrf_token %}
+    <button class="float-right btn btn-lg btn-primary" type="submit">Follow</button>
+</form>
+
+<div class="row">
+    <div class="col">
+    <img src="{{ course.cover.url }}" alt="{{ course.name }}">
+    </div>
+    <div class="col">
+    <p>
+        <label>Course name:</label>
+        {{ course.name }}
+    </p>
+    <p>
+        <label>Course author:</label>
+        {{ course.owner_user.first_name}}
+        {{ course.owner_user.last_name}}
+    </p>
+    <p>
+        <label>Course rating:</label>
+        {{ course.rating|default:"course wasn't rated" }}
+    </p>
+    <p>
+        <label>Course content:</label>
+        {{ course.content }}
+    </p>
+    </div>
+</div>
+
+{% endblock %}
+

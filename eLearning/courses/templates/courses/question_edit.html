@@ -1,0 +1,95 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Question detail
+{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <a href="{% url 'page_edit' course_pk=course_pk page_pk=page_pk%}">
+        <button class="float-left btn btn-lg btn-primary" type="submit">Back to page edit</button>
+    </a>
+</div>
+<div class="row">
+    <div class="col">
+        {% if 'edit' in view %}
+        <form class="form-question" id="question_form" method="post" action="{% url 'question_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">
+        {% else %}
+        <form class="form-question" id="question_form" method="post" action="{% url 'question_create' course_pk=course_pk page_pk=page_pk %}">
+        {% endif %}
+            {% csrf_token %}
+            <h1 class="h3 mb-3 font-weight-normal">Question</h1>
+
+            <p>
+                <label> Choose type:</label>
+                <select id="typeId" name="type" required>
+                    {% for type, type_name in question_types %}
+                    <option value="{{type}}">{{type_name}}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            {% for error in form.type.errors%}
+            <p style="color:red;">{{ error|default:"" }}</p>
+            {% endfor %}
+
+            <p><input type="text" name="content" id="inputContent" class="form-control" placeholder="Description" required
+                autofocus value="{{form.initial.content}}"></p>
+            {% for error in form.content.errors%}
+            <p style="color:red;">{{ error|default:"" }}</p>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+            <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
+            {% endif %}
+
+            {% if success_message %}
+            <p style="color: green; text-align: center;">{{success_message}}</p>
+            {% endif %}
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
+        </form>
+    </div>
+    {% if 'edit' in view %}
+    {% load course_extras %}
+    <div class="col">
+        <a href="{% url 'variant_create' course_pk=course_pk page_pk=page_pk question_pk=question_pk %}">
+            <button class="float-right btn btn-lg btn-primary" type="submit">Add</button>
+        </a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Is correct</th>
+                    <th scope="col">Variant</th>
+                    <th scope="col">Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for variant in variant_list %}
+                <tr>
+                    <th scope="row">{{ variant.is_correct }}</th>
+                    <td>{{variant.content}}</td>
+                    <td><a href="{% url 'variant_edit' course_pk=course_pk page_pk=page_pk question_pk=question_pk variant_pk=variant.pk %}">edit</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block js_scripts %}
+<script>
+$(document).ready(function() {
+    selectElement('typeId', '{{ type }}')
+
+    function selectElement(id, valueToSelect) {
+        let element = document.getElementById(id);
+        element.value = valueToSelect;
+    }
+});
+</script>
+{% endblock %}

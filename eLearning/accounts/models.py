@@ -59,6 +59,7 @@ class Account(AbstractBaseUser):
     email = models.EmailField(verbose_name="email", max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
+    favorite_courses = models.ManyToManyField('courses.Course', related_name='fav_course_users') 
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

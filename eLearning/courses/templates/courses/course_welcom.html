@@ -1,0 +1,100 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Course enrollment detail
+{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+{% if not course_enrollment.finished_at %}
+<a href="{% url 'course_page' course_pk=course_enrollment.course.pk page_pk=current_page.pk%}">
+    <button class="float-right btn btn-lg btn-primary" type="submit">Continue</button>
+</a>
+{% endif %}
+<div class="row">
+    <div class="col">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Page number</th>
+                    <th scope="col">Done</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for page in page_list %}
+                <tr>
+                    {% if course_enrollment.current_page.number > page.number or course_enrollment.finished_at %}
+                    <th scope="row">
+                        <a href="{% url 'course_page' course_pk=course_enrollment.course.pk page_pk=page.pk %}">
+                        {{page.number}}
+                        </a>
+                    </th>
+                    <td>yes</td>
+                    {% else %}
+                    <th scope="row">{{page.number}}</th>
+                    <td>no</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col">
+    <p>
+        <img src="{{ course_enrollment.course.cover.url }}" alt="{{ course.name }}">
+    </p>
+    <p>
+        <label>Course name:</label>
+        {{ course_enrollment.course.name }}
+    </p>
+    <p>
+        <label>Course author:</label>
+        {{ course_enrollment.course.owner_user.first_name}}
+        {{ course_enrollment.course.owner_user.last_name}}
+    </p>
+    <p>
+        <label>Course rating:</label>
+        {{ total_rate|default:"course wasn't rated" }}
+    </p>
+    <p>
+        <label>Course content:</label>
+        {{ course_enrollment.course.content }}
+    </p>
+    <p>
+        <label>Started at:</label>
+        {{ course_enrollment.started_at }}
+    </p>
+    <p>
+        <label>Finished at:</label>
+        {{ course_enrollment.finished_at|default:"you haven't finished" }}
+    </p>
+    <p>
+        <label>Current page:</label>
+        {{ course_enrollment.current_page.number|default:"you haven't started to study" }}
+    </p>
+    <p>
+        <label>Progress:</label>
+        {{ course_enrollment.progress|default:"you haven't started to study" }}
+    </p>
+    <p>
+        <label>Points:</label>
+        {{ course_enrollment.points|default:"you haven't started to study" }}
+        {% if course_enrollment.points %}
+        of {{ total_points }}
+        {% endif %}
+    </p>
+    <p>
+        <label>Grade:</label>
+        {{ grade|default:"you haven't started to study" }}
+        {% if grade %}
+        of {{ total_grade }}
+        {% endif %}
+    </p>
+
+    </div>
+</div>
+
+{% endblock %}
+

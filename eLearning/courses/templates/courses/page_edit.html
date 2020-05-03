@@ -1,0 +1,77 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Page detail
+{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <a href="{% url 'course_edit' course_pk=course_pk %}">
+        <button class="float-left btn btn-lg btn-primary" type="submit">Back to course edit</button>
+    </a>
+</div>
+<div class="row">
+    <div class="col">
+        {% if 'edit' in view %}
+        <form class="form-page" id="page_form" method="post" action="{% url 'page_edit' course_pk=course_pk page_pk=page_pk %}">
+        {% else %}
+        <form class="form-page" id="page_form" method="post" action="{% url 'page_create' course_pk=course_pk%}">
+        {% endif %}
+            {% csrf_token %}
+            <h1 class="h3 mb-3 font-weight-normal">Page</h1>
+
+            <p><input type="text" name="number" id="inputNumber" class="form-control" placeholder="Page number" required
+                value="{% firstof page_number form.initial.number %}"
+                readonly></p>
+            {% for error in form.number.errors%}
+            <p style="color:red;">{{ error|default:"" }}</p>
+            {% endfor %}
+
+            <p><input type="text" name="content" id="inputContent" class="form-control" placeholder="Description" required
+                autofocus value="{{form.initial.content}}"></p>
+            {% for error in form.content.errors%}
+            <p style="color:red;">{{ error|default:"" }}</p>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+            <p style="color:red;">{{ form.non_field_errors|default:"" }}</p>
+            {% endif %}
+
+            {% if success_message %}
+            <p style="color: green; text-align: center;">{{success_message}}</p>
+            {% endif %}
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Save changes</button>
+        </form>
+    </div>
+    {% if 'edit' in view %}
+    <div class="col">
+        <a href="{% url 'question_create' course_pk=course_pk page_pk=page_pk %}">
+            <button class="float-right btn btn-lg btn-primary" type="submit">Add</button>
+        </a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col">Question</th>
+                    <th scope="col">Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for question in question_list %}
+                {% load course_extras %}
+                <tr>
+                    <th scope="row">{{ question_types|get_item:question.type }}</th>
+                    <td>{{question.content}}</td>
+                    <td><a href="{% url 'question_edit' course_pk=course_pk page_pk=page_pk question_pk=question.pk %}">edit</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
