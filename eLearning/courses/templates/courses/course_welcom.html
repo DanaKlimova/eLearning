@@ -82,7 +82,7 @@ Course enrollment detail
                     <div class="bold">
                         Course content:
                     </div>
-                    {{ course_enrollment.course.content }}
+                    {% autoescape off %}{{ course_enrollment.course.content }}{% endautoescape %}
                 </label>
             </div>
         </div>

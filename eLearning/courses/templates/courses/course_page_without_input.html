@@ -51,7 +51,7 @@ Course page
             <div class="bold part">
                 Page content
             </div>
-            {{ current_page.content }}
+            {% autoescape off %}{{ current_page.content }}{% endautoescape %}
         </label>
 
         <div class="questions">
