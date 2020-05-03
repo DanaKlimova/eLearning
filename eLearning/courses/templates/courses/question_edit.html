@@ -17,7 +17,7 @@ Question detail
 <div class="question-grid">
     <div class="back-button-position">
         <a href="{% url 'page_edit' course_pk=course_pk page_pk=page_pk %}">
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
                     type="button"><i class="fas fa-arrow-left arrow-left"></i></button>
         </a>
     </div>
@@ -33,7 +33,7 @@ Question detail
             {% if 'edit' not in view %}
             <div class="back-button-position">
                 <a href="{% url 'page_edit' course_pk=course_pk page_pk=page_pk %}">
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
                             type="button"><i class="fas fa-arrow-left arrow-left"></i></button>
                 </a>
             </div>
@@ -85,7 +85,7 @@ Question detail
                 {% endif %}
 
                 <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button" type="submit">Save changes</button>
-            
+
             </div>
             {% if 'edit' not in view %}
             </div>
