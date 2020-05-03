@@ -123,7 +123,7 @@ $(document).ready(function() {
         return formData;
     }
 
-    $("#buttonId").click(async function() {
+    $("#buttonId").one('click', async function() {
         formData = getFormData();
         let csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0];
         //formData[csrf_token.name] = csrf_token.value;

@@ -109,7 +109,7 @@ $(document).ready(function() {
         });
     }
         
-    $("#rateButtonId").click(async function() {
+    $("#rateButtonId").one('click', async function() {
         let rate = $("input[name='rate']:checked").val();
         let post_data = {
             csrfmiddlewaretoken: "{{ csrf_token }}",
