@@ -25,6 +25,7 @@
 .upload-file {
     padding: 10px 0;
     color: #343a40;
+    font-size: calc(12px + .5vw);
 }
 
 .course-cover {

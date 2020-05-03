@@ -15,9 +15,9 @@ Course page
 {% block content %}
 <dialog class="mdl-dialog">
     <div class="mdl-dialog__content">
-        <p>
+        <div class="text-data">
             Please, rate course
-        </p>
+        </div>
         <form>
             {% csrf_token %}
             <div class="rate">
@@ -35,15 +35,15 @@ Course page
         </form>
     </div>
     <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
-        <button id="closeButtonId" type="button" class="mdl-button close">Close</button>
-        <button id="rateButtonId" type="button" class="mdl-button">Rate</button>
+        <button id="closeButtonId" type="button" class="mdl-button d-button close">Close</button>
+        <button id="rateButtonId" type="button" class="mdl-button d-button">Rate</button>
     </div>
 </dialog>
 <div class="container background">
     <div class="page-content-wrapper">
 
         <a href="{% url 'course_welcom' course_pk=course_pk %}">
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button"
                     type="submit">To course</button>
         </a>
 
@@ -71,7 +71,7 @@ Course page
                 <p>
                     <div class="variant" id="v_{{ variant.pk }}">
                         <label>
-                        {{ variant.content }}
+                        {{ forloop.counter }}) {{ variant.content }}
                         </label>
                     </div>
                 </p>  
@@ -85,7 +85,7 @@ Course page
             <a href="{% url 'course_welcom' course_pk=course_pk %}">
             {% endif %}
 
-            <button id="buttonId" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+            <button id="buttonId" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button"
                     type="button">{{button_type}}</button>
             </a>
         </div>

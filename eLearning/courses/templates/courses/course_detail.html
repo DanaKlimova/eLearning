@@ -15,7 +15,7 @@ Course detail
 <div class="container-grid background">
     <form id="follow_form" method="post" action="{% url 'course_welcom' course_pk=course_pk%}">
         {% csrf_token %}
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect follow-button"
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect follow-button button"
                     type="submit">Follow</button>
     </form>
 

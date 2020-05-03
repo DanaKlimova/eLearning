@@ -1,7 +1,6 @@
 .follow-button {
     float: right;
     margin: 10px;
-    color: #343a40;
 }
 
 .container-grid {
@@ -19,14 +18,9 @@
 
 .image-position {
     grid-column: 1/2;
-    padding: 10px;
+    padding: 15px;
 }
 
 .course-data-position {
     grid-column: 2/3;
-}
-
-.text-data {
-    display: block;
-    margin: 10px 0;
 }

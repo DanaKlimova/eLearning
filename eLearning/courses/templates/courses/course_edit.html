@@ -148,7 +148,7 @@ Course detail
                 <label class="success-label">{{success_message}}</label>
                 {% endif %}
 
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button" type="submit">Save changes</button>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button button" type="submit">Save changes</button>
             {% if 'edit' not in view|lower %}
             </div>
             {% endif %}
@@ -157,7 +157,7 @@ Course detail
         </div>
         <div class="page-col background">
             <a href="{% url 'page_create' course_pk=course_pk %}">
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect add-button" type="submit">Add page</button>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect add-button button" type="submit">Add page</button>
             </a>
             <div class="table-wrapper">
                 <table id="pageTableId" class="cell-border stripe hover table">
@@ -196,7 +196,8 @@ $(document).ready(function() {
     tinymce.init({
         selector: "textarea",
         height: "480",
-        plugins: "codesample, link, lists"
+        plugins: "codesample, link, lists",
+        content_style: 'body { font-size: calc(16px + .6vw) !important };'
     });
     $("#pageTableId").DataTable( {
         searching: false,
@@ -204,7 +205,7 @@ $(document).ready(function() {
     });
     selectElement('typeId', '{{ type }}');
     selectElement('statusId', '{{ status }}');
-    addClassByName('pageTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect');
+    addClassByName('pageTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button');
 
     function selectElement(id, valueToSelect) {
         let element = document.getElementById(id);

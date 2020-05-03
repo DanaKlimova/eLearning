@@ -1,6 +1,10 @@
 label {
-    font-size: 1vw;
     color: #343a40;
+}
+
+input {
+    padding: 5px;
+    font-size: calc(12px + .5vw);
 }
 
 .container {
@@ -49,15 +53,11 @@ label {
     margin: 10px;
 }
 
-.text-input {
-    padding: 5px;
-    font-size: 1vw;
-}
-
 .submit-button {
     display: block;
     margin: 20px auto;
     color: #343a40;
     height: auto;
     padding: 0 35px;
+    font-size: calc(14px + .5vw);
 }

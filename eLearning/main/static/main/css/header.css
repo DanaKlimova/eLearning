@@ -6,6 +6,7 @@
     border-radius: 1em;
     padding: 10px;
     box-shadow: 0 0 1em rgba(0, 0, 0, .05);
+    font-size: calc(18px + .6vw);
 }
 
 .user-name {
@@ -14,7 +15,6 @@
     text-align: center;
     padding: 8px;
     border: 1px;
-    font-size: 1.7vw;
     color: #343a40;
 }
 
@@ -22,7 +22,6 @@
     justify-self: end;
     align-self: center;
     border: 1px;
-    font-size: 1.5vw;
 }
 
 .nav>a {
