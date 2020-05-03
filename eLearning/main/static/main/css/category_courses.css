@@ -17,3 +17,19 @@
 .not-done {
     color: red;
 }
+
+.medal {
+    max-width: 14px;
+    max-height: auto;
+    color: blue;
+}
+
+.download {
+    color: blue;
+}
+
+.table {
+    background-color: white;
+    color: #343a40;
+    font-size: 1vw;
+}

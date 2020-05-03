@@ -1,0 +1,51 @@
+@media print {
+    /* TODO: bad solution */
+    @page {
+        size: landscape;
+        width: 297mm;
+        height: 210mm;
+        margin: 0px;
+    }
+}
+
+html,
+body {
+    width: 297mm;
+    height: 210mm;
+    margin: 0px;
+}
+
+.grid {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100%;
+    font-family: 'Chilanka', cursive;
+    src: url("font/Chilanka-Regular.ttf");
+    font-size: 35px;
+}
+
+.cert-text-header {
+    font-size: 50px;
+}
+
+.cert-text {
+    text-align: center;
+}
+
+.bold-text {
+    font-weight: bold;
+}
+
+.header-image,
+.footer-image {
+    width: 100%;
+    height: auto;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    margin: -15px;
+}

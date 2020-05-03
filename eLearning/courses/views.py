@@ -31,7 +31,6 @@ from courses.forms import (
 
 from accounts.models import Account
 
-
 START_PAGE_NUMBER = 1
 logger = logging.getLogger('eLearning')
 
@@ -767,21 +766,21 @@ class CoursePageView(View):
                 # questions wasn't passed, show template with input
                 else:
                     tasks = self.get_tasks()
-                    current_page_number = self.page_instance.number
-                    next_page_number = current_page_number + 1
-                    try:
-                        next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
-                    # last page
-                    except Page.DoesNotExist:
-                        next_page_pk = None
-                    # next page
-                    else:
-                        next_page_pk = next_page.pk
+                    # current_page_number = self.page_instance.number
+                    # next_page_number = current_page_number + 1
+                    # try:
+                    #     next_page = Page.objects.get(course=self.course_instance, number=next_page_number)
+                    # # last page
+                    # except Page.DoesNotExist:
+                    #     next_page_pk = None
+                    # # next page
+                    # else:
+                        # next_page_pk = next_page.pk
 
                     question_types = dict(Question.QUESTION_TYPE_CHOICES)
                     context = self.get_context_data(
                         object_=self.page_instance,
-                        next_page_pk=next_page_pk,
+                        # next_page_pk=next_page_pk,
                         tasks=tasks,
                         finished=self.is_course_enrollment_finished,
                         question_types=question_types,
@@ -885,11 +884,12 @@ class CoursePageView(View):
     def get_user_variants(self, results):
         user_variant = []
         for result in results:
-            variant_pks = result.results.split(Result.RESULTS_SEPARATOR)
-            for variant_pk in variant_pks:
-                user_variant.append(
-                    Variant.objects.get(pk=variant_pk)
-                )
+            if result.results:
+                variant_pks = result.results.split(Result.RESULTS_SEPARATOR)
+                for variant_pk in variant_pks:
+                    user_variant.append(
+                        Variant.objects.get(pk=variant_pk)
+                    )
         return user_variant
 
     @staticmethod

@@ -2,8 +2,11 @@ from collections import namedtuple
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
-from courses.models import Course
+from courses.models import Course, CourseEnrollment
+from main.utils import render_to_pdf
+
 
 # TODO: think about course ordering.
 def home(request):
@@ -151,3 +154,41 @@ def recomended_courses(request):
         context["courses"] = recomended_courses
         context["courses_type"] = "recomended"
     return render(request, "main/category_courses.html", context)
+
+
+@login_required
+def generate_cert(request, course_pk):
+    if request.method == "GET":
+        try:
+            course = Course.objects.get(pk=course_pk)
+        except Course.DoesNotExist:
+            logger.info("Request certificate for not existing course.")
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        try:
+            course_enrollment = CourseEnrollment.objects.get(course=course, user=request.user)
+        except CourseEnrollment.DoesNotExist:
+            logger.info("Request certificate for not existing course enrollment.")
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        else:
+            if not course_enrollment.finished_at:
+                logger.info("Request certificate for not completed course enrollment.")
+                redirect_url = reverse('course_welcom', kwargs={"course_pk": course_enrollment.course.pk})
+                return HttpResponseRedirect(redirect_url)
+                
+            if course_enrollment.grade < course_enrollment.course.min_pass_grade:
+                logger.info("Request certificate for failed course enrollment.")
+                redirect_url = reverse('course_welcom', kwargs={"course_pk": course_enrollment.course.pk})
+                return HttpResponseRedirect(redirect_url)
+
+            full_name = ' '.join([course_enrollment.user.first_name, course_enrollment.user.last_name])
+            context = {
+                'name': full_name,
+                'course': course_enrollment.course.name,
+                'date': course_enrollment.finished_at,
+            }
+            template_name = 'main/certificate.html'
+            pdf = render_to_pdf(template_name, request, context)
+            return HttpResponse(pdf, content_type='application/pdf')
+            # return render(request, template_name, context)

@@ -19,3 +19,4 @@ values==2019.4.13
 Pillow==7.0.0
 django-heroku
 gunicorn
+weasyprint
