@@ -132,7 +132,11 @@ Course enrollment detail
                     <div class="bold">
                         Course rating:
                     </div>
-                    {{ total_rate|default:"course wasn't rated" }}
+                    {% if course_enrollment.course.rating %}
+                    {{ course_enrollment.course.rating|floatformat:"1" }}
+                    {% else %}
+                    {{ course_enrollment.course.rating|default:"course wasn't rated" }}
+                    {% endif %}
                 </label>
 
                 <label class="text-data">
@@ -154,10 +158,7 @@ Course enrollment detail
                         <div class="bold">
                             Points:
                         </div>
-                        {{ course_enrollment.points|default:"you haven't started to study" }}
-                        {% if course_enrollment.points %}
-                        of {{ total_points }}
-                        {% endif %}
+                        {{ course_enrollment.points }} of {{ total_points }}
                     </label>
                 {% endif %}
 

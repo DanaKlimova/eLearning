@@ -17,7 +17,7 @@ Page detail
 <div class="page-grid">
     <div class="back-button-position">
         <a href="{% url 'course_edit' course_pk=course_pk %}">
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
                     type="button"><i class="fas fa-arrow-left arrow-left"></i></button>
         </a>
     </div>
@@ -33,7 +33,7 @@ Page detail
             {% if 'edit' not in view|lower %}
             <div class="back-button-position">
                 <a href="{% url 'course_edit' course_pk=course_pk %}">
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
                     type="button"><i class="fas fa-arrow-left arrow-left"></i></button>
                  </a>
             </div>
