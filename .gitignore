@@ -5,3 +5,4 @@ eLearning/db.sqlite3
 *.vscode
 *.env
 *.log
+eLearning/staticfiles/

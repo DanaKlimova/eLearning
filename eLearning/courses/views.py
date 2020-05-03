@@ -746,7 +746,7 @@ class CoursePageView(View):
                         next_page_pk = None
                     # next page
                     else:
-                        if not self.course_enrollment.finished_at:
+                        if self.course_enrollment.current_page.number == current_page_number and not self.course_enrollment.finished_at:
                             self.update_course_enrollment(next_page)
                         button_type = 'Next'
                         next_page_pk = next_page.pk

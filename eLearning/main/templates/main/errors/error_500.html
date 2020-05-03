@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% load static %}
+    <link rel="shortcut icon" type="image/png" href="{% static 'main/image/favicon.ico' %}"/>
+    <title>
+    eLearning
+    </title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{% static 'main/css/error.css' %}" />
+</head>
+
+<body>
+    <div class="page-content">
+        <div class="error-text">500</div>
+        <div class="error-text">ERROR</div>
+        <img class='error-image' src="{% static 'main/image/broken-robot.png' %}" alt='broken_robot'>
+        <div class="error-text">INTERNAL SERVER ERROR</div>
+</body>
+</html>
