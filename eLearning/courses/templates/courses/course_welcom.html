@@ -44,7 +44,7 @@ Course enrollment detail
                 {{ course_enrollment.progress|default:"0"|floatformat:"0"  }}%
             </label>
             <div id="progressId" class="mdl-progress mdl-js-progress progress"></div>
-                   
+
             <table id="pageTableId" class="cell-border stripe hover table">
                 <thead>
                     <tr>
@@ -75,7 +75,7 @@ Course enrollment detail
     <div class="course-data-col background">
         <div class="course-description-block">
             <div class="border-content">
-                
+
                 <img class="course-cover" src="{{ course_enrollment.course.cover.url }}" alt="{{ course.name }}">
 
                 <label class="text-data">
@@ -90,14 +90,14 @@ Course enrollment detail
             <div class="border-content">
 
                 {% if course_enrollment.finished_at %}
-                
+
                 <label class="text-data">
                     <div class="bold">
                         Finished at:
                     </div>
                     {{ course_enrollment.finished_at|default:"you haven't finished" }}
                 </label>
-                    
+
                 <label class="text-data">
                     <div class="bold">
                         Grade:
