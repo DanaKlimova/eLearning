@@ -50,7 +50,7 @@ def home(request):
             [enrollment.course for enrollment in last_completed_course_enrollments]
         )
 
-        recomended_courses = NamedCourses('Recomended', (
+        recommended_courses = NamedCourses('Recomended', (
             Course.objects.filter(type='pbl', status='rdy')
             ).union(
             user.individual_courses.filter(status='rdy')
@@ -61,7 +61,7 @@ def home(request):
             users_courses,
             starred_courses,
             last_completed_courses,
-            recomended_courses,
+            recommended_courses,
         ]
         context['columns'] = 3
     else:
@@ -71,7 +71,7 @@ def home(request):
 
 
 @login_required
-def current_courses(request):
+def current_courses_view(request):
     if request.method == "GET":
         context = {}
 
@@ -88,7 +88,7 @@ def current_courses(request):
 
 
 @login_required
-def users_courses(request):
+def users_courses_view(request):
     if request.method == "GET":
         context = {}
 
@@ -110,7 +110,7 @@ def users_courses(request):
 
 
 @login_required
-def starred_courses(request):
+def starred_courses_view(request):
     if request.method == "GET":
         context = {}
 
@@ -123,12 +123,11 @@ def starred_courses(request):
 
 
 @login_required
-def completed_courses(request):
+def completed_courses_view(request):
     if request.method == "GET":
         context = {}
 
         user = request.user
-
 
         completed_course_enrollments = user.courseenrollment_set.filter(
             finished_at__isnull=False
@@ -144,24 +143,24 @@ def completed_courses(request):
 
 
 @login_required
-def recomended_courses(request):
+def recommended_courses_view(request):
     if request.method == "GET":
         context = {}
 
         user = request.user
 
-        recomended_courses = (Course.objects.filter(type='pbl', status='rdy')
+        recommended_courses = (Course.objects.filter(type='pbl', status='rdy')
             ).union(
             user.individual_courses.filter(status='rdy')
         ).order_by('rating')
 
-        context["courses"] = recomended_courses
+        context["courses"] = recommended_courses
         context["courses_type"] = "recomended"
     return render(request, "main/category_courses.html", context)
 
 
 @login_required
-def generate_cert(request, course_pk):
+def generate_cert_view(request, course_pk):
     if request.method == "GET":
         try:
             course = Course.objects.get(pk=course_pk)
