@@ -24,36 +24,38 @@ def home(request):
         ])
 
         current_course_enrollments = user.courseenrollment_set.filter(
-            finished_at__isnull=True
+            finished_at__isnull=True,
         ).order_by('course__rating')[:6]
         current_courses = NamedCourses(
             'Current courses',
-            [enrollment.course for enrollment in current_course_enrollments]
+            [enrollment.course for enrollment in current_course_enrollments
+             if enrollment.course.is_visible]
         )
 
         users_courses = NamedCourses('Users courses', (
-            Course.objects.filter(type='pbl', owner_type='usr', status='rdy')
+            Course.objects.filter(type='pbl', owner_type='usr', status='rdy', is_visible=True)
         ).union(
-            user.individual_courses.filter(owner_type='usr', status='rdy')
+            user.individual_courses.filter(owner_type='usr', status='rdy', is_visible=True)
         ).order_by('rating')[:6])
 
         starred_courses = NamedCourses(
             'Starred courses',
-            user.favorite_courses.order_by('rating')[:6]
+            user.favorite_courses.filter(is_visible=True).order_by('rating')[:6]
         )
 
         last_completed_course_enrollments = user.courseenrollment_set.filter(
-            finished_at__isnull=False
+            finished_at__isnull=False,
         ).order_by('course__rating')[:6]
         last_completed_courses = NamedCourses(
             'Last completed courses',
-            [enrollment.course for enrollment in last_completed_course_enrollments]
+            [enrollment.course for enrollment in last_completed_course_enrollments
+             if enrollment.course.is_visible]
         )
 
         recommended_courses = NamedCourses('Recomended', (
-            Course.objects.filter(type='pbl', status='rdy')
+            Course.objects.filter(type='pbl', status='rdy', is_visible=True)
             ).union(
-            user.individual_courses.filter(status='rdy')
+            user.individual_courses.filter(status='rdy', is_visible=True)
         ).order_by('rating')[:6])
 
         context['courses_set'] = [
@@ -80,11 +82,12 @@ def current_courses_view(request):
             finished_at__isnull=True
         ).order_by('-course__rating')
 
-        current_courses = [course_enrollment.course for course_enrollment in current_course_enrollments]
+        current_courses = [course_enrollment.course for course_enrollment in current_course_enrollments
+                           if course_enrollment.course.is_visible]
 
         context["courses"] = current_courses
         context["courses_type"] = "current"
-    return render(request, "main/category_courses.html", context)
+        return render(request, "main/category_courses.html", context)
 
 
 @login_required
@@ -97,16 +100,18 @@ def users_courses_view(request):
         users_courses = (Course.objects.filter(
             type='pbl',
             owner_type='usr',
-            status='rdy')
+            status='rdy',
+            is_visible=True)
             ).union(
             user.individual_courses.filter(
                 owner_type='usr',
-                status='rdy'
+                status='rdy',
+                is_visible=True,
             )).order_by('rating')
 
         context["courses"] = users_courses
         context["courses_type"] = "users"
-    return render(request, "main/category_courses.html", context)
+        return render(request, "main/category_courses.html", context)
 
 
 @login_required
@@ -115,11 +120,11 @@ def starred_courses_view(request):
         context = {}
 
         user = request.user
-        starred_courses = user.favorite_courses.order_by('rating')
+        starred_courses = user.favorite_courses.filter(is_visible=True).order_by('rating')
 
         context["courses"] = starred_courses
         context["courses_type"] = "starred"
-    return render(request, "main/category_courses.html", context)
+        return render(request, "main/category_courses.html", context)
 
 
 @login_required
@@ -133,13 +138,15 @@ def completed_courses_view(request):
             finished_at__isnull=False
         ).order_by('course__rating')
 
-        completed_courses = [enrollment.course for enrollment in completed_course_enrollments]
-        is_passed = [enrollment.is_pass for enrollment in completed_course_enrollments]
+        completed_courses = [enrollment.course for enrollment in completed_course_enrollments
+                             if enrollment.course.is_visible]
+        is_passed = [enrollment.is_pass for enrollment in completed_course_enrollments
+                     if enrollment.course.is_visible]
 
         context["courses"] = completed_courses
         context["is_passed"] = is_passed
         context["courses_type"] = "completed"
-    return render(request, "main/category_courses.html", context)
+        return render(request, "main/category_courses.html", context)
 
 
 @login_required
@@ -149,9 +156,9 @@ def recommended_courses_view(request):
 
         user = request.user
 
-        recommended_courses = (Course.objects.filter(type='pbl', status='rdy')
+        recommended_courses = (Course.objects.filter(type='pbl', status='rdy', is_visible=True)
             ).union(
-            user.individual_courses.filter(status='rdy')
+            user.individual_courses.filter(status='rdy', is_visible=True)
         ).order_by('rating')
 
         context["courses"] = recommended_courses

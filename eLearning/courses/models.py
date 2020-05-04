@@ -11,6 +11,7 @@ from accounts.models import Account
 
 logger = logging.getLogger('eLearning')
 
+
 def validate_image_size(img):
         img_size = img.file.size
         print(img_size)
@@ -50,17 +51,18 @@ class Course(models.Model):
     DEFAULT_COURSE_COVER = 'courses/default.png'
     TOTAL_GRADE = 10
 
+    name = models.CharField(max_length=255)
+    is_visible = models.BooleanField(default=False)
+    status = models.CharField(
+        max_length=3, choices=COURSE_STATUS_CHOICES, default='drf',
+    )
+    type = models.CharField(max_length=3, choices=COURSE_TYPE_CHOICES, default='pbl')
     owner_type = models.CharField(max_length=3, choices=COURSE_OWNER_TYPE_CHOICES,)
     owner_user = models.ForeignKey(
         Account, null=True, on_delete=models.CASCADE, related_name='managed_courses'
     )
     min_pass_grade = models.FloatField(verbose_name='minimum pass grade')
-    status = models.CharField(
-        max_length=3, choices=COURSE_STATUS_CHOICES, default='drf',
-    )
-    type = models.CharField(max_length=3, choices=COURSE_TYPE_CHOICES, default='pbl')
     content = models.TextField()
-    name = models.CharField(max_length=255)
     rating = models.FloatField(null=True)
     students = models.ManyToManyField(Account, related_name='individual_courses')
     cover = models.ImageField(upload_to=course_cover_path, default=DEFAULT_COURSE_COVER,
