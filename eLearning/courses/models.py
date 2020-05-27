@@ -69,11 +69,6 @@ class Course(models.Model):
                               validators=[validate_image_size])
 
 
-class CertificateTemplate(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    content = models.TextField()
-
-
 class Page(models.Model):
     number = models.IntegerField()
     content = models.TextField()
@@ -96,15 +91,9 @@ class Variant(models.Model):
     is_correct = models.BooleanField()
 
 
-class Certificate(models.Model):
-    template = models.ForeignKey(CertificateTemplate, on_delete=models.CASCADE)
-    content = models.TextField()
-
-
 class CourseEnrollment(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    certificate = models.ForeignKey(Certificate, on_delete=models.CASCADE, null=True)
     current_page = models.ForeignKey(Page, on_delete=models.CASCADE, null=True)
     started_at = models.DateField(auto_now_add=True)
     finished_at = models.DateField(null=True)
