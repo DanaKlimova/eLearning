@@ -17,12 +17,10 @@ class AccountAdmin(UserAdmin):
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "employees",
         "is_visible",
     )
     readonly_fields = (
         "name",
-        "employees",
     )
     ordering = ("is_visible",)
 
