@@ -4,6 +4,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic.edit import FormView
+from django.views.generic import ListView
 from django.http import HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -14,7 +15,7 @@ from accounts.forms import (
     RegistrationForm,
     AccountUpdateForm,
 )
-from accounts.models import Account
+from accounts.models import Account, Organization
 
 
 logger = logging.getLogger('eLearning')
@@ -115,3 +116,13 @@ class LogoutUser(LogoutView):
         if next_page:
             return HttpResponseRedirect(next_page)
         return super().dispatch(request, *args, **kwargs)
+
+
+@method_decorator(login_required, name='dispatch')
+class OrganizationListView(ListView):
+    model = Organization
+    context_object_name = 'organization_list'
+
+    def get_queryset(self):
+        queryset = Organization.objects.filter(manager=self.request.user)
+        return queryset
