@@ -10,6 +10,7 @@ class CourseAdmin(admin.ModelAdmin):
         "type",
         "owner_type",
         "owner_user",
+        "owner_organization",
         "min_pass_grade",
         "rating",
     )
@@ -19,6 +20,7 @@ class CourseAdmin(admin.ModelAdmin):
         "type",
         "owner_type",
         "owner_user",
+        "owner_organization",
         "min_pass_grade",
         "content",
         "students",
