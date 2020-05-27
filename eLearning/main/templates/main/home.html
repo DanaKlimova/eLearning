@@ -89,6 +89,8 @@ Home
                 <a class="courses-name" href="{% url 'completed_courses' %}">
             {% elif "recomended" in courses.name|lower %}
                 <a class="courses-name" href="{% url 'recomended_courses' %}">
+            {% elif "organization" in courses.name|lower %}
+                <a class="courses-name" href="{% url 'organization_courses' %}">
             {% endif %}
                     {{ courses.name }}
                 </a>
@@ -115,6 +117,8 @@ Home
                     You haven't completed any course.
                     {% elif "recommended" in courses.name|lower %}
                     There are no reated courses.
+                    {% elif "organization" in courses.name|lower %}
+                    You haven't got any organization course.
                     {% endif %}
                 </div>
             {% endfor %}

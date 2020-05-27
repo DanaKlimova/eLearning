@@ -1,0 +1,60 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Organization list
+{% endblock %}
+
+{% block styles %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'courses/datatables/heavy/datatables.min.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/course_list.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="container background">s
+  <div class="table-wrapper">
+    <table id="organizationTableId" class="cell-border stripe hover table">
+      <thead>
+        <tr>
+          <th scope="col">№</th>
+          <th scope="col">Organization</th>
+          <th scope="col">Approved</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for organization in organization_list %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ organization.name }}</td>
+            <td>{{ organization.is_visible }}</td>
+            </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block js_scripts %}
+<script src="https://kit.fontawesome.com/e278b3cacc.js" crossorigin="anonymous"></script>
+<script type="text/javascript"
+        src="{% static 'courses/datatables/heavy/datatables.min.js' %}">
+</script>
+
+<script>
+$(document).ready(function(){
+  $("#organizationTableId").DataTable();
+  addClassByName('organizationTableId_length', ' table-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button');
+
+  function addClassByName(name, class_) {
+        var elements = document.getElementsByName(name);
+        elements.forEach(function (item, index) {
+            item.className += class_;
+        });
+    }
+});
+</script>
+{% endblock %}
+

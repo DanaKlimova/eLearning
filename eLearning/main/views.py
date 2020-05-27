@@ -3,9 +3,11 @@ import logging
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.utils import flatten
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 
+from accounts.models import Account
 from courses.models import Course, CourseEnrollment
 from main.utils import render_to_pdf
 
@@ -34,8 +36,6 @@ def home(request):
 
         users_courses = NamedCourses('Users courses', (
             Course.objects.filter(type='pbl', owner_type='usr', status='rdy', is_visible=True)
-        ).union(
-            user.individual_courses.filter(owner_type='usr', status='rdy', is_visible=True)
         ).order_by('rating')[:6])
 
         starred_courses = NamedCourses(
@@ -52,11 +52,19 @@ def home(request):
              if enrollment.course.is_visible]
         )
 
-        recommended_courses = NamedCourses('Recomended', (
+        recommended_courses = NamedCourses('Recommended', (
             Course.objects.filter(type='pbl', status='rdy', is_visible=True)
-            ).union(
-            user.individual_courses.filter(status='rdy', is_visible=True)
-        ).order_by('rating')[:6])
+            ).order_by('rating')[:6])
+
+        organizations = user.organizations.all()
+        courses = []
+        for org in organizations:
+            courses.append(list(org.course_set.filter(status='rdy', is_visible=True)))
+
+        courses = flatten(courses)
+        # TODO: sort by rating
+        organization_courses = NamedCourses('Organization', courses[:6])
+        print(organization_courses)
 
         context['courses_set'] = [
             current_courses,
@@ -64,6 +72,7 @@ def home(request):
             starred_courses,
             last_completed_courses,
             recommended_courses,
+            organization_courses,
         ]
         context['columns'] = 3
     else:
@@ -163,6 +172,25 @@ def recommended_courses_view(request):
 
         context["courses"] = recommended_courses
         context["courses_type"] = "recomended"
+    return render(request, "main/category_courses.html", context)
+
+
+@login_required
+def organization_courses_view(request):
+    if request.method == "GET":
+        context = {}
+
+        user = request.user
+
+        organizations = user.organizations.all()
+        courses = []
+        for org in organizations:
+            courses.append(list(org.course_set.filter(status='rdy', is_visible=True)))
+
+        courses = flatten(courses)
+
+        context["courses"] = courses
+        context["courses_type"] = "organization"
     return render(request, "main/category_courses.html", context)
 
 

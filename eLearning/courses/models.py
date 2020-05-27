@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 
-from accounts.models import Account
+from accounts.models import Account, Organization
 
 logger = logging.getLogger('eLearning')
 
@@ -32,19 +32,17 @@ class Course(models.Model):
     COURSE_TYPE_CHOICES = [
         ('pbl', 'public'),
         ('prv', 'private'),
-        ('ind', 'individual'),
     ]
     COURSE_USER_TYPE_CHOICES = [
         ('pbl', 'public'),
-        ('ind', 'individual'),
     ]
     COURSE_ORG_TYPE_CHOICES = [
         ('pbl', 'public'),
         ('prv', 'private'),
-        ('ind', 'individual'),
     ]
     COURSE_OWNER_TYPE_CHOICES = [
         ('usr', 'user'),
+        ('org', 'org'),
     ]
     MB = 2 ** 20
     MAX_IMAGE_SIZE = 5 * MB
@@ -61,17 +59,13 @@ class Course(models.Model):
     owner_user = models.ForeignKey(
         Account, null=True, on_delete=models.CASCADE, related_name='managed_courses'
     )
+    owner_organization = models.ForeignKey(Organization, null=True, on_delete=models.CASCADE)
     min_pass_grade = models.FloatField(verbose_name='minimum pass grade')
     content = models.TextField()
     rating = models.FloatField(null=True)
     students = models.ManyToManyField(Account, related_name='individual_courses')
     cover = models.ImageField(upload_to=course_cover_path, default=DEFAULT_COURSE_COVER,
                               validators=[validate_image_size])
-
-
-class CertificateTemplate(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    content = models.TextField()
 
 
 class Page(models.Model):
@@ -96,15 +90,9 @@ class Variant(models.Model):
     is_correct = models.BooleanField()
 
 
-class Certificate(models.Model):
-    template = models.ForeignKey(CertificateTemplate, on_delete=models.CASCADE)
-    content = models.TextField()
-
-
 class CourseEnrollment(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    certificate = models.ForeignKey(Certificate, on_delete=models.CASCADE, null=True)
     current_page = models.ForeignKey(Page, on_delete=models.CASCADE, null=True)
     started_at = models.DateField(auto_now_add=True)
     finished_at = models.DateField(null=True)

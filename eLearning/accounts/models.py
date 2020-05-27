@@ -64,6 +64,8 @@ class Account(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    organization = models.ForeignKey("Organization", null=True, on_delete=models.DO_NOTHING, related_name='account_sign_as')
+    is_organization = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
@@ -78,3 +80,10 @@ class Account(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+
+
+class Organization(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    manager = models.OneToOneField(Account, on_delete=models.CASCADE, related_name='manager')
+    employees = models.ManyToManyField(Account, related_name='organizations')
+    is_visible = models.BooleanField(default=False)

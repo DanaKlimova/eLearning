@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from accounts.models import Account
+from accounts.models import Account, Organization
 
 
 class AccountAdmin(UserAdmin):
@@ -14,4 +14,13 @@ class AccountAdmin(UserAdmin):
     fieldsets = ()
 
 
+class OrganizationAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "is_visible",
+    )
+    ordering = ("is_visible",)
+
+
 admin.site.register(Account, AccountAdmin)
+admin.site.register(Organization, OrganizationAdmin)
