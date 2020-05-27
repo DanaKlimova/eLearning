@@ -14,6 +14,7 @@ from accounts.forms import (
     AccountAuthenticationForm,
     RegistrationForm,
     AccountUpdateForm,
+    OrganizationForm,
 )
 from accounts.models import Account, Organization
 
@@ -126,3 +127,163 @@ class OrganizationListView(ListView):
     def get_queryset(self):
         queryset = Organization.objects.filter(manager=self.request.user)
         return queryset
+
+
+@method_decorator(login_required, name='dispatch')
+class CreateOrganizationView(FormView):
+    template_name = "accounts/organization_edit.html"
+    form_class = OrganizationForm
+    model = Organization
+    organization_pk = None
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs['view'] = 'create'
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.manager = self.request.user
+        organization = form.save()
+        success_url = reverse('organization_edit', kwargs={'organization_pk': organization.pk})
+        return HttpResponseRedirect(success_url)
+
+    def form_invalid(self, form):
+        form.initial = {
+            "name": self.request.POST.get("name"),
+        }
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+# TODO: transfer js code in static file
+@method_decorator(login_required, name='dispatch')
+class EditOrganizationView(FormView):
+    template_name = "accounts/organization_edit.html"
+    form_class = OrganizationForm
+    model = Organization
+    extra_context = {"success_message": ""}
+    organization = None
+    organization_pk = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.organization_pk = kwargs['organization_pk']
+        try:
+            self.organization = Organization.objects.get(pk=self.organization_pk)
+        except Organization.DoesNotExist:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if self.organization.manager != request.user:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
+        else:
+            handler = self.http_method_not_allowed
+        return handler(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'instance': self.organization})
+        return kwargs
+
+    def get_initial(self):
+        self.initial = {
+            "name": self.organization.name,
+        }
+        return self.initial.copy()
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            self.extra_context["success_message"] = "Organization updated"
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get(self, request, *args, **kwargs):
+        self.extra_context["success_message"] = ""
+        return self.render_to_response(self.get_context_data())
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs['organization_pk'] = self.organization_pk
+        kwargs['view'] = 'edit'
+        kwargs["employees"] = self.organization.employees.all()
+        return kwargs
+
+    def form_valid(self, form):
+        form.initial = {
+            "name": self.request.POST.get("name")
+        }
+        form.save()
+        return render(self.request, self.template_name, self.get_context_data())
+
+
+def add_employee(request, organization_pk):
+    if request.method == "POST":
+        try:
+            organization = Organization.objects.get(pk=organization_pk)
+        except Organization.DoesNotExist:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if organization.manager != request.user:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+
+        employee_email = request.POST.get('email')
+        try:
+            employee = Account.objects.get(email=employee_email)
+        except Account.DoesNotExist:
+            redirect_url = reverse('organization_edit', kwargs={"organization_pk": organization_pk})
+            return HttpResponseRedirect(redirect_url)
+
+        organization.employees.add(employee)
+
+        redirect_url = reverse('organization_edit', kwargs={"organization_pk": organization_pk})
+        return HttpResponseRedirect(redirect_url)
+
+
+@login_required
+def sign_as(request, organization_pk):
+    if request.method == "POST":
+        try:
+            organization = Organization.objects.get(pk=organization_pk)
+        except Organization.DoesNotExist:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if organization.manager != request.user:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+
+        request.user.organization = organization
+        request.user.is_organization = True
+        request.user.save()
+
+        redirect_url = reverse('organization_list', kwargs={})
+        return HttpResponseRedirect(redirect_url)
+
+
+@login_required
+def unsign_as(request, organization_pk):
+    if request.method == "POST":
+        try:
+            organization = Organization.objects.get(pk=organization_pk)
+        except Organization.DoesNotExist:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+        if organization.manager != request.user:
+            redirect_url = reverse('home', kwargs={})
+            return HttpResponseRedirect(redirect_url)
+
+        request.user.organization = None
+        request.user.is_organization = False
+        request.user.save()
+
+        redirect_url = reverse('organization_list', kwargs={})
+        return HttpResponseRedirect(redirect_url)

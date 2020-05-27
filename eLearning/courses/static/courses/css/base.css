@@ -134,3 +134,12 @@ td {
     width: 100%;
     height: auto;
 }
+
+.link-button {
+     background: none;
+     border: none;
+     color: rgb(255,64,129);
+     text-decoration: none;
+     cursor: pointer;
+     font-size: calc(14px + .5vw);
+}

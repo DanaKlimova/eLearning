@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
 
-from accounts.models import Account
+from accounts.models import Account, Organization
 
 
 class AccountAuthenticationForm(forms.ModelForm):
@@ -50,3 +50,11 @@ class AccountUpdateForm(forms.ModelForm):
             except Account.DoesNotExist:
                 return email
             raise forms.ValidationError(f"Email {email} is already exist.")
+
+
+class OrganizationForm(forms.ModelForm):
+    class Meta:
+        model = Organization
+        fields = (
+            'name',
+        )

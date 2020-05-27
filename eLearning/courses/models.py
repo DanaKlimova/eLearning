@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 
-from accounts.models import Account
+from accounts.models import Account, Organization
 
 logger = logging.getLogger('eLearning')
 
@@ -32,19 +32,17 @@ class Course(models.Model):
     COURSE_TYPE_CHOICES = [
         ('pbl', 'public'),
         ('prv', 'private'),
-        ('ind', 'individual'),
     ]
     COURSE_USER_TYPE_CHOICES = [
         ('pbl', 'public'),
-        ('ind', 'individual'),
     ]
     COURSE_ORG_TYPE_CHOICES = [
         ('pbl', 'public'),
         ('prv', 'private'),
-        ('ind', 'individual'),
     ]
     COURSE_OWNER_TYPE_CHOICES = [
         ('usr', 'user'),
+        ('org', 'org'),
     ]
     MB = 2 ** 20
     MAX_IMAGE_SIZE = 5 * MB
@@ -61,6 +59,7 @@ class Course(models.Model):
     owner_user = models.ForeignKey(
         Account, null=True, on_delete=models.CASCADE, related_name='managed_courses'
     )
+    owner_organization = models.ForeignKey(Organization, null=True, on_delete=models.CASCADE)
     min_pass_grade = models.FloatField(verbose_name='minimum pass grade')
     content = models.TextField()
     rating = models.FloatField(null=True)
