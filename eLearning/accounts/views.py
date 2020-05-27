@@ -123,7 +123,7 @@ class LogoutUser(LogoutView):
 class ManageOrganizationListView(ListView):
     model = Organization
     context_object_name = 'organization_list'
-    template_name_suffix = "manage_list"
+    template_name_suffix = "_manage_list"
 
     def get_queryset(self):
         queryset = Organization.objects.filter(manager=self.request.user)
@@ -132,7 +132,7 @@ class ManageOrganizationListView(ListView):
 
 @method_decorator(login_required, name='dispatch')
 class OrganizationListView(ListView):
-    context_object_name = '_manage_list'
+    context_object_name = 'organization_list'
 
     def get_queryset(self):
         queryset = self.request.user.organizations.all()
