@@ -13,10 +13,10 @@ logger = logging.getLogger('eLearning')
 
 
 def validate_image_size(img):
-        img_size = img.file.size
-        print(img_size)
-        if img_size > Course.MAX_IMAGE_SIZE:
-            raise ValidationError(f"Max image size is {Course.MB} MB.")
+    img_size = img.file.size
+    print(img_size)
+    if img_size > Course.MAX_IMAGE_SIZE:
+        raise ValidationError(f"Max image size is {Course.MB} MB.")
 
 
 def course_cover_path(course, filename):
