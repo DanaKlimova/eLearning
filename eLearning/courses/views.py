@@ -141,7 +141,7 @@ class EditCourseView(FormView):
 
 
 @method_decorator(login_required, name='dispatch')
-class  CreateCourseView(FormView):
+class CreateCourseView(FormView):
     template_name = "courses/course_edit.html"
     form_class = CourseForm
     model = Course
@@ -189,7 +189,7 @@ class  CreateCourseView(FormView):
 
 
 @method_decorator(login_required, name='dispatch')
-class  CreatePageView(FormView):
+class CreatePageView(FormView):
     template_name = "courses/page_edit.html"
     form_class = PageForm
     model = Page
@@ -312,7 +312,7 @@ class EditPageView(FormView):
 
 
 @method_decorator(login_required, name='dispatch')
-class  CreateQuestionView(FormView):
+class CreateQuestionView(FormView):
     template_name = "courses/question_edit.html"
     form_class = QuestionForm
     model = Question
@@ -455,8 +455,9 @@ class EditQuestionView(FormView):
         form.save()
         return render(self.request, self.template_name, self.get_context_data())
 
+
 @method_decorator(login_required, name='dispatch')
-class  CreateVariantView(FormView):
+class CreateVariantView(FormView):
     template_name = "courses/variant_edit.html"
     form_class = VariantForm
     model = Variant
@@ -534,6 +535,7 @@ class  CreateVariantView(FormView):
         else:
             form.add_error(None, f'A variant with "{content}" content already exists.')
             return self.form_invalid(form)
+
 
 # TODO: transfer js code in static file
 # TODO: add question type check

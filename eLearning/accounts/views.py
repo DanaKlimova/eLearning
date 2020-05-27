@@ -1,10 +1,10 @@
 import logging
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, reverse
 from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic.edit import FormView
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
@@ -31,7 +31,7 @@ class LoginUser(LoginView):
         return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form):
-        logger.info("User entered invalid credentions. User didn't log in.")
+        logger.info("User entered invalid credentials. User didn't log in.")
         return self.render_to_response(self.get_context_data(form=form))
 
 
@@ -57,6 +57,7 @@ class RegistrationView(FormView):
             "last_name": self.request.POST.get("last_name"),
         }
         return self.render_to_response(self.get_context_data(form=form))
+
 
 @method_decorator(login_required, name='dispatch')
 class AccountView(FormView):
