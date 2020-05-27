@@ -27,9 +27,10 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['*']
-DEBUG_PROPAGATE_EXCEPTIONS = True
+# DEBUG_PROPAGATE_EXCEPTIONS = True
 
 
 # Application definition
@@ -180,7 +181,7 @@ LOGGING = {
     },
 }
 
-django_heroku.settings(locals())
+# django_heroku.settings(locals())
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -195,3 +196,5 @@ DATABASES = {
         'PORT': os.getenv("DB_PORT"),
     }
 }
+
+DEBUG = True

@@ -29,7 +29,7 @@ from courses.forms import (
     VariantForm,
 )
 
-from accounts.models import Account
+from accounts.models import Account, Organization
 
 START_PAGE_NUMBER = 1
 logger = logging.getLogger('eLearning')
@@ -49,7 +49,10 @@ class CourseListView(ListView):
         return handler(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = Course.objects.filter(owner_user=self.request.user)
+        if self.request.user.is_organization:
+            queryset = Course.objects.filter(owner_organization=self.request.user.organization)
+        else:
+            queryset = Course.objects.filter(owner_user=self.request.user)
         return queryset
 
 
@@ -70,7 +73,7 @@ class EditCourseView(FormView):
         except Course.DoesNotExist:
             redirect_url = reverse('home', kwargs={})
             return HttpResponseRedirect(redirect_url)
-        if self.course_instance.owner_user != request.user:
+        if self.course_instance.owner_user != request.user or self.course_instance.owner_organization:
             redirect_url = reverse('home', kwargs={})
             return HttpResponseRedirect(redirect_url)
         if request.method.lower() in self.http_method_names:
@@ -111,7 +114,10 @@ class EditCourseView(FormView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs['course_pk'] = self.course_pk
-        kwargs['course_types'] = self.model.COURSE_USER_TYPE_CHOICES
+        if self.course_instance.owner_organization:
+            kwargs['course_types'] = self.model.COURSE_ORG_TYPE_CHOICES
+        else:
+            kwargs['course_types'] = self.model.COURSE_USER_TYPE_CHOICES
         kwargs['course_statuses'] = self.model.COURSE_STATUS_CHOICES
         kwargs['type'] = self.course_instance.type
         kwargs['status'] = self.course_instance.status
@@ -151,22 +157,30 @@ class CreateCourseView(FormView):
         form = self.get_form()
         if form.is_valid():
             logger.info(f'{request.user} created course - {self.course_pk}.')
-            return self.form_valid(form)
+            return self.form_valid(form, request.user)
         else:
             logger.info(f"{request.user} didn't created course - {self.course_pk}.")
             return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs['course_types'] = self.model.COURSE_USER_TYPE_CHOICES
+        if self.request.user.is_organization:
+            kwargs['course_types'] = self.model.COURSE_ORG_TYPE_CHOICES
+        else:
+            kwargs['course_types'] = self.model.COURSE_USER_TYPE_CHOICES
         kwargs['course_statuses'] = self.model.COURSE_STATUS_CHOICES
         # kwargs['action_url'] = 'course_create'
         kwargs['view'] = 'create'
         return kwargs
 
-    def form_valid(self, form):
-        form.instance.owner_type = 'usr'
+    def form_valid(self, form, user):
+        if user.is_organization:
+            form.instance.owner_type = 'org'
+        else:
+            form.instance.owner_type = 'usr'
+
         form.instance.owner_user = self.request.user
+        form.instance.owner_organization = self.request.user.organization
         course = form.save()
         Page.objects.create(
             course=course,

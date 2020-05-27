@@ -12,7 +12,10 @@ Organization list
 {% endblock %}
 
 {% block content %}
-<div class="container background">s
+<div class="container background">
+  <a href="{% url 'organization_create' %}">
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect add-button button">add organization</button>
+  </a>
   <div class="table-wrapper">
     <table id="organizationTableId" class="cell-border stripe hover table">
       <thead>
@@ -20,6 +23,9 @@ Organization list
           <th scope="col">№</th>
           <th scope="col">Organization</th>
           <th scope="col">Approved</th>
+          <th scope="col">Edit</th>
+          <th scope="col">Sign in</th>
+          <th scope="col">Sign out</th>
         </tr>
       </thead>
       <tbody>
@@ -28,6 +34,22 @@ Organization list
             <td>{{ forloop.counter }}</td>
             <td>{{ organization.name }}</td>
             <td>{{ organization.is_visible }}</td>
+            <td>
+              <a href="{% url 'organization_edit' organization_pk=organization.pk %}"><i class="far fa-edit" title="edit"></i></a>
+            </td>
+            <td>
+                <form id="sign_as_form" method="post" enctype="multipart/form-data"
+                    action="{% url 'organization_sign_as' organization_pk=organization.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="link-button"><i class="fas fa-sign-in-alt" title="sign in"></i></button>
+                </form>
+            </td>
+            <td>
+                <form id="unsign_as_form" method="post" enctype="multipart/form-data"
+                    action="{% url 'organization_unsign_as' organization_pk=organization.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="link-button"><i class="fas fa-sign-out-alt" title="sign out"></i></button>
+                </form>
             </td>
         </tr>
         {% endfor %}

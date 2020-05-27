@@ -1,0 +1,116 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Organization detail
+{% endblock %}
+
+{% block styles %}
+{% load static %}
+<link rel="stylesheet" type="text/css"
+    href="{% static 'courses/datatables/light/datatables.min.css' %}"/>
+<link rel="stylesheet" href="{% static 'courses/css/base.css' %}" />
+<link rel="stylesheet" href="{% static 'courses/css/course_edit.css' %}" />
+{% endblock %}
+
+{% block content %}
+{% if 'edit' in view|lower %}
+<div class="course-grid">
+    <div class="form-col background">
+    {% endif %}
+        {% if 'edit' in view|lower %}
+        <form id="organization_form" method="post" enctype="multipart/form-data"
+            action="{% url 'organization_edit' organization_pk=organization_pk %}">
+        {% else %}
+        <form id="organization_form" method="post" enctype="multipart/form-data"
+            action="{% url 'organization_create' %}">
+        {% endif %}
+            {% csrf_token %}
+
+            {% if 'edit' not in view|lower %}
+            <div class="container background">
+            {% endif %}
+                <div class="course-form-grid">
+
+                    <div class="form-input-item">
+                        <label>Organization name</label>
+                        <input type="text" name="name" id="inputName" class="glowing-border text-input" required
+                            value="{{form.initial.name}}">
+                    </div>
+
+                    {% if form.name.errors %}
+                    <div class="form-input-item">
+                        <label class="error-label">
+                            {% for error in form.name.errors%}
+                            {{ error|default:"" }}
+                            {% endfor %}
+                        </label>
+                    </div>
+                    {% endif %}
+
+                {% if form.non_field_errors %}
+                <label class="error-label">{{ form.non_field_errors|default:"" }}</label>
+                {% endif %}
+
+                {% if success_message %}
+                <label class="success-label">{{success_message}}</label>
+                {% endif %}
+
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect submit-button button" type="submit">Save changes</button>
+            {% if 'edit' not in view|lower %}
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+    {% if 'edit' in view|lower %}
+    <div class="page-col background">
+        <form id="add_employee_form" method="post" enctype="multipart/form-data"
+            action="{% url 'add_employee' organization_pk=organization_pk %}">
+            {% csrf_token %}
+                <div class="form-input-item">
+                    <label>Email</label>
+                    <input type="text" name="email" id="inputEmail" class="glowing-border text-input" required>
+                </div>
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect add-button button" type="submit">Add employee</button>
+        </form>
+        <div class="table-wrapper">
+            <table id="employeesTableId" class="cell-border stripe hover table">
+                <thead>
+                    <tr>
+                        <th scope="col">Number</th>
+                        <th scope="col">Employee</th>
+                        <th scope="col">Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ employee.email }}</td>
+                        <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block js_scripts %}
+<script src="https://kit.fontawesome.com/e278b3cacc.js" crossorigin="anonymous"></script>
+<script type="text/javascript"
+    src="{% static 'courses/datatables/light/datatables.min.js' %}">
+</script>
+<script type="text/javascript" src="{% static 'courses/tinymce/js/tinymce/tinymce.min.js' %}">
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#employeesTableId").DataTable( {
+        searching: false,
+        ordering: false
+    });
+});
+</script>
+{% endblock %}

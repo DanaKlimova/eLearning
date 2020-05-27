@@ -120,12 +120,22 @@ class LogoutUser(LogoutView):
 
 
 @method_decorator(login_required, name='dispatch')
-class OrganizationListView(ListView):
+class ManageOrganizationListView(ListView):
     model = Organization
     context_object_name = 'organization_list'
+    template_name_suffix = "manage_list"
 
     def get_queryset(self):
         queryset = Organization.objects.filter(manager=self.request.user)
+        return queryset
+
+
+@method_decorator(login_required, name='dispatch')
+class OrganizationListView(ListView):
+    context_object_name = 'organization_list'
+
+    def get_queryset(self):
+        queryset = self.request.user.organizations.all()
         return queryset
 
 
