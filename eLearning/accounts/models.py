@@ -83,7 +83,6 @@ class Account(AbstractBaseUser):
 
 class Organization(models.Model):
     name = models.CharField(max_length=255)
-    employees = models.ForeignKey(
-        Account, null=True, on_delete=models.CASCADE, related_name='organization'
-    )
+    manager = models.OneToOneField(Account, on_delete=models.CASCADE)
+    employees = models.ManyToManyField(Account, related_name='organizations')
     is_visible = models.BooleanField(default=False)
