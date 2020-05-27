@@ -19,9 +19,6 @@ class OrganizationAdmin(admin.ModelAdmin):
         "name",
         "is_visible",
     )
-    readonly_fields = (
-        "name",
-    )
     ordering = ("is_visible",)
 
 
