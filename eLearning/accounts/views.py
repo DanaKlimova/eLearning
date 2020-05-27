@@ -132,7 +132,7 @@ class ManageOrganizationListView(ListView):
 
 @method_decorator(login_required, name='dispatch')
 class OrganizationListView(ListView):
-    context_object_name = 'manage_list'
+    context_object_name = '_manage_list'
 
     def get_queryset(self):
         queryset = self.request.user.organizations.all()
