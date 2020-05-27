@@ -1,7 +1,7 @@
 from django.test import TestCase
-from django.urls import reverse
 
-from accounts.models import AccountManager, Account
+from accounts.models import Account
+
 
 # TODO: add messages to asserts
 class TestModels(TestCase):
